@@ -44,6 +44,16 @@ echo "==> Configuring static BusyBox"
 
 make -C "$WORK/busybox" defconfig
 
+echo "==> Disabling incompatible BusyBox tc applet"
+
+sed -i 's/^CONFIG_TC=y/# CONFIG_TC is not set/' \
+    "$WORK/busybox/.config"
+
+if grep -q '^CONFIG_TC=y' "$WORK/busybox/.config"; then
+    echo "ERROR: CONFIG_TC is still enabled"
+    exit 1
+fi
+
 sed -i 's/^# CONFIG_STATIC is not set/CONFIG_STATIC=y/' \
     "$WORK/busybox/.config"
 

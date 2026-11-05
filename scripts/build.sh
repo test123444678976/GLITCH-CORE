@@ -54,7 +54,21 @@ grep -q '^CONFIG_STATIC=y' "$WORK/busybox/.config" || {
 
 echo "==> Building BusyBox"
 
-make -C "$WORK/busybox" -j"$(nproc)"
+echo "==> Building BusyBox (diagnostic mode)"
+
+if make -C "$WORK/busybox" -j1 V=1 2>&1 | tee "$WORK/busybox-build.log"; then
+    echo "==> BusyBox compilation successful"
+else
+    STATUS=$?
+
+    echo "ERROR: BusyBox compilation failed!"
+    echo "==> Relevant errors:"
+
+    grep -n -E 'error:|Error [0-9]|undefined reference|fatal error' \
+        "$WORK/busybox-build.log" || true
+
+    exit "$STATUS"
+fi
 
 echo "==> Installing BusyBox"
 

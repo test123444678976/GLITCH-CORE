@@ -20,7 +20,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential bc bison flex libelf-dev libssl-dev \
-            libncurses-dev cpio xz-utils wget ca-certificates xorriso grub-pc-bin grub-common
+            libncurses-dev cpio xz-utils wget ca-certificates xorriso mtools grub-pc-bin grub-common
 
       - name: Build bootable prototype
         run: |

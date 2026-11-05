@@ -24,9 +24,25 @@ mv "$WORK/linux-${KERNEL_VERSION}" "$WORK/linux"
 
 echo "==> Configuring Linux kernel"
 
+echo "==> Configuring Linux kernel"
+
 make -C "$WORK/linux" defconfig
 
+"$WORK/linux/scripts/kconfig/merge_config.sh" \
+    -m \
+    -O "$WORK/linux" \
+    "$WORK/linux/.config" \
+    "$ROOT/config/kernel.config"
+
 make -C "$WORK/linux" olddefconfig
+
+echo "==> Checking graphics configuration"
+
+grep -q '^CONFIG_DRM=y' "$WORK/linux/.config"
+grep -q '^CONFIG_DRM_VIRTIO_GPU=y' "$WORK/linux/.config"
+grep -q '^CONFIG_VIRTIO_PCI=y' "$WORK/linux/.config"
+
+echo "==> Graphics configuration OK"
 
 echo "==> Building Linux kernel"
 

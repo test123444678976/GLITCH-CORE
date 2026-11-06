@@ -32,6 +32,7 @@ jobs:
             autoconf automake libtool \
             gperf autopoint \
             docbook-xsl xsltproc \
+            grub-efi-amd64-bin \
             file patch unzip
 
       - name: Build GLITCH//CORE

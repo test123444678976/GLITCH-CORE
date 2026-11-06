@@ -12,7 +12,7 @@ a bootable GRUB ISO.
 The first milestone is to boot into a BusyBox shell in QEMU. Later milestones
 can replace this bootstrap root filesystem with a full LFS-built userspace.
 
-## Build without Linux on your school PC
+## Build without Linux on your public PC
 
 You only need a browser and permission to use GitHub:
 
@@ -42,7 +42,6 @@ qemu-system-x86_64.exe -m 1024 -cdrom GLITCH-CORE.iso -boot d
 ```
 
 If the QEMU executable is not on PATH, use its full installation path.
-Do not install software on a managed school computer without permission.
 
 ## Project layout
 

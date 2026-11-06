@@ -48,3 +48,38 @@ jobs:
           path: dist/GLITCH-CORE.iso
           if-no-files-found: error
           retention-days: 7
+                
+  prepare-lfs-sources:
+    name: Prepare GLITCH//CORE LFS 13.1
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install LFS host dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            bison gawk perl python3 \
+            patch diffutils findutils \
+            file xz-utils wget ca-certificates
+
+      - name: Download and verify LFS sources
+        run: |
+          chmod +x scripts/build-lfs.sh
+          ./scripts/build-lfs.sh
+
+      - name: Upload LFS sources
+        uses: actions/upload-artifact@v4
+        with:
+          name: glitch-core-lfs-13.1-sources
+          path: |
+            work-lfs/lfs/sources/
+            work-lfs/LFS-VERSION
+          if-no-files-found: error
+          retention-days: 7
+

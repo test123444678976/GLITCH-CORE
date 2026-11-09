@@ -103,13 +103,18 @@ build_gcc() {
     extract_once "$(archive "gcc-$GCC_VERSION.tar.*")" "$src"
 
     # GCC's build system detects these in-tree dependency directories.
-    extract_once "$(archive "mpfr-$MPFR_VERSION.tar.*")" "$src/mpfr-$MPFR_VERSION"
-    extract_once "$(archive "gmp-$GMP_VERSION.tar.*")" "$src/gmp-$GMP_VERSION"
-    extract_once "$(archive "mpc-$MPC_VERSION.tar.*")" "$src/mpc-$MPC_VERSION"
-
-    [[ ! -e "$src/mpfr" ]] && mv "$src/mpfr-$MPFR_VERSION" "$src/mpfr"
-    [[ ! -e "$src/gmp"  ]] && mv "$src/gmp-$GMP_VERSION" "$src/gmp"
-    [[ ! -e "$src/mpc"  ]] && mv "$src/mpc-$MPC_VERSION" "$src/mpc"
+    if [[ ! -d "$src/mpfr" ]]; then
+        extract_once "$(archive "mpfr-$MPFR_VERSION.tar.*")" "$SOURCES/mpfr-$MPFR_VERSION"
+        mv "$SOURCES/mpfr-$MPFR_VERSION" "$src/mpfr"
+    fi
+    if [[ ! -d "$src/gmp" ]]; then
+        extract_once "$(archive "gmp-$GMP_VERSION.tar.*")" "$SOURCES/gmp-$GMP_VERSION"
+        mv "$SOURCES/gmp-$GMP_VERSION" "$src/gmp"
+    fi
+    if [[ ! -d "$src/mpc" ]]; then
+        extract_once "$(archive "mpc-$MPC_VERSION.tar.*")" "$SOURCES/mpc-$MPC_VERSION"
+        mv "$SOURCES/mpc-$MPC_VERSION" "$src/mpc"
+    fi
 
     mkdir -p "$build"
     log "Configuring GCC $GCC_VERSION Pass 1 for $LFS_TGT"

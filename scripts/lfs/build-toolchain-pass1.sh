@@ -37,6 +37,10 @@ for cmd in tar xz make gcc g++ ld awk sed; do
     command -v "$cmd" >/dev/null 2>&1 || fail "Missing host command: $cmd"
 done
 
+# LFS requires the cross-tools to take precedence over host tools.
+export LFS LFS_TGT
+export PATH="$TOOLS/bin:$PATH"
+
 archive() {
     local pattern="$1"
     local found
@@ -115,6 +119,9 @@ build_gcc() {
         extract_once "$(archive "mpc-$MPC_VERSION.tar.*")" "$SOURCES/mpc-$MPC_VERSION"
         mv "$SOURCES/mpc-$MPC_VERSION" "$src/mpc"
     fi
+
+    # Match the x86_64 library directory convention required by LFS 13.1.
+    sed -e '/m64=/s/lib64/lib/' -i "$src/gcc/config/i386/t-linux64"
 
     mkdir -p "$build"
     log "Configuring GCC $GCC_VERSION Pass 1 for $LFS_TGT"

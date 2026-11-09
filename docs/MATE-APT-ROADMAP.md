@@ -1,43 +1,69 @@
-# GLITCH//CORE — Debian, APT and MATE integration
+# GLITCH//CORE — LFS, MATE and APT roadmap
 
-## Target
+## Project direction
 
-The desktop edition will use a Debian Trixie amd64 userspace. The existing
-GLITCH//CORE Linux kernel and GRUB boot flow remain project-controlled.
-APT and dpkg are first-class components of the installed system.
+GLITCH//CORE is an independent x86_64 Linux distribution built from Linux
+From Scratch (LFS), using the systemd edition as its starting point.
 
-## Desktop stack
+**Debian is not the base system.** The Debian-based prototype files have been
+removed from this branch. The existing BusyBox ISO remains a separate,
+minimal rescue/bootstrap prototype until the LFS system can boot reliably.
 
-- APT and dpkg — package management
-- systemd — init and service management
-- Xorg — display server
-- LightDM — graphical login manager
+## Target desktop
+
 - MATE — primary desktop environment
-- Caja — file manager
 - Marco — window manager
+- Caja — file manager
+- LightDM — graphical login manager
+- Xorg — initial display server
 - NetworkManager — network management
+- systemd — init and service management
 
-The package selection is maintained in `config/desktop-packages.txt`.
+The project's own branding, wallpaper and GLITCH//CORE color palette will
+be applied after the desktop boots reliably.
 
-## Build stages
+## Package management: APT is a goal, not yet implemented
 
-1. Keep the existing BusyBox prototype unchanged on `main`.
-2. Prepare a Debian Trixie amd64 root filesystem with debootstrap.
-3. Install and configure APT, systemd, Xorg, LightDM and MATE in that rootfs.
-4. Add a live-root boot design (compressed SquashFS plus a small initramfs).
-5. Integrate the live root into the GRUB ISO and test booting in QEMU.
-6. Apply the existing GLITCH//CORE logo, wallpaper and color palette.
-7. Add a persistent-install option only after the live desktop is stable.
+APT is still a requested project feature. It must not be represented as
+working until it has been built, integrated and tested on the LFS system.
 
-## Important implementation note
+APT normally works with dpkg, .deb packages, package indexes, dependency
+metadata, maintainer scripts and repository signing. Building APT and dpkg
+for an LFS base does not automatically make arbitrary Debian packages
+compatible: their dependencies, filesystem assumptions and maintainer
+scripts must also match GLITCH//CORE.
 
-`scripts/prepare-debian-rootfs.sh` prepares the Debian userspace. It does
-not yet replace `scripts/build.sh` or create a desktop ISO. The current
-BusyBox ISO remains the known-good prototype until the Debian live-root boot
-path has been implemented and tested.
+The intended investigation is to build and integrate dpkg and APT from
+source against the GLITCH//CORE userspace, then create a signed
+GLITCH//CORE package repository. Compatibility with selected Debian
+packages can be evaluated separately; it must never be promised globally.
 
-## Build host requirements
+## Build milestones
 
-The preparation script expects a Debian/Ubuntu build host with `debootstrap`
-installed and must be run as root (for example, with `sudo`). The GitHub
-Actions runner can install `debootstrap` in a later workflow step.
+1. Keep the current BusyBox ISO as the known-good bootstrap/rescue prototype.
+2. Complete the LFS 13.1 systemd build. The current
+   scripts/build-lfs.sh only downloads and verifies source archives; it does
+   not compile LFS yet.
+3. Boot the LFS-built base system in QEMU and verify kernel, init, storage,
+   networking and system services.
+4. Build and integrate the MATE desktop stack and graphical login.
+5. Investigate and build dpkg and APT natively for the LFS userspace.
+6. Create GLITCH//CORE package metadata, repository signing and package
+   build rules; test install, upgrade and removal operations.
+7. Integrate the LFS root filesystem and desktop into a bootable ISO.
+8. Apply GLITCH//CORE branding and test the ISO in QEMU before considering
+   installation to physical hardware.
+
+## Current implementation status
+
+- Kernel + static BusyBox bootable prototype: present in scripts/build.sh.
+- LFS 13.1 source download and MD5 verification: present in
+  scripts/build-lfs.sh.
+- Full LFS compilation: not implemented yet.
+- MATE desktop: not implemented yet.
+- APT/dpkg integration: not implemented yet.
+- LFS desktop ISO: not implemented yet.
+
+Do not describe source preparation as a completed LFS build, and do not
+describe APT or MATE as available until the corresponding milestones pass
+tests.

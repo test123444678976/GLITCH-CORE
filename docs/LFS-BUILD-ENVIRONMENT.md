@@ -45,12 +45,21 @@ described in the official LFS book. The `tools` directory must be writable
 by the unprivileged build account. Do not use the host's root filesystem as
 the target, and do not run the compiler script as root.
 
-With the LFS build account and its clean LFS environment active:
+With the LFS build account and its clean LFS environment active, set the target and put the cross-tools first in `PATH`:
 
 ```bash
-LFS=/absolute/path/to/work-lfs/lfs JOBS=4 bash scripts/lfs/build-toolchain-pass1.sh binutils
-LFS=/absolute/path/to/work-lfs/lfs JOBS=4 bash scripts/lfs/build-toolchain-pass1.sh gcc
+export LFS=/absolute/path/to/work-lfs/lfs
+export LFS_TGT=x86_64-lfs-linux-gnu
+export PATH="$LFS/tools/bin:$PATH"
+export JOBS=4
+
+bash scripts/lfs/build-toolchain-pass1.sh binutils
+bash scripts/lfs/build-toolchain-pass1.sh gcc
 ```
+
+The GCC Pass 1 step also applies the x86_64 library-directory adjustment
+required by the LFS 13.1 instructions. The script does not install host
+packages or modify the host system.
 
 Or run both stages in order:
 

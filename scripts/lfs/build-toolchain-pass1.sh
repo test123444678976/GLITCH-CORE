@@ -138,7 +138,6 @@ build_gcc() {
         --enable-default-pie \
         --enable-default-ssp \
         --disable-fixincludes \
-        --enable-initfini-array \
         --disable-nls \
         --disable-shared \
         --disable-multilib \

@@ -1,0 +1,48 @@
+# GLITCH//CORE MATE desktop stack
+# Target: LFS 13.1-systemd, x86_64
+# This is an integration target list, NOT an installed package list.
+# Build only after the complete LFS base and its development toolchain exist.
+
+[display-server]
+xorg-server
+xorg-xinit
+xorg-xauth
+mesa
+
+[desktop-core]
+mate-common
+mate-desktop
+mate-menus
+mate-settings-daemon
+mate-session-manager
+mate-panel
+mate-control-center
+mate-notification-daemon
+mate-polkit
+
+[window-manager]
+marco
+
+[file-manager]
+caja
+caja-extensions
+
+[login-manager]
+lightdm
+lightdm-gtk-greeter
+
+[desktop-utilities]
+mate-terminal
+mate-system-monitor
+mate-screenshot
+mate-utils
+mate-calc
+atril
+engrampa
+eom
+pluma
+
+[system-integration]
+dbus
+polkit
+networkmanager

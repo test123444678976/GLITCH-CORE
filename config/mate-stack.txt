@@ -31,11 +31,23 @@ caja-extensions
 lightdm
 lightdm-gtk-greeter
 
+[desktop-applets-and-services]
+mate-applets
+mate-backgrounds
+mate-icon-theme
+mate-indicator-applet
+mate-media
+mate-power-manager
+mate-screensaver
+mate-themes
+mate-user-guide
+
 [desktop-utilities]
 mate-terminal
 mate-system-monitor
 mate-screenshot
 mate-utils
+mozo
 mate-calc
 atril
 engrampa

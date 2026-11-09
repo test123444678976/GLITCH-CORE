@@ -67,3 +67,11 @@ packages can be evaluated separately; it must never be promised globally.
 Do not describe source preparation as a completed LFS build, and do not
 describe APT or MATE as available until the corresponding milestones pass
 tests.
+
+
+## Build environment
+
+The first implementation step is a read-only host preflight at
+`scripts/lfs/check-host.sh`. See
+`docs/LFS-BUILD-ENVIRONMENT.md` for requirements and staged implementation.
+The source downloader remains a preparation step only.

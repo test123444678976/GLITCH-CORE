@@ -40,6 +40,8 @@ done
 # LFS requires the cross-tools to take precedence over host tools.
 export LFS LFS_TGT
 export PATH="$TOOLS/bin:$PATH"
+export LC_ALL=POSIX
+umask 022
 
 archive() {
     local pattern="$1"

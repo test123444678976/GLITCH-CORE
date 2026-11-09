@@ -46,7 +46,7 @@ packages can be evaluated separately; it must never be promised globally.
    not compile LFS yet.
 3. Boot the LFS-built base system in QEMU and verify kernel, init, storage,
    networking and system services.
-4. Build and integrate the MATE desktop stack and graphical login.
+4. Resolve and build the dependencies required by `config/mate-stack.txt` against the completed LFS base; then build and integrate MATE, Marco, Caja, Xorg and LightDM. The manifest is a target list, not a package manager or build script.
 5. Investigate and build dpkg and APT natively for the LFS userspace.
 6. Create GLITCH//CORE package metadata, repository signing and package
    build rules; test install, upgrade and removal operations.
@@ -60,7 +60,8 @@ packages can be evaluated separately; it must never be promised globally.
 - LFS 13.1 source download and MD5 verification: present in
   scripts/build-lfs.sh.
 - Full LFS compilation: not implemented yet.
-- MATE desktop: not implemented yet.
+- MATE stack target manifest: present in `config/mate-stack.txt` (planning/integration input only).
+- MATE desktop binaries, Xorg session and graphical login: not built or installed yet.
 - APT/dpkg integration: not implemented yet.
 - LFS desktop ISO: not implemented yet.
 

@@ -5,7 +5,7 @@
 - Architecture: x86_64
 - Base: Linux From Scratch 13.1-systemd
 - Init: systemd
-- Build reference: [official LFS systemd book](https://www.linuxfromscratch.org/lfs/view/systemd/)
+- Build reference: [official LFS systemd book](https://www.linuxfromscratch.org/lfs/view/stable-systemd/)
 
 The host is only a temporary build environment. It does not become the
 GLITCH//CORE base distribution. LFS itself is built from source in an
@@ -25,14 +25,19 @@ install software or modify partitions, filesystems, mounts, or the host.
 
 ## Source preparation
 
-Run the existing source preparation step:
+Run the source preparation step:
 
 ```bash
 bash scripts/build-lfs.sh
 ```
 
-It downloads the official source manifest and archives and verifies the
-published checksums. It does not compile the system.
+It downloads the official LFS 13.1-systemd source manifest and archives and
+verifies their published MD5 checksums. Before downloading, it checks that
+the manifest contains the LFS 13.1 toolchain versions (Binutils 2.47 and
+GCC 16.2.0). It also filters the legacy LFS-Bootscripts archive from both
+download and checksum manifests: that package belongs to the System V
+boot process and is not part of the systemd edition. This step does not
+compile the system.
 
 ## Chapter 5: first cross-toolchain stages
 
@@ -97,7 +102,6 @@ reproducible build. Review the official book before updating any version.
 - Do not run package compilation as root when the LFS book specifies the
   unprivileged `lfs` user.
 - Keep all new work on `feature/mate-desktop` until it is reviewed and tested.
-
 
 ## GitHub Actions: first LFS toolchain build
 

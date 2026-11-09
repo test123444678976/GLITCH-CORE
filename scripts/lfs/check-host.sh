@@ -30,7 +30,7 @@ fi
 
 required=(
     bash gcc g++ ld make bison awk gawk diff find grep gzip m4 patch
-    perl python3 sed tar texi2any xz wget md5sum file
+    perl python3 sed tar makeinfo xz wget md5sum file
 )
 
 echo "== Required commands =="
@@ -48,10 +48,9 @@ echo "== Host versions =="
 if command -v gcc >/dev/null 2>&1; then
     gcc_version="$(gcc -dumpfullversion -dumpversion)"
     echo "GCC: $gcc_version"
-    if [[ "$(printf '%s\n' 16.2.0 "$gcc_version" | sort -V | tail -n1)" == "$gcc_version" && "$gcc_version" != "16.2.0" ]]; then
-        ok "GCC is not newer than the LFS 13.1 tested ceiling (16.2.0)"
-    elif [[ "$gcc_version" == "16.2.0" ]]; then
-        ok "GCC matches the LFS 13.1 tested ceiling (16.2.0)"
+    gcc_ceiling="$(printf '%s\n' "$gcc_version" 16.2.0 | sort -V | tail -n1)"
+    if [[ "$gcc_ceiling" == "16.2.0" ]]; then
+        ok "GCC is at or below the LFS 13.1 tested ceiling (16.2.0)"
     else
         warn "GCC $gcc_version is newer than 16.2.0; LFS 13.1 says newer versions are untested"
     fi

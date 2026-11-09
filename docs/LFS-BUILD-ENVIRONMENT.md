@@ -101,13 +101,15 @@ reproducible build. Review the official book before updating any version.
 
 ## GitHub Actions: first LFS toolchain build
 
-The repository includes a manual workflow at
-`.github/workflows/lfs-toolchain-pass1.yml`. It runs on the selected
-branch and uses an Ubuntu 24.04 GitHub-hosted runner. Start it from
-**Actions → GLITCH//CORE — LFS toolchain Pass 1 → Run workflow** and
-select `feature/mate-desktop`.
+The LFS pipeline is a job in the existing manually dispatched
+`.github/workflows/build.yml` workflow. Keeping it in that existing
+workflow makes it available through the repository's current Actions
+entry point without adding a new workflow file to the default branch.
+Open **Actions → Build GLITCH//CORE ISO → Run workflow** and select
+`feature/mate-desktop`. The LFS jobs run only for manual dispatch;
+ordinary pushes to `main` continue to run the existing ISO build.
 
-The workflow:
+The LFS job:
 
 1. Prints runner CPU, memory, and available disk information.
 2. Installs the host tools needed for the first LFS stages.

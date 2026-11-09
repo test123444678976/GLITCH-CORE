@@ -97,3 +97,31 @@ reproducible build. Review the official book before updating any version.
 - Do not run package compilation as root when the LFS book specifies the
   unprivileged `lfs` user.
 - Keep all new work on `feature/mate-desktop` until it is reviewed and tested.
+
+
+## GitHub Actions: first LFS toolchain build
+
+The repository includes a manual workflow at
+`.github/workflows/lfs-toolchain-pass1.yml`. It runs on the selected
+branch and uses an Ubuntu 24.04 GitHub-hosted runner. Start it from
+**Actions → GLITCH//CORE — LFS toolchain Pass 1 → Run workflow** and
+select `feature/mate-desktop`.
+
+The workflow:
+
+1. Prints runner CPU, memory, and available disk information.
+2. Installs the host tools needed for the first LFS stages.
+3. Runs the read-only host preflight.
+4. Downloads and verifies the official LFS 13.1-systemd source set.
+5. Builds Binutils Pass 1, then GCC Pass 1, as the non-root runner user.
+6. Verifies the cross-linker, compiler target, and completion markers.
+7. Uploads a seven-day artifact named `glitch-core-lfs-toolchain-pass1`
+   containing the source/build workspace and `$LFS/tools` checkpoint.
+
+This is an initial hosted-runner pipeline, not yet a complete resumable
+multi-stage LFS build system. GitHub-hosted runner disk and memory limits
+may cause the build to fail; inspect the workflow logs and available
+resources before changing parallelism or splitting later stages. A green
+workflow means only that these two Pass 1 stages passed their checks; it
+does not mean the base distribution, MATE, APT, or a bootable LFS ISO is
+complete.

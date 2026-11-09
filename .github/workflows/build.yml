@@ -117,10 +117,10 @@ jobs:
       - name: Install LFS host dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \\
-            build-essential \\
-            bison gawk m4 texinfo perl python3 \\
-            patch diffutils findutils grep sed \\
+          sudo apt-get install -y \
+            build-essential \
+            bison gawk m4 texinfo perl python3 \
+            patch diffutils findutils grep sed \
             file gzip xz-utils wget ca-certificates
 
       - name: Run read-only host preflight

@@ -61,6 +61,8 @@ packages can be evaluated separately; it must never be promised globally.
   scripts/build-lfs.sh.
 - Full LFS compilation: not implemented yet.
 - MATE stack target manifest: present in `config/mate-stack.txt` (planning/integration input only).
+- MATE manifest validator: present in `scripts/lfs/validate-mate-stack.sh`; wired into the manual GitHub Actions workflow.
+- MATE LFS integration guide: present in `docs/MATE-LFS-INTEGRATION.md`.
 - MATE desktop binaries, Xorg session and graphical login: not built or installed yet.
 - APT/dpkg integration: not implemented yet.
 - LFS desktop ISO: not implemented yet.

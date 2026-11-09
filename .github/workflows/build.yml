@@ -158,3 +158,15 @@ jobs:
             work-lfs/lfs/tools/
           if-no-files-found: error
           retention-days: 7
+
+  validate-mate-stack:
+    name: Validate GLITCH//CORE MATE stack
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout selected branch
+        uses: actions/checkout@v4
+
+      - name: Validate MATE target manifest
+        run: |
+          bash scripts/lfs/validate-mate-stack.sh

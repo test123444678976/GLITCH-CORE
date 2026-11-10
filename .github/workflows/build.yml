@@ -30,6 +30,7 @@ jobs:
           chmod +x scripts/lfs/*.sh
           bash scripts/lfs/test-mate-config.sh
           bash scripts/lfs/test-graphics-stack.sh
+          bash scripts/lfs/test-graphics-target.sh
 
       - name: Validate APT and dpkg integration plan
         run: |

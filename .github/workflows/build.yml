@@ -197,3 +197,31 @@ jobs:
             work-lfs/lfs/tools/
           if-no-files-found: error
           retention-days: 7
+
+  desktop-build-host-preflight:
+    name: Preflight host for Xorg, Mesa, GTK and MATE
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout selected branch
+        uses: actions/checkout@v4
+
+      - name: Install graphical desktop build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential gcc g++ make binutils \
+            meson ninja-build cmake pkg-config \
+            python3 perl autoconf automake libtool m4 \
+            bison flex gettext gawk patch diffutils \
+            file xz-utils bzip2 gzip texinfo \
+            curl wget git rsync ccache \
+            xsltproc docbook-xsl gperf autopoint \
+            intltool xorriso mtools grub-common
+
+      - name: Check shell syntax
+        run: bash -n scripts/lfs/check-desktop-build-host.sh
+
+      - name: Run read-only graphical desktop host preflight
+        run: bash scripts/lfs/check-desktop-build-host.sh

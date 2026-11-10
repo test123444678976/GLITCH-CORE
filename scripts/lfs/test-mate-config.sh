@@ -30,4 +30,4 @@ grep -q 'Refusing to modify the host root filesystem' "$ROOT/scripts/lfs/install
 
 echo "MATE integration configuration: OK"
 echo "NOTE: these checks do not compile MATE or create a desktop ISO."
-echo "MATE target preflight script: OK"\n
+echo "MATE target preflight script: OK"

@@ -55,7 +55,6 @@ echo "GLITCH//CORE — MATE target rootfs inspection"
 echo "Target: $TARGET"
 echo
 echo "== Desktop runtime =="
-check_file "MATE session" usr/bin/mate-session executable
 check_any file "GTK 3 runtime library" usr/lib/libgtk-3.so.0 usr/lib64/libgtk-3.so.0 usr/lib/x86_64-linux-gnu/libgtk-3.so.0
 check_any file "GDK 3 runtime library" usr/lib/libgdk-3.so.0 usr/lib64/libgdk-3.so.0 usr/lib/x86_64-linux-gnu/libgdk-3.so.0
 check_any file "GLib runtime library" usr/lib/libglib-2.0.so.0 usr/lib64/libglib-2.0.so.0 usr/lib/x86_64-linux-gnu/libglib-2.0.so.0

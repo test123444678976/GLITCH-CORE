@@ -19,6 +19,8 @@ grep -Eq '^user-session=mate$' "$ROOT/config/lightdm/lightdm.conf" ||
   fail "LightDM is not configured to start the MATE session."
 grep -Eq '^Exec=mate-session$' "$ROOT/config/xsessions/mate.desktop" ||
   fail "MATE session desktop entry is invalid."
+grep -q 'systemctl --root=.* enable dbus.service' "$ROOT/scripts/lfs/install-mate-config.sh" ||
+  fail "D-Bus is not enabled in the target system."
 grep -q 'systemctl --root=.* enable lightdm.service' "$ROOT/scripts/lfs/install-mate-config.sh" ||
   fail "LightDM is not enabled in the target system."
 bash -n "$ROOT/scripts/lfs/install-mate-config.sh"

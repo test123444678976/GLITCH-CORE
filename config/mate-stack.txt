@@ -123,16 +123,11 @@ libnotify
 libxklavier
 libgtop
 libatasmart
-polkit
-dbus
-networkmanager
 
 # Input and hardware support
 [input-stack]
 libinput
 xf86-input-libinput
-xkeyboard-config
-xkbcomp
 
 # Optional Xorg hardware DDX drivers; use modesetting where appropriate
 [optional-video-drivers]

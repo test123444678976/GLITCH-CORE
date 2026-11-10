@@ -32,7 +32,7 @@ jobs:
 
       - name: Validate APT and dpkg integration plan
         run: |
-          bash scripts/lfs/validate-package-manager.sh
+          bash scripts/lfs/test-package-manager.sh
 
   build:
     name: Build rescue ISO

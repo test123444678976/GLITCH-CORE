@@ -54,7 +54,7 @@ This does **not** make GLITCH//CORE Debian-based. Debian/Ubuntu binary
 packages and repositories must not be used as the system base or default
 package source. See `config/package-manager.txt`.
 
-APT is not installed or usable yet. It must not be advertised as available
+APT is not installed in the LFS target or usable yet. CI now compiles dpkg/APT from the pinned source archives into isolated artifacts on an Ubuntu build runner; those artifacts are not target packages and must not be advertised as available
 until dpkg, apt-get, apt-cache, signature verification, dependency resolution
 and package install/upgrade/remove tests pass in the target system.
 
@@ -81,9 +81,9 @@ and package install/upgrade/remove tests pass in the target system.
 - `scripts/lfs/check-mate-target.sh` — read-only inspection of an installed MATE target. It also checks GTK 3 runtime libraries, compiled GLib schemas and the LightDM GTK greeter executable.
 - `scripts/lfs/test-mate-target.sh` — fixture-based regression tests for complete/incomplete desktop targets, GTK runtime and greeter detection.
 - `scripts/lfs/validate-package-manager.sh` — validates the APT/dpkg integration plan.
-- `scripts/lfs/test-package-manager.sh` — positive/negative tests for the package plan and repository safety policy.
+- `config/package-manager-sources.lock` — pinned dpkg 1.23.11 and APT 3.0.4 source archives with SHA-256 digests; these are source-only inputs, not Debian binary packages.\n- `scripts/lfs/validate-package-manager-sources.sh` and `fetch-package-manager-sources.sh` — validate and fetch the pinned native package-manager source archives.\n- `scripts/lfs/build-dpkg.sh` and `build-apt.sh` — native source-build recipes that stage outputs with DESTDIR, without installing into the host or target rootfs.\n- `scripts/lfs/test-package-manager-build.sh` — source-lock and build-recipe safety regression tests.\n- `scripts/lfs/build-libdrm.sh` — compiles the pinned libdrm prerequisite into an isolated staging tree.\n- `.github/workflows/build.yml` — compiles dpkg/APT and libdrm into separate short-lived CI artifacts for review; CI runner packages are build dependencies only.
 
-The graphics source lock is intentionally **partial**: it pins four upstream archives only, not every dependency in the graphics inventory. The remaining packages, signatures, patches, build options and target dependency closure still need review before a complete Xorg/Mesa build can be enabled.
+The graphics source lock is intentionally **partial**: it pins four upstream archives only, not every dependency in the graphics inventory. xorgproto and libdrm now have individual source-build recipes and CI artifacts; Mesa and Xorg still require their full dependency closure and target integration. The remaining packages, signatures, patches, build options and target dependency closure still need review before a complete Xorg/Mesa build can be enabled.
 
 The LFS source preparation and cross-toolchain Pass 1 are intermediate
 milestones. They do not yet produce a complete LFS userspace.
@@ -95,7 +95,7 @@ package-manager plan on pushes and pull requests. The expensive rescue ISO
 build runs manually or on pushes to `main`. The manual workflow also offers
 LFS source preparation and the experimental toolchain Pass 1.
 
-A successful validation job is **not** proof that MATE or APT has been built.
+A successful CI staging build is **not** proof that MATE or APT has been installed in the LFS target. A successful validation job is **not** proof that the full desktop has been built.
 A successful rescue ISO job is **not** a desktop ISO.
 
 ## Test the current rescue ISO with QEMU

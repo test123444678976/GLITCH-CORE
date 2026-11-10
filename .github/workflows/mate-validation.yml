@@ -8,6 +8,7 @@ on:
       - ".github/workflows/mate-validation.yml"
       - "config/mate-stack.txt"
       - "config/mate-build-order.txt"
+      - "config/graphics-sources.lock"
       - "config/lightdm/**"
       - "config/xsessions/**"
       - "scripts/lfs/**"
@@ -46,3 +47,4 @@ jobs:
           bash scripts/lfs/test-mate-config.sh
           bash scripts/lfs/test-graphics-stack.sh
           bash scripts/lfs/test-graphics-target.sh
+          bash scripts/lfs/test-graphics-sources.sh

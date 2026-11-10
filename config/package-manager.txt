@@ -15,7 +15,6 @@ apt
 [dpkg-runtime-dependencies]
 zlib
 xz-utils
-zstd
 bzip2
 libmd
 

@@ -85,7 +85,7 @@ make_target() {
 valid="$tmpdir/valid-target"
 echo "[TEST] Exercise successful target installation"
 make_target "$valid"
-bash "$ROOT/scripts/lfs/install-mate-config.sh" "$valid" >/dev/null
+bash -x "$ROOT/scripts/lfs/install-mate-config.sh" "$valid" >/dev/null
 [[ -s "$valid/etc/lightdm/lightdm.conf" ]] || fail "Installer did not install LightDM configuration."
 [[ -s "$valid/usr/share/xsessions/mate.desktop" ]] || fail "Installer did not install the MATE session entry."
 grep -Fq -- '--root='"$valid"' enable dbus.service' "$SYSTEMCTL_LOG" ||

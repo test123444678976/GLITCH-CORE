@@ -37,6 +37,10 @@ jobs:
         run: |
           python3 scripts/glitch-sdk/test-sdk.py
           python3 scripts/glitch-sdk/glitch.py validate examples/apps/hello-world
+          python3 -m py_compile examples/apps/settings/main.py
+          python3 scripts/glitch-sdk/glitch.py validate examples/apps/settings
+          python3 scripts/glitch-sdk/glitch.py pack examples/apps/settings --output "$RUNNER_TEMP/glitch-settings.gcpkg"
+          python3 scripts/glitch-sdk/glitch.py inspect "$RUNNER_TEMP/glitch-settings.gcpkg"
 
       - name: Validate APT and dpkg integration plan
         run: |

@@ -57,5 +57,27 @@ if PATH="$tmp/bin:$PATH" bash "$FETCHER" "$tmp/valid.lock" "$tmp/dest" >/dev/nul
 fi
 [[ ! -e "$CURL_MARKER" ]] || fail "Downloader invoked curl before rejecting the symlink."
 
+# Exercise package filtering with a deterministic fake curl; no network is used.
+mkdir -p "$tmp/fake-bin" "$tmp/filter-dest"
+printf 'fixture archive bytes\n' > "$tmp/archive.fixture"
+fixture_sha="$(sha256sum "$tmp/archive.fixture" | awk '{print $1}')"
+printf 'xorgproto|2026.1|xorgproto-2026.1.tar.xz|https://xorg.freedesktop.org/archive/individual/proto/xorgproto-2026.1.tar.xz|%s\n' "$fixture_sha" > "$tmp/filter.lock"
+cat > "$tmp/fake-bin/curl" <<'CURL'
+#!/usr/bin/env bash
+out=''
+while (($#)); do
+  if [[ "$1" == --output ]]; then out="$2"; shift 2; else shift; fi
+done
+[[ -n "$out" ]] || exit 91
+cp "$CURL_FIXTURE" "$out"
+CURL
+chmod +x "$tmp/fake-bin/curl"
+export CURL_FIXTURE="$tmp/archive.fixture"
+PATH="$tmp/fake-bin:$PATH" bash "$FETCHER" "$tmp/filter.lock" "$tmp/filter-dest" xorgproto >/dev/null
+cmp "$tmp/archive.fixture" "$tmp/filter-dest/xorgproto-2026.1.tar.xz" || fail "Filtered source fetch did not store the selected archive."
+if PATH="$tmp/fake-bin:$PATH" bash "$FETCHER" "$tmp/filter.lock" "$tmp/filter-dest" libdrm >/dev/null 2>&1; then
+  fail "Downloader accepted a package filter that matched no source."
+fi
+
 echo "Graphics source lock tests: OK"
-echo "NOTE: tests validate lock structure and downloader safeguards; they do not download or compile packages."
+echo "NOTE: tests use a fake downloader for filtering; they do not compile packages."

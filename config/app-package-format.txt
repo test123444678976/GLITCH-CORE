@@ -1,0 +1,32 @@
+# GLITCH//CORE application package format — GCPKG v1
+# Status: initial developer-tooling specification, not yet integrated into the OS.
+
+[identity]
+manifest=glitch-app.json
+archive-extension=.gcpkg
+archive-container=ZIP
+encoding=UTF-8
+manifest-format=JSON
+schema-version=1
+
+[manifest-required-fields]
+id=reverse-domain-style identifier, lowercase letters digits dots hyphens
+name=human-readable application name
+version=semantic version string
+entrypoint=relative path to application entry file
+runtime=python3 or static
+files=array of relative paths included in the package
+
+[archive-layout]
+- glitch-app.json at archive root
+- only manifest-listed application files
+- no absolute paths, parent traversal, symlinks or duplicate paths
+- package contents must remain inside the application directory
+
+[security-and-compatibility]
+- Package validation must happen before extraction or execution.
+- The initial SDK creates and inspects packages; it does not install system-wide.
+- Do not run package code during validation or packaging.
+- Do not claim signature verification, dependency resolution, sandboxing or rollback support.
+- Future system integration must add signed repository metadata, ownership tracking,
+  dependency handling, safe installation and uninstall before packages are trusted.

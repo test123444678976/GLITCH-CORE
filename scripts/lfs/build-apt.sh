@@ -35,5 +35,5 @@ DESTDIR="$STAGE" cmake --install "$build"
 [[ -x "$STAGE/usr/bin/apt-cache" ]] || fail "apt-cache was not staged."
 mkdir -p "$STAGE/usr/share/glitch-core"
 printf 'package=apt\nversion=%s\nsource_sha256=%s\ninstall_mode=DESTDIR\n' "$version" "$checksum" > "$STAGE/usr/share/glitch-core/apt-build-info"
-find "$STAGE" -type f -print | sort > "$STAGE/installed-files.txt"
+(cd "$STAGE" && find . -type f -print | LC_ALL=C sort > installed-files.txt)
 echo "APT $version compiled and staged in $STAGE; not installed into an LFS rootfs."

@@ -34,6 +34,7 @@ jobs:
           bash scripts/lfs/test-graphics-target.sh
           bash scripts/lfs/test-graphics-sources.sh
           bash scripts/lfs/test-xorgproto-build.sh
+          bash scripts/lfs/test-package-manager-build.sh
 
       - name: Validate GLITCH application SDK
         run: |
@@ -308,5 +309,38 @@ jobs:
           path: |
             work-lfs/package-manager-stage/dpkg/
             work-lfs/package-manager-stage/apt/
+          if-no-files-found: error
+          retention-days: 14
+
+  build-libdrm:
+    name: Build pinned libdrm graphics foundation
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/feature/mate-desktop'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout selected branch
+        uses: actions/checkout@v4
+
+      - name: Install libdrm build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl meson ninja-build python3 libpciaccess-dev libudev-dev
+
+      - name: Download only the pinned libdrm source
+        run: |
+          chmod +x scripts/lfs/*.sh
+          bash scripts/lfs/fetch-graphics-sources.sh \
+            config/graphics-sources.lock \
+            "$GITHUB_WORKSPACE/work-lfs/graphics-sources" \
+            libdrm
+
+      - name: Compile and stage libdrm
+        run: bash scripts/lfs/build-libdrm.sh
+
+      - name: Upload libdrm staging artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: glitch-core-libdrm-x86_64
+          path: work-lfs/graphics-stage/libdrm/
           if-no-files-found: error
           retention-days: 14

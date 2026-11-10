@@ -25,20 +25,20 @@ while IFS= read -r raw || [[ -n "$raw" ]]; do
   IFS='|' read -r name version archive url checksum <<< "$line"
   final="$DEST/$archive"
 
-  if [[ -f "$final" ]]; then
+  if [[ -f "$final" && ! -L "$final" ]]; then
     if printf '%s  %s\n' "$checksum" "$final" | sha256sum --check --status; then
       echo "[ OK ] $name $version already downloaded and verified."
       continue
     fi
     echo "[WARN] Existing archive has the wrong checksum; replacing it: $archive"
-  elif [[ -e "$final" ]]; then
+  elif [[ -e "$final" || -L "$final" ]]; then
     fail "Refusing to replace a non-regular archive path: $final"
   fi
 
   echo "==> Downloading $name $version"
   partial="$tmpdir/$archive.part"
   curl --fail --location --silent --show-error \
-    --proto '=https' --tlsv1.2 \
+    --proto '=https' --proto-redir '=https' --tlsv1.2 \
     --output "$partial" "$url"
 
   printf '%s  %s\n' "$checksum" "$partial" | sha256sum --check --status ||

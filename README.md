@@ -35,12 +35,14 @@ After the complete desktop packages have been built and installed into a
 target rootfs, inspect it with:
 
 ```bash
+bash scripts/lfs/check-graphics-target.sh /absolute/path/to/target-rootfs
 bash scripts/lfs/check-mate-target.sh /absolute/path/to/target-rootfs
 bash scripts/lfs/install-mate-config.sh /absolute/path/to/target-rootfs
 ```
 
 The installer refuses the host root filesystem and checks required desktop
-components before changing the target.
+components plus the Xorg/Mesa graphics files before changing the target. The
+MATE target inspection also runs the graphics readiness gate.
 
 ## Package management: APT + dpkg target
 

@@ -28,7 +28,7 @@ while IFS= read -r raw || [[ -n "$raw" ]]; do
 
   if [[ "$line" =~ ^[a-zA-Z0-9][a-zA-Z0-9+_.-]*$ ]]; then
     :
-  elif [[ "$line" =~ ^[a-zA-Z0-9-]+=[a-zA-Z0-9\ /+-]+$ ]]; then
+  elif [[ "$line" =~ ^[a-zA-Z0-9-]+=[a-zA-Z0-9._/ +:-]+$ ]]; then
     :
   else
     fail "Invalid package-manager manifest entry: $raw"

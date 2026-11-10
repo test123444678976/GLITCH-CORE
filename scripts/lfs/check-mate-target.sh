@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
 # Read-only post-install check for a completed GLITCH//CORE target rootfs.
 TARGET_INPUT="${1:-}"
 fail() { echo "ERROR: $*" >&2; exit 2; }

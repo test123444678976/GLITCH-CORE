@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "org.glitchcore.hello-world",
+  "name": "Hello GLITCH",
+  "version": "1.0.0",
+  "runtime": "python3",
+  "entrypoint": "main.py",
+  "files": [
+    "main.py"
+  ]
+}

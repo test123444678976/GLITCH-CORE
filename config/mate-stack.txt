@@ -110,3 +110,32 @@ pluma
 dbus
 polkit
 networkmanager
+
+# Additional runtime integration (recommended for a usable desktop)
+[desktop-runtime]
+gvfs
+udisks2
+upower
+accountsservice
+libsecret
+gnome-keyring
+libnotify
+libxklavier
+libgtop
+libatasmart
+polkit
+dbus
+networkmanager
+
+# Input and hardware support
+[input-stack]
+libinput
+xf86-input-libinput
+xkeyboard-config
+xkbcomp
+
+# Optional Xorg hardware DDX drivers; use modesetting where appropriate
+[optional-video-drivers]
+xf86-video-amdgpu
+xf86-video-intel
+xf86-video-nouveau

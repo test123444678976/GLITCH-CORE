@@ -30,5 +30,5 @@ make DESTDIR="$STAGE" install
 for bin in dpkg dpkg-deb dpkg-query; do [[ -x "$STAGE/usr/bin/$bin" ]] || fail "Missing staged executable: $bin"; done
 mkdir -p "$STAGE/usr/share/glitch-core"
 printf 'package=dpkg\nversion=%s\nsource_sha256=%s\ninstall_mode=DESTDIR\n' "$version" "$checksum" > "$STAGE/usr/share/glitch-core/dpkg-build-info"
-find "$STAGE" -type f -print | sort > "$STAGE/installed-files.txt"
+(cd "$STAGE" && find . -type f -print | LC_ALL=C sort > installed-files.txt)
 echo "dpkg $version compiled and staged in $STAGE; not installed into an LFS rootfs."

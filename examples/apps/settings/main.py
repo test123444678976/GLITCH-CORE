@@ -72,8 +72,9 @@ class SettingsWindow(Gtk.ApplicationWindow):
         self.accent = "Blue"
         self.provider = Gtk.CssProvider()
         self.display = Gdk.Display.get_default()
-        Gtk.StyleContext.add_provider_for_display(
-            self.display, self.provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        Gtk.StyleContext.add_provider_for_screen(
+            Gdk.Screen.get_default(), self.provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
         self.provider.load_from_data(CSS)
 
@@ -102,6 +103,7 @@ class SettingsWindow(Gtk.ApplicationWindow):
         self.pages.set_transition_duration(130)
         body.pack_start(self.pages, True, True, 0)
 
+        self.nav_buttons = {}
         for key, label in (
             ("system", "◈   System"),
             ("appearance", "◐   Appearance"),
@@ -112,8 +114,8 @@ class SettingsWindow(Gtk.ApplicationWindow):
             button.get_style_context().add_class("nav-button")
             button.connect("clicked", self.navigate, key)
             sidebar.pack_start(button, False, False, 0)
-            if key == "system":
-                button.get_style_context().add_class("nav-active")
+            self.nav_buttons[key] = button
+        self.nav_buttons["system"].get_style_context().add_class("nav-active")
 
         self.pages.add_named(self.build_system_page(), "system")
         self.pages.add_named(self.build_appearance_page(), "appearance")
@@ -201,6 +203,12 @@ class SettingsWindow(Gtk.ApplicationWindow):
 
     def navigate(self, _button: Gtk.Button, page: str) -> None:
         self.pages.set_visible_child_name(page)
+        for key, button in self.nav_buttons.items():
+            context = button.get_style_context()
+            if key == page:
+                context.add_class("nav-active")
+            else:
+                context.remove_class("nav-active")
 
     def on_theme_changed(self, switch: Gtk.Switch, _property: object) -> None:
         self.dark = switch.get_active()

@@ -17,14 +17,14 @@ optional_missing=0
 check_file() {
   local label="$1" path="$2" mode="${3:-file}"
   if [[ "$mode" == executable ]]; then
-    if [[ -x "$TARGET/$path" ]]; then printf '[ OK ] %s\n' "$label"; ((ok+=1)); else printf '[MISS] %s (%s)\n' "$label" "$path"; ((missing+=1)); fi
+    if [[ -x "$TARGET/$path" ]]; then printf '[ OK ] %s\n' "$label"; ok=$((ok + 1)); else printf '[MISS] %s (%s)\n' "$label" "$path"; missing=$((missing + 1)); fi
   else
-    if [[ -e "$TARGET/$path" ]]; then printf '[ OK ] %s\n' "$label"; ((ok+=1)); else printf '[MISS] %s (%s)\n' "$label" "$path"; ((missing+=1)); fi
+    if [[ -e "$TARGET/$path" ]]; then printf '[ OK ] %s\n' "$label"; ok=$((ok + 1)); else printf '[MISS] %s (%s)\n' "$label" "$path"; missing=$((missing + 1)); fi
   fi
 }
 check_optional() {
   local label="$1" path="$2"
-  if [[ -e "$TARGET/$path" ]]; then printf '[ OK ] %s\n' "$label"; ((ok+=1)); else printf '[OPT ] %s not installed (%s)\n' "$label" "$path"; ((optional_missing+=1)); fi
+  if [[ -e "$TARGET/$path" ]]; then printf '[ OK ] %s\n' "$label"; ok=$((ok + 1)); else printf '[OPT ] %s not installed (%s)\n' "$label" "$path"; optional_missing=$((optional_missing + 1)); fi
 }
 
 echo "GLITCH//CORE — MATE target rootfs inspection"
@@ -43,16 +43,16 @@ echo
 echo "== Display and login =="
 check_file "Xorg server" usr/bin/Xorg executable
 if [[ ! -x "$TARGET/usr/bin/Xorg" && -x "$TARGET/usr/lib/Xorg" ]]; then
-  printf '[ OK ] Xorg server (usr/lib/Xorg)\n'; ((ok+=1)); ((missing-=1))
+  printf '[ OK ] Xorg server (usr/lib/Xorg)\n'; ok=$((ok + 1)); missing=$((missing - 1))
 fi
 check_file "LightDM executable" usr/sbin/lightdm executable
 if [[ ! -x "$TARGET/usr/sbin/lightdm" && -x "$TARGET/usr/bin/lightdm" ]]; then
-  printf '[ OK ] LightDM executable (usr/bin/lightdm)\n'; ((ok+=1)); ((missing-=1))
+  printf '[ OK ] LightDM executable (usr/bin/lightdm)\n'; ok=$((ok + 1)); missing=$((missing - 1))
 fi
 check_file "LightDM GTK greeter" usr/share/xgreeters/lightdm-gtk-greeter.desktop
 check_file "LightDM service unit" usr/lib/systemd/system/lightdm.service
 if [[ ! -e "$TARGET/usr/lib/systemd/system/lightdm.service" && -e "$TARGET/lib/systemd/system/lightdm.service" ]]; then
-  printf '[ OK ] LightDM service unit (lib/systemd)\n'; ((ok+=1)); ((missing-=1))
+  printf '[ OK ] LightDM service unit (lib/systemd)\n'; ok=$((ok + 1)); missing=$((missing - 1))
 fi
 
 echo

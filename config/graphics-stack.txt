@@ -33,7 +33,6 @@ libxxf86vm
 libxdamage
 libxfont2
 libxkbfile
-libxshmfence
 xkeyboard-config
 xkbcomp
 libxcvt

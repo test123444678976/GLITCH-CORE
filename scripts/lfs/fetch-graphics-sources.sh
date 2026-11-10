@@ -22,12 +22,14 @@ DEST="$(realpath -e "$DEST_INPUT")"
 tmpdir="$(mktemp -d "$DEST/.graphics-download.XXXXXX")"
 cleanup() { rm -rf "$tmpdir"; }
 trap cleanup EXIT
+selected_count=0
 
 while IFS= read -r raw || [[ -n "$raw" ]]; do
   line="${raw%%#*}"
   [[ -z "${line//[[:space:]]/}" ]] && continue
   IFS='|' read -r name version archive url checksum <<< "$line"
   [[ -z "$PACKAGE_FILTER" || "$name" == "$PACKAGE_FILTER" ]] || continue
+  selected_count=$((selected_count + 1))
   final="$DEST/$archive"
 
   if [[ -f "$final" && ! -L "$final" ]]; then
@@ -52,6 +54,7 @@ while IFS= read -r raw || [[ -n "$raw" ]]; do
   mv -f "$partial" "$final"
   echo "[ OK ] $archive verified and stored."
 done < "$LOCK"
+(( selected_count > 0 )) || fail "No package matched the requested source filter: $PACKAGE_FILTER"
 
 echo
 echo "Verified graphics source archives are in: $DEST"

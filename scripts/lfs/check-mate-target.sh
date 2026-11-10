@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Read-only post-install check for a completed GLITCH//CORE target rootfs.
+TARGET_INPUT="${1:-}"
+fail() { echo "ERROR: $*" >&2; exit 2; }
+[[ -n "$TARGET_INPUT" ]] || fail "Usage: $0 /absolute/path/to/target-rootfs"
+[[ "$TARGET_INPUT" == /* ]] || fail "Target path must be absolute."
+[[ -d "$TARGET_INPUT" ]] || fail "Target directory does not exist."
+TARGET="$(realpath -e "$TARGET_INPUT")"
+[[ "$TARGET" != "/" ]] || fail "Refusing to inspect the host root as a target."
+[[ -d "$TARGET/etc" && -d "$TARGET/usr" ]] || fail "Target is missing etc/ or usr/."
+
+ok=0
+missing=0
+optional_missing=0
+check_file() {
+  local label="$1" path="$2" mode="${3:-file}"
+  if [[ "$mode" == executable ]]; then
+    if [[ -x "$TARGET/$path" ]]; then printf '[ OK ] %s\n' "$label"; ((ok+=1)); else printf '[MISS] %s (%s)\n' "$label" "$path"; ((missing+=1)); fi
+  else
+    if [[ -e "$TARGET/$path" ]]; then printf '[ OK ] %s\n' "$label"; ((ok+=1)); else printf '[MISS] %s (%s)\n' "$label" "$path"; ((missing+=1)); fi
+  fi
+}
+check_optional() {
+  local label="$1" path="$2"
+  if [[ -e "$TARGET/$path" ]]; then printf '[ OK ] %s\n' "$label"; ((ok+=1)); else printf '[OPT ] %s not installed (%s)\n' "$label" "$path"; ((optional_missing+=1)); fi
+}
+
+echo "GLITCH//CORE — MATE target rootfs inspection"
+echo "Target: $TARGET"
+echo
+echo "== Desktop runtime =="
+check_file "MATE session" usr/bin/mate-session executable
+check_file "Marco window manager" usr/bin/marco executable
+check_file "Caja file manager" usr/bin/caja executable
+check_file "MATE session desktop entry" usr/share/xsessions/mate.desktop
+check_file "MATE panel" usr/bin/mate-panel executable
+check_file "MATE settings daemon" usr/bin/mate-settings-daemon executable
+check_file "MATE control center" usr/bin/mate-control-center executable
+
+echo
+echo "== Display and login =="
+check_file "Xorg server" usr/bin/Xorg executable
+if [[ ! -x "$TARGET/usr/bin/Xorg" && -x "$TARGET/usr/lib/Xorg" ]]; then
+  printf '[ OK ] Xorg server (usr/lib/Xorg)\n'; ((ok+=1)); ((missing-=1))
+fi
+check_file "LightDM executable" usr/sbin/lightdm executable
+if [[ ! -x "$TARGET/usr/sbin/lightdm" && -x "$TARGET/usr/bin/lightdm" ]]; then
+  printf '[ OK ] LightDM executable (usr/bin/lightdm)\n'; ((ok+=1)); ((missing-=1))
+fi
+check_file "LightDM GTK greeter" usr/share/xgreeters/lightdm-gtk-greeter.desktop
+check_file "LightDM service unit" usr/lib/systemd/system/lightdm.service
+if [[ ! -e "$TARGET/usr/lib/systemd/system/lightdm.service" && -e "$TARGET/lib/systemd/system/lightdm.service" ]]; then
+  printf '[ OK ] LightDM service unit (lib/systemd)\n'; ((ok+=1)); ((missing-=1))
+fi
+
+echo
+echo "== System integration =="
+check_file "D-Bus daemon" usr/bin/dbus-daemon executable
+check_optional "NetworkManager daemon" usr/sbin/NetworkManager
+check_optional "Polkit daemon" usr/lib/polkit-1/polkitd
+check_optional "MATE terminal" usr/bin/mate-terminal
+check_optional "MATE file manager extensions directory" usr/lib/caja/extensions
+
+echo
+echo "== Result =="
+echo "Present: $ok | Required missing: $missing | Optional missing: $optional_missing"
+if (( missing > 0 )); then
+  echo "MATE target is NOT ready for integration."
+  exit 1
+fi
+echo "Core MATE target checks passed. Review optional components before making a release."
+echo "This is a filesystem check; it does not boot the target or prove graphics work."

@@ -29,6 +29,7 @@ jobs:
         run: |
           chmod +x scripts/lfs/*.sh
           bash scripts/lfs/test-mate-config.sh
+          bash scripts/lfs/test-mate-target.sh
           bash scripts/lfs/test-graphics-stack.sh
           bash scripts/lfs/test-graphics-target.sh
           bash scripts/lfs/test-graphics-sources.sh

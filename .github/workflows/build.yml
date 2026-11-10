@@ -33,6 +33,7 @@ jobs:
           bash scripts/lfs/test-graphics-stack.sh
           bash scripts/lfs/test-graphics-target.sh
           bash scripts/lfs/test-graphics-sources.sh
+          bash scripts/lfs/test-xorgproto-build.sh
 
       - name: Validate GLITCH application SDK
         run: |
@@ -226,3 +227,38 @@ jobs:
 
       - name: Run read-only graphical desktop host preflight
         run: bash scripts/lfs/check-desktop-build-host.sh
+
+  build-xorgproto:
+    name: Build pinned X.Org protocol headers
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/feature/mate-desktop'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout selected branch
+        uses: actions/checkout@v4
+
+      - name: Install xorgproto build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl meson ninja-build python3
+
+      - name: Download only the pinned xorgproto source
+        run: |
+          chmod +x scripts/lfs/fetch-graphics-sources.sh
+          bash scripts/lfs/fetch-graphics-sources.sh \
+            config/graphics-sources.lock \
+            "$GITHUB_WORKSPACE/work-lfs/graphics-sources" \
+            xorgproto
+
+      - name: Compile and stage xorgproto
+        run: |
+          chmod +x scripts/lfs/build-xorgproto.sh
+          bash scripts/lfs/build-xorgproto.sh
+
+      - name: Upload xorgproto staging artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: glitch-core-xorgproto-x86_64
+          path: work-lfs/graphics-stage/xorgproto/
+          if-no-files-found: error
+          retention-days: 14

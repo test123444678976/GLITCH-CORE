@@ -22,7 +22,7 @@ echo "Invalid manifest correctly rejected."
 
 echo
 echo "== Repository safety policy test =="
-if grep -Eiq 'deb\\s+.*(debian.org|ubuntu.com)|archive.ubuntu.com|deb.debian.org' "$MANIFEST"; then
+if grep -Eiq 'deb[[:space:]]+.*(debian.org|ubuntu.com)|archive.ubuntu.com|deb.debian.org' "$MANIFEST"; then
   echo "ERROR: foreign Debian/Ubuntu repository detected in native package plan." >&2
   exit 1
 fi

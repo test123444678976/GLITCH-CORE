@@ -4,11 +4,15 @@ set -Eeuo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 LOCK="${1:-$ROOT/config/graphics-sources.lock}"
 DEST_INPUT="${2:-$ROOT/work-lfs/graphics-sources}"
+PACKAGE_FILTER="${3:-}"
 fail() { echo "ERROR: $*" >&2; exit 1; }
 
 command -v curl >/dev/null 2>&1 || fail "curl is required."
 command -v sha256sum >/dev/null 2>&1 || fail "sha256sum is required."
 bash "$ROOT/scripts/lfs/validate-graphics-sources.sh" "$LOCK"
+if [[ -n "$PACKAGE_FILTER" && ! "$PACKAGE_FILTER" =~ ^[a-z0-9][a-z0-9+_.-]*$ ]]; then
+  fail "Invalid package filter: $PACKAGE_FILTER"
+fi
 
 mkdir -p "$DEST_INPUT"
 DEST="$(realpath -e "$DEST_INPUT")"
@@ -23,6 +27,7 @@ while IFS= read -r raw || [[ -n "$raw" ]]; do
   line="${raw%%#*}"
   [[ -z "${line//[[:space:]]/}" ]] && continue
   IFS='|' read -r name version archive url checksum <<< "$line"
+  [[ -z "$PACKAGE_FILTER" || "$name" == "$PACKAGE_FILTER" ]] || continue
   final="$DEST/$archive"
 
   if [[ -f "$final" && ! -L "$final" ]]; then
@@ -50,4 +55,9 @@ done < "$LOCK"
 
 echo
 echo "Verified graphics source archives are in: $DEST"
-echo "Only the entries in the partial lock were downloaded; no compilation was performed."
+if [[ -n "$PACKAGE_FILTER" ]]; then
+  echo "Package filter: $PACKAGE_FILTER"
+else
+  echo "All entries in the partial lock were selected."
+fi
+echo "No compilation was performed by this downloader."

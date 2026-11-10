@@ -47,6 +47,7 @@ jobs:
       - name: Validate APT and dpkg integration plan
         run: |
           bash scripts/lfs/test-package-manager.sh
+          bash scripts/lfs/test-package-manager-build.sh
 
   build:
     name: Build rescue ISO
@@ -260,5 +261,52 @@ jobs:
         with:
           name: glitch-core-xorgproto-x86_64
           path: work-lfs/graphics-stage/xorgproto/
+          if-no-files-found: error
+          retention-days: 14
+
+  native-package-manager-build:
+    name: Compile native dpkg and APT source packages
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/feature/mate-desktop'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      JOBS: "2"
+    steps:
+      - name: Checkout selected branch
+        uses: actions/checkout@v4
+
+      - name: Install native package-manager build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential autoconf automake libtool gettext \
+            cmake ninja-build pkg-config curl xz-utils \
+            libbz2-dev liblzma-dev libzstd-dev libselinux1-dev libmd-dev \
+            libdb-dev libcurl4-openssl-dev libgnutls28-dev libgcrypt20-dev \
+            liblz4-dev zlib1g-dev libxxhash-dev libseccomp-dev libsystemd-dev \
+            libudev-dev libssl-dev
+
+      - name: Download and verify dpkg and APT sources
+        run: |
+          chmod +x scripts/lfs/*.sh
+          bash scripts/lfs/fetch-package-manager-sources.sh \
+            config/package-manager-sources.lock \
+            "$GITHUB_WORKSPACE/work-lfs/package-manager-sources"
+
+      - name: Compile and stage dpkg
+        run: |
+          bash scripts/lfs/build-dpkg.sh
+
+      - name: Compile and stage APT
+        run: |
+          bash scripts/lfs/build-apt.sh
+
+      - name: Upload native package-manager build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: glitch-core-native-dpkg-apt-x86_64
+          path: |
+            work-lfs/package-manager-stage/dpkg/
+            work-lfs/package-manager-stage/apt/
           if-no-files-found: error
           retention-days: 14

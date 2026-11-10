@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=GLITCH//CORE MATE
+Comment=GLITCH//CORE desktop session
+Exec=mate-session
+TryExec=mate-session
+Type=Application
+DesktopNames=MATE

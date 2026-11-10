@@ -337,6 +337,11 @@ jobs:
         run: |
           bash scripts/lfs/build-apt.sh
 
+      - name: Audit staged native executables and provenance
+        run: |
+          chmod +x scripts/lfs/test-package-manager-stage.sh
+          bash scripts/lfs/test-package-manager-stage.sh
+
       - name: Package native dpkg and APT staging trees
         run: |
           tar -C work-lfs/package-manager-stage -czf work-lfs/glitch-core-native-dpkg-apt-x86_64.tar.gz dpkg apt

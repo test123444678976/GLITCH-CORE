@@ -24,8 +24,13 @@ while IFS= read -r raw || [[ -n "$raw" ]]; do
     continue
   fi
 
-  [[ "$line" =~ ^[a-zA-Z0-9][a-zA-Z0-9+_.-]*$|^[a-zA-Z0-9-]+=[a-zA-Z0-9 /+-]+$ ]] ||
+  if [[ "$line" =~ ^[a-zA-Z0-9][a-zA-Z0-9+_.-]*$ ]]; then
+    :
+  elif [[ "$line" =~ ^[a-zA-Z0-9-]+=[a-zA-Z0-9\ /+-]+$ ]]; then
+    :
+  else
     fail "Invalid package-manager manifest entry: $raw"
+  fi
 
   [[ -z "${seen[$line]+x}" ]] || fail "Duplicate entry: $line"
   seen["$line"]=1

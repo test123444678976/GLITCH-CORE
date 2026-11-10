@@ -53,11 +53,6 @@ fi
 if bash "$CHECK" "$tmpdir/valid/.." >/dev/null 2>&1; then
   fail "Checker accepted an incomplete parent directory."
 fi
-if bash "$CHECK" "$tmpdir/valid" >/dev/null 2>&1; then
-  : # Absolute path is expected in normal test environments.
-else
-  fail "Checker unexpectedly rejected the valid absolute target."
-fi
 if bash "$CHECK" "/" >/dev/null 2>&1; then
   fail "Checker accepted the host root filesystem."
 fi

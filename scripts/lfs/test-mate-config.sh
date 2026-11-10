@@ -65,7 +65,7 @@ export PATH="$tmpdir/bin:$PATH"
 
 make_target() {
   local target="$1"
-  mkdir -p "$target/etc" "$target/usr/bin" "$target/usr/sbin" \
+  mkdir -p "$target/etc/X11" "$target/usr/bin" "$target/usr/sbin" \
     "$target/usr/lib/xorg/modules" "$target/usr/lib/dri" \
     "$target/usr/lib/systemd/system" "$target/usr/share/xgreeters"
   for bin in mate-session marco caja Xorg dbus-daemon lightdm-gtk-greeter; do
@@ -85,7 +85,7 @@ make_target() {
 valid="$tmpdir/valid-target"
 echo "[TEST] Exercise successful target installation"
 make_target "$valid"
-bash -x "$ROOT/scripts/lfs/install-mate-config.sh" "$valid" >/dev/null
+bash "$ROOT/scripts/lfs/install-mate-config.sh" "$valid" >/dev/null
 [[ -s "$valid/etc/lightdm/lightdm.conf" ]] || fail "Installer did not install LightDM configuration."
 [[ -s "$valid/usr/share/xsessions/mate.desktop" ]] || fail "Installer did not install the MATE session entry."
 grep -Fq -- '--root='"$valid"' enable dbus.service' "$SYSTEMCTL_LOG" ||

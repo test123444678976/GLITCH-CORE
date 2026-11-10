@@ -4,6 +4,7 @@ set -Eeuo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 fail() { echo "ERROR: $*" >&2; exit 1; }
 
+echo "[TEST] Validate MATE manifest"
 bash "$ROOT/scripts/lfs/validate-mate-stack.sh"
 
 for file in \
@@ -39,6 +40,7 @@ grep -q 'TARGET="$(realpath -e "$TARGET_INPUT")"' "$ROOT/scripts/lfs/install-mat
 grep -q 'Refusing to modify the host root filesystem' "$ROOT/scripts/lfs/install-mate-config.sh" ||
   fail "Installer is missing its host-root safety guard."
 
+echo "[TEST] Static installer and safety checks passed"
 tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
 
@@ -81,6 +83,7 @@ make_target() {
 }
 
 valid="$tmpdir/valid-target"
+echo "[TEST] Exercise successful target installation"
 make_target "$valid"
 bash "$ROOT/scripts/lfs/install-mate-config.sh" "$valid" >/dev/null
 [[ -s "$valid/etc/lightdm/lightdm.conf" ]] || fail "Installer did not install LightDM configuration."
@@ -91,6 +94,7 @@ grep -Fq -- '--root='"$valid"' enable lightdm.service' "$SYSTEMCTL_LOG" ||
   fail "Installer did not enable LightDM in the target."
 
 # Missing greeter executable must fail before any configuration is written.
+echo "[TEST] Exercise missing greeter rejection"
 bad="$tmpdir/missing-greeter"
 make_target "$bad"
 rm "$bad/usr/bin/lightdm-gtk-greeter"
@@ -104,6 +108,7 @@ fi
   fail "Installer enabled services after a failed runtime preflight."
 
 # Missing GTK runtime must also fail before writing configuration.
+echo "[TEST] Exercise missing GTK rejection"
 bad_gtk="$tmpdir/missing-gtk"
 make_target "$bad_gtk"
 rm "$bad_gtk/usr/lib/libgtk-3.so.0"

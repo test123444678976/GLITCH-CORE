@@ -51,7 +51,7 @@ See:
 - `scripts/lfs/check-host.sh` — read-only host preflight
 - `scripts/lfs/build-toolchain-pass1.sh` — Binutils/GCC cross-toolchain Pass 1
 - `scripts/lfs/validate-mate-stack.sh` — validates the MATE target manifest
-- `scripts/lfs/test-mate-config.sh` — checks MATE integration configuration
+- `scripts/lfs/test-mate-config.sh` — checks MATE integration configuration\n- `scripts/lfs/check-mate-target.sh` — read-only check of an installed MATE rootfs before integration
 
 ## Build the rescue ISO
 

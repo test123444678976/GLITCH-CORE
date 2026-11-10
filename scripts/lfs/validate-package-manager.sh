@@ -28,8 +28,10 @@ while IFS= read -r raw || [[ -n "$raw" ]]; do
 
   if [[ "$line" =~ ^[a-zA-Z0-9][a-zA-Z0-9+_.-]*$ ]]; then
     :
-  elif [[ "$line" =~ ^[a-zA-Z0-9-]+=[a-zA-Z0-9._/ +:-]+$ ]]; then
-    :
+  elif [[ "$line" == *=* ]]; then
+    key="\${line%%=*}"
+    value="\${line#*=}"
+    [[ "$key" =~ ^[a-zA-Z0-9-]+$ && -n "$value" ]] || fail "Invalid key/value manifest entry: $raw"
   else
     fail "Invalid package-manager manifest entry: $raw"
   fi

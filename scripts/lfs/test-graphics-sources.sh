@@ -36,6 +36,8 @@ fi
 
 grep -q 'sha256sum --check' "$FETCHER" || fail "Downloader does not verify SHA-256."
 grep -q -- "--proto '=https'" "$FETCHER" || fail "Downloader does not restrict curl to HTTPS."
+grep -q -- "--proto-redir '=https'" "$FETCHER" || fail "Downloader does not restrict redirects to HTTPS."
+grep -q '!-L "$final"' "$FETCHER" || fail "Downloader does not reject symlinked archive destinations."
 grep -q 'validate-graphics-sources.sh' "$FETCHER" || fail "Downloader does not validate its lockfile first."
 
 echo "Graphics source lock tests: OK"

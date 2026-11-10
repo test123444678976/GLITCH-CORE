@@ -41,6 +41,8 @@ jobs:
               bash -n "$script"
             done
 
-      - name: Validate MATE manifest and integration
+      - name: Validate MATE, Xorg and Mesa integration
         run: |
           bash scripts/lfs/test-mate-config.sh
+          bash scripts/lfs/test-graphics-stack.sh
+          bash scripts/lfs/test-graphics-target.sh

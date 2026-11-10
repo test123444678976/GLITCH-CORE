@@ -13,7 +13,8 @@ packages=0
 required=(
   glib gtk3 cairo pango gdk-pixbuf mesa xorg-server libxkbfile libxfont2 xkbcomp libepoxy at-spi2-atk gnome-themes-extra
   mate-common mate-desktop mate-menus mate-settings-daemon
-  libcanberra startup-notification libwnck libmatekbd libmatemixer\n  mate-session-manager mate-panel marco caja
+  libcanberra startup-notification libwnck libmatekbd libmatemixer
+  mate-session-manager mate-panel marco caja
   lightdm lightdm-gtk-greeter dbus polkit networkmanager
 )
 

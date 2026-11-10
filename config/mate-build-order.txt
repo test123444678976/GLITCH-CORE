@@ -35,10 +35,18 @@
 # mate-applets, mate-backgrounds, mate-icon-theme, mate-themes,
 # mate-power-manager, mate-screensaver, mate-media.
 #
-# Stage 5 — login, networking and system integration
+# Stage 5 — desktop runtime and device integration
+# gvfs, udisks2, upower, accountsservice, libsecret, gnome-keyring,
+# libnotify, libxklavier, libgtop, libatasmart, libinput,
+# xf86-input-libinput, polkit, dbus, networkmanager.
+#
+# Stage 6 — login, networking and system integration
 # lightdm, lightdm-gtk-greeter, networkmanager, polkit, elogind
 # (only if the selected desktop stack requires it; prefer systemd-logind
 # on this systemd build).
+#
+# Optional video DDX packages: xf86-video-amdgpu, xf86-video-intel,
+# xf86-video-nouveau. Prefer the Xorg modesetting driver when suitable.
 #
 # Before implementation:
 # - Pin every source to a release and checksum.

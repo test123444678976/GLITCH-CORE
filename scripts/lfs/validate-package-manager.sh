@@ -12,7 +12,9 @@ groups=0
 entries=0
 while IFS= read -r raw || [[ -n "$raw" ]]; do
   line="${raw%%#*}"
-  line="$(printf '%s' "$line" | xargs)"
+  # Trim whitespace without xargs: policy notes may contain apostrophes.
+  line="${line#"${line%%[![:space:]]*}"}"
+  line="${line%"${line##*[![:space:]]}"}"
   [[ -z "$line" ]] && continue
 
   if [[ "$line" =~ ^\[[a-z0-9-]+\]$ ]]; then

@@ -25,7 +25,7 @@ The intended stack includes:
 - GVFS, UDisks2, UPower, AccountsService and keyring/secret integration
 - libinput and Xorg input support, with optional hardware-specific video drivers
 
-The MATE manifests, LightDM session files and guarded target-rootfs
+The MATE and dedicated Xorg/Mesa graphics manifests, LightDM session files and guarded target-rootfs
 configuration scripts are in this branch. The target installer enables
 D-Bus and LightDM, and enables NetworkManager when its unit is present. They are configuration and
 validation work only: **MATE has not yet been compiled into the target rootfs
@@ -62,6 +62,8 @@ and package install/upgrade/remove tests pass in the target system.
 - `scripts/lfs/check-host.sh` — read-only build-host preflight.
 - `scripts/lfs/build-toolchain-pass1.sh` — experimental Binutils/GCC cross-toolchain Pass 1.
 - `scripts/lfs/validate-mate-stack.sh` — validates the MATE target manifest.
+- `config/graphics-stack.txt` — explicit Mesa, Xorg, protocol/library and input-stack inventory.
+- `scripts/lfs/validate-graphics-stack.sh` and `test-graphics-stack.sh` — validate the graphics inventory and test missing/duplicate target rejection.
 - `scripts/lfs/test-mate-config.sh` — tests MATE session configuration and safety guards.
 - `scripts/lfs/check-mate-target.sh` — read-only inspection of an installed MATE target.
 - `scripts/lfs/validate-package-manager.sh` — validates the APT/dpkg integration plan.

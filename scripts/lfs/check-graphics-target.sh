@@ -14,16 +14,23 @@ TARGET="$(realpath -e "$TARGET_INPUT")"
 ok=0
 missing=0
 check_any() {
-  local label="$1"; shift
-  local path
+  local kind="$1" label="$2"; shift 2
+  local path candidate found=0
   for path in "$@"; do
-    if [[ -e "$TARGET/$path" ]]; then
+    candidate="$TARGET/$path"
+    case "$kind" in
+      executable) [[ -f "$candidate" && -x "$candidate" ]] && found=1 ;;
+      file)       [[ -f "$candidate" ]] && found=1 ;;
+      directory)  [[ -d "$candidate" ]] && found=1 ;;
+      *) fail "Internal checker error: unknown check kind '$kind'." ;;
+    esac
+    if (( found )); then
       printf '[ OK ] %s (%s)\n' "$label" "$path"
       ok=$((ok + 1))
       return 0
     fi
   done
-  printf '[MISS] %s (checked: %s)\n' "$label" "$*"
+  printf '[MISS] %s (expected %s; checked: %s)\n' "$label" "$kind" "$*"
   missing=$((missing + 1))
   return 0
 }
@@ -32,17 +39,17 @@ echo "GLITCH//CORE — Xorg + Mesa target inspection"
 echo "Target: $TARGET"
 echo
 echo "== Xorg server and modules =="
-check_any "Xorg server executable" usr/bin/Xorg usr/lib/Xorg usr/libexec/Xorg
-check_any "Xorg module directory" usr/lib/xorg/modules usr/lib64/xorg/modules
-check_any "Xorg configuration directory" etc/X11
+check_any executable "Xorg server executable" usr/bin/Xorg usr/lib/Xorg usr/libexec/Xorg
+check_any directory "Xorg module directory" usr/lib/xorg/modules usr/lib64/xorg/modules
+check_any directory "Xorg configuration directory" etc/X11
 
 echo
 echo "== Mesa userspace =="
-check_any "Mesa/OpenGL library" usr/lib/libGL.so.1 usr/lib64/libGL.so.1 usr/lib/x86_64-linux-gnu/libGL.so.1
-check_any "Mesa EGL library" usr/lib/libEGL.so.1 usr/lib64/libEGL.so.1 usr/lib/x86_64-linux-gnu/libEGL.so.1
-check_any "Mesa GBM library" usr/lib/libgbm.so.1 usr/lib64/libgbm.so.1 usr/lib/x86_64-linux-gnu/libgbm.so.1
-check_any "Mesa DRI driver directory" usr/lib/dri usr/lib64/dri usr/lib/x86_64-linux-gnu/dri
-check_any "Mesa software rasterizer" usr/lib/dri/swrast_dri.so usr/lib64/dri/swrast_dri.so usr/lib/x86_64-linux-gnu/dri/swrast_dri.so
+check_any file "Mesa/OpenGL library" usr/lib/libGL.so.1 usr/lib64/libGL.so.1 usr/lib/x86_64-linux-gnu/libGL.so.1
+check_any file "Mesa EGL library" usr/lib/libEGL.so.1 usr/lib64/libEGL.so.1 usr/lib/x86_64-linux-gnu/libEGL.so.1
+check_any file "Mesa GBM library" usr/lib/libgbm.so.1 usr/lib64/libgbm.so.1 usr/lib/x86_64-linux-gnu/libgbm.so.1
+check_any directory "Mesa DRI driver directory" usr/lib/dri usr/lib64/dri usr/lib/x86_64-linux-gnu/dri
+check_any file "Mesa software rasterizer" usr/lib/dri/swrast_dri.so usr/lib64/dri/swrast_dri.so usr/lib/x86_64-linux-gnu/dri/swrast_dri.so
 
 echo
 echo "== Result =="

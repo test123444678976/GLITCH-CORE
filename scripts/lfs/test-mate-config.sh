@@ -25,6 +25,11 @@ grep -q 'systemctl --root=.* enable lightdm.service' "$ROOT/scripts/lfs/install-
   fail "LightDM is not enabled in the target system."
 bash -n "$ROOT/scripts/lfs/install-mate-config.sh"
 bash -n "$ROOT/scripts/lfs/check-mate-target.sh"
+bash -n "$ROOT/scripts/lfs/check-graphics-target.sh"
+grep -q 'check-graphics-target.sh' "$ROOT/scripts/lfs/check-mate-target.sh" ||
+  fail "MATE target inspection must include the Xorg + Mesa graphics gate."
+grep -q 'check-graphics-target.sh' "$ROOT/scripts/lfs/install-mate-config.sh" ||
+  fail "MATE installer must preflight Xorg + Mesa before enabling graphical login."
 grep -q 'TARGET="$(realpath -e "$TARGET_INPUT")"' "$ROOT/scripts/lfs/install-mate-config.sh" ||
   fail "Installer must resolve target paths before its host-root safety check."
 grep -q 'Refusing to modify the host root filesystem' "$ROOT/scripts/lfs/install-mate-config.sh" ||

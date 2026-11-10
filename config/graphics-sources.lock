@@ -1,6 +1,7 @@
 # GLITCH//CORE graphics source lock — initial verified subset
 # Format: package|version|archive|https-url|sha256
-# Checksums are SHA-256 values published by upstream release notes/announcements.
+# Checksums come from upstream release metadata where available; the Xorg server digest
+# is cross-checked against independent distribution source metadata.
 # This is deliberately a partial lock: it does NOT pin every package in graphics-stack.txt.
 # Review upstream signatures and build options before promoting this set into release builds.
 

@@ -145,3 +145,15 @@ Application metadata lives in `glitch-app.json`. See
 There is no system-wide installation, signature verification, dependency
 resolver, sandbox or application store yet. Do not treat untrusted packages
 as safe to execute. The SDK is not yet integrated into the rescue ISO.
+
+
+### First graphical application: GLITCH//CORE Settings
+
+The GTK 3 developer preview is in `examples/apps/settings/`. It includes
+System, Appearance and About pages, with an in-window light/dark preview and
+accent-color selector. The appearance controls affect only the preview and
+are not persisted or applied to system settings.
+
+It requires GTK 3 and PyGObject, which are not part of the current BusyBox
+rescue ISO. The CI validation compiles its Python source, validates its app
+manifest, packages it with the SDK and inspects the resulting archive.

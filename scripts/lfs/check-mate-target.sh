@@ -58,7 +58,15 @@ fi
 echo
 echo "== System integration =="
 check_file "D-Bus daemon" usr/bin/dbus-daemon executable
+if [[ -e "$TARGET/usr/lib/systemd/system/dbus.service" || -e "$TARGET/lib/systemd/system/dbus.service" ]]; then
+  printf '[ OK ] D-Bus systemd service\n'; ok=$((ok + 1))
+else
+  printf '[MISS] D-Bus systemd service\n'; missing=$((missing + 1))
+fi
 check_optional "NetworkManager daemon" usr/sbin/NetworkManager
+check_optional "GVFS volume/filesystem integration" usr/libexec/gvfsd
+check_optional "udisks2 storage service" usr/lib/udisks2/udisksd
+check_optional "UPower power service" usr/libexec/upowerd
 check_optional "Polkit daemon" usr/lib/polkit-1/polkitd
 check_optional "MATE terminal" usr/bin/mate-terminal
 check_optional "MATE file manager extensions directory" usr/lib/caja/extensions

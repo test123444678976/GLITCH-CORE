@@ -23,6 +23,7 @@ TARGET="$(realpath -e "$TARGET_INPUT")"
 [[ -x "$TARGET/usr/bin/Xorg" || -x "$TARGET/usr/lib/Xorg" ]] || fail "Xorg server executable is missing."
 [[ -e "$TARGET/usr/share/xgreeters/lightdm-gtk-greeter.desktop" ]] || fail "LightDM GTK greeter desktop entry is missing."
 [[ -e "$TARGET/usr/lib/systemd/system/lightdm.service" || -e "$TARGET/lib/systemd/system/lightdm.service" ]] || fail "LightDM systemd service is missing."
+[[ -x "$TARGET/usr/bin/dbus-daemon" ]] || fail "D-Bus daemon executable is missing."
 [[ -e "$TARGET/usr/lib/systemd/system/dbus.service" || -e "$TARGET/lib/systemd/system/dbus.service" ]] || fail "D-Bus systemd service is missing."
 command -v systemctl >/dev/null 2>&1 || fail "systemctl is required on the build host."
 

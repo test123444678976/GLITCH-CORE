@@ -75,7 +75,8 @@ and package install/upgrade/remove tests pass in the target system.
 - `.github/workflows/graphics-sources.yml` — manually triggered workflow that uploads the verified partial source set as a short-lived artifact.
 - `scripts/lfs/check-graphics-target.sh` and `test-graphics-target.sh` — inspect staged Xorg/Mesa file types and exercise standard/alternate layouts, missing components and safety guards with fixtures.
 - `scripts/lfs/test-mate-config.sh` — tests MATE session configuration and safety guards.
-- `scripts/lfs/check-mate-target.sh` — read-only inspection of an installed MATE target.
+- `scripts/lfs/check-mate-target.sh` — read-only inspection of an installed MATE target. It also checks GTK 3 runtime libraries, compiled GLib schemas and the LightDM GTK greeter executable.
+- `scripts/lfs/test-mate-target.sh` — fixture-based regression tests for complete/incomplete desktop targets, GTK runtime and greeter detection.
 - `scripts/lfs/validate-package-manager.sh` — validates the APT/dpkg integration plan.
 - `scripts/lfs/test-package-manager.sh` — positive/negative tests for the package plan and repository safety policy.
 

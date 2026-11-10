@@ -28,6 +28,17 @@ grep -q 'TARGET="$(realpath -e "$TARGET_INPUT")"' "$ROOT/scripts/lfs/install-mat
 grep -q 'Refusing to modify the host root filesystem' "$ROOT/scripts/lfs/install-mate-config.sh" ||
   fail "Installer is missing its host-root safety guard."
 
+# Exercise the safety guard with a symlink that resolves to the host root.
+tmpdir="$(mktemp -d)"
+trap 'rm -rf "$tmpdir"' EXIT
+ln -s / "$tmpdir/root-link"
+if bash "$ROOT/scripts/lfs/install-mate-config.sh" "$tmpdir/root-link" >/dev/null 2>&1; then
+  fail "Installer accepted a symlink resolving to the host root."
+fi
+if bash "$ROOT/scripts/lfs/check-mate-target.sh" "$tmpdir/root-link" >/dev/null 2>&1; then
+  fail "Target preflight accepted a symlink resolving to the host root."
+fi
+
 echo "MATE integration configuration: OK"
 echo "NOTE: these checks do not compile MATE or create a desktop ISO."
 echo "MATE target preflight script: OK"

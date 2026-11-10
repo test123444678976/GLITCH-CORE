@@ -68,8 +68,10 @@ and package install/upgrade/remove tests pass in the target system.
 - `scripts/lfs/validate-graphics-stack.sh` and `test-graphics-stack.sh` — validate the graphics inventory and test missing/duplicate target rejection.
 - `config/graphics-build-order.txt` — staged dependency order and release gates for reproducible Xorg/Mesa builds.
 - `config/graphics-sources.lock` — initial partial source lock for Mesa 26.2.6, libdrm 2.4.134, Xorg server 21.1.25 and xorgproto 2026.1, with HTTPS URLs and SHA-256 values.
+- `docs/GRAPHICS-SOURCE-PINS.md` — provenance for the pinned archive checksums and remaining source-lock work.
 - `scripts/lfs/validate-graphics-sources.sh` and `test-graphics-sources.sh` — validate pinned source metadata and reject unsafe or incomplete entries.
 - `scripts/lfs/fetch-graphics-sources.sh` — download only the locked archives over HTTPS and verify SHA-256 before keeping them; this does not compile packages.
+- `.github/workflows/graphics-sources.yml` — manually triggered workflow that uploads the verified partial source set as a short-lived artifact.
 - `scripts/lfs/check-graphics-target.sh` and `test-graphics-target.sh` — inspect staged Xorg/Mesa file types and exercise standard/alternate layouts, missing components and safety guards with fixtures.
 - `scripts/lfs/test-mate-config.sh` — tests MATE session configuration and safety guards.
 - `scripts/lfs/check-mate-target.sh` — read-only inspection of an installed MATE target.

@@ -12,7 +12,7 @@ grep -q '^xtrans|1.6.0|xtrans-1.6.0.tar.xz|https://xorg.freedesktop.org/archive/
 grep -q 'sha256sum --check --status' "$BUILD" || fail "Builder does not verify SHA-256."
 grep -q 'DESTDIR="$STAGE"' "$BUILD" || fail "Builder does not use isolated DESTDIR staging."
 grep -q 'id -u' "$BUILD" || fail "Builder does not reject root execution."
-grep -q 'xtrans-1.6.0' "$BUILD" || fail "Builder does not pin the expected source directory."
+grep -q 'version" == "1.6.0' "$BUILD" || fail "Builder does not pin the expected xtrans release."
 grep -q 'not an LFS target installation' "$BUILD" || fail "Builder does not distinguish host staging from target installation."
 
 echo "xtrans build pipeline checks: OK"

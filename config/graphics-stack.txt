@@ -1,0 +1,56 @@
+# GLITCH//CORE graphics stack inventory
+# Target: x86_64, LFS 13.1-systemd
+# Planning inventory only; not a pinned or completed package build.
+# Resolve versions, mandatory/optional Meson options and checksums per upstream
+# release before enabling any source-build recipe.
+
+[mesa-foundations]
+zlib
+expat
+libdrm
+libpciaccess
+libxshmfence
+wayland
+wayland-protocols
+libepoxy
+llvm
+
+[xorg-protocols-and-libraries]
+xorgproto
+xtrans
+libxau
+xcb-proto
+libxcb
+libx11
+libxext
+libxrender
+libxi
+libxrandr
+libxfixes
+libxcursor
+libxinerama
+libxxf86vm
+libxdamage
+libxfont2
+libxkbfile
+libxshmfence
+xkeyboard-config
+xkbcomp
+libxcvt
+
+[graphics-drivers]
+mesa
+
+[xorg-server]
+xorg-server
+xorg-xinit
+xorg-xauth
+
+[input]
+libinput
+xf86-input-libinput
+
+[optional-hardware-ddx]
+xf86-video-amdgpu
+xf86-video-intel
+xf86-video-nouveau

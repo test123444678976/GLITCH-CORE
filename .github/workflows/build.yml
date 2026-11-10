@@ -285,7 +285,7 @@ jobs:
             libbz2-dev liblzma-dev libzstd-dev libselinux1-dev libmd-dev \
             libdb-dev libcurl4-openssl-dev libgnutls28-dev libgcrypt20-dev \
             liblz4-dev zlib1g-dev libxxhash-dev libseccomp-dev libsystemd-dev \
-            libudev-dev libssl-dev
+            libudev-dev libssl-dev triehash
 
       - name: Download and verify dpkg and APT sources
         run: |

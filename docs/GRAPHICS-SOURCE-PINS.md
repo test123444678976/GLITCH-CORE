@@ -10,6 +10,7 @@ complete dependency closure and not a package build recipe.
 | libdrm | 2.4.134 | `libdrm-2.4.134.tar.xz` | [libdrm 2.4.134 release announcement](https://lwn.net/Articles/1075398/) |
 | Xorg server | 21.1.25 | `xorg-server-21.1.25.tar.xz` | [X.Org upstream archive](https://xorg.freedesktop.org/archive/individual/xserver/) and [independent distribution distinfo](https://lists.freebsd.org/archives/dev-commits-ports-branches/2026-October/015677.html) |
 | xorgproto | 2026.1 | `xorgproto-2026.1.tar.xz` | [xorgproto 2026.1 release announcement](https://www.mail-archive.com/xorg%40lists.x.org/msg08348.html) |
+| xtrans | 1.6.0 | `xtrans-1.6.0.tar.xz` | [X.Org upstream archive](https://xorg.freedesktop.org/archive/individual/lib/) and [Buildroot distinfo](https://fossies.org/linux/buildroot/package/x11r7/xlib_xtrans/xlib_xtrans.hash) |
 
 ## Integrity policy
 
@@ -23,7 +24,7 @@ complete dependency closure and not a package build recipe.
 
 ## Remaining work
 
-The lock currently covers only Mesa, libdrm, Xorg server and xorgproto.
+The lock currently covers Mesa, libdrm, Xorg server, xorgproto and xtrans.
 It does not pin the rest of the X11 libraries, input stack, LLVM/Clang,
 Wayland dependencies, build helpers, patches or package-specific configure
 options. Do not treat it as permission to run a full graphics build yet.

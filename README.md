@@ -1,89 +1,99 @@
 # GLITCH//CORE
 
-Experimental x86_64 Linux distribution project.
+Experimental independent x86_64 Linux distribution project.
 
-## Current prototype
+## Current status (November 2026)
 
-The existing ISO build is a **bootable BusyBox rescue prototype**, not yet a
-complete Linux From Scratch (LFS) operating system. It downloads and compiles
-an upstream Linux kernel and static BusyBox, creates a small initramfs, and
-packages them with GRUB.
+GLITCH//CORE is being developed as an independent Linux From Scratch (LFS)
+13.1-systemd-based distribution. Debian is **not** the operating-system base.
 
-The rescue ISO is intentionally kept separate while the LFS userspace is
-developed. A successful rescue ISO build does not mean that the MATE desktop
-is present.
+The current bootable ISO is still a BusyBox rescue prototype. It is useful
+for checking the kernel, GRUB and initramfs, but it is **not** the finished
+desktop operating system.
 
-## MATE desktop target
+## Desktop target: MATE
 
-The intended primary desktop is **MATE**, replacing the earlier GNOME plan.
-The integration target includes:
+The primary desktop target is **MATE**, replacing the earlier GNOME plan.
+The intended stack includes:
 
+- Xorg and Mesa graphics
+- GTK 3, GLib, Cairo and Pango
 - MATE session, panel, settings daemon and control center
 - Marco window manager and Caja file manager
-- Xorg display server and Mesa graphics
 - LightDM with the GTK greeter
-- NetworkManager and systemd integration
+- D-Bus, systemd-logind, Polkit and NetworkManager
 
-The current MATE work lives on the `feature/mate-desktop` branch. The package
-list in `config/mate-stack.txt` and build sequence in
-`config/mate-build-order.txt` are planning/validation files. They do **not**
-mean those packages have already been compiled or installed.
+The MATE manifests, LightDM session files and guarded target-rootfs
+configuration scripts are in this branch. They are configuration and
+validation work only: **MATE has not yet been compiled into the target rootfs
+or included in a bootable desktop ISO**.
 
-The LightDM session configuration is in `config/lightdm/` and
-`config/xsessions/`. After all required packages have been built and installed
-into a completed target root filesystem, the guarded integration script can
-apply the session configuration:
+After the complete desktop packages have been built and installed into a
+target rootfs, inspect it with:
 
 ```bash
+bash scripts/lfs/check-mate-target.sh /absolute/path/to/target-rootfs
 bash scripts/lfs/install-mate-config.sh /absolute/path/to/target-rootfs
 ```
 
-The script resolves symlinks and `..` before refusing the host root, then checks for the required desktop, display-server and LightDM files before changing the target. Use `scripts/lfs/check-mate-target.sh` for a read-only inspection of an installed target rootfs.
+The installer refuses the host root filesystem and checks required desktop
+components before changing the target.
 
-## LFS preparation
+## Package management: APT + dpkg target
 
-The LFS 13.1-systemd source preparation and cross-toolchain Pass 1 are
-experimental milestones. They do not yet produce a complete LFS userspace.
-See:
+The project targets native builds of **dpkg and APT** from upstream source,
+compiled against the GLITCH//CORE LFS userspace. The intended package format
+is .deb, with a GLITCH//CORE-owned signed repository and metadata.
 
-- `scripts/build-lfs.sh` — downloads and verifies the LFS source set
-- `scripts/lfs/check-host.sh` — read-only host preflight
-- `scripts/lfs/build-toolchain-pass1.sh` — Binutils/GCC cross-toolchain Pass 1
-- `scripts/lfs/validate-mate-stack.sh` — validates the MATE target manifest
-- `scripts/lfs/test-mate-config.sh` — checks MATE integration configuration
-- `scripts/lfs/check-mate-target.sh` — read-only check of an installed MATE rootfs before integration
+This does **not** make GLITCH//CORE Debian-based. Debian/Ubuntu binary
+packages and repositories must not be used as the system base or default
+package source. See `config/package-manager.txt`.
 
-## Build the rescue ISO
+APT is not installed or usable yet. It must not be advertised as available
+until dpkg, apt-get, apt-cache, signature verification, dependency resolution
+and package install/upgrade/remove tests pass in the target system.
 
-The existing GitHub Actions workflow builds the BusyBox rescue ISO. It does
-not yet build the LFS system or MATE desktop. Run it from the repository's
-Actions tab and download the `glitch-core-iso` artifact after a successful run.
+## LFS milestones
 
-## Test with QEMU on Windows
+- `scripts/build-lfs.sh` — downloads and verifies the official LFS 13.1-systemd source set.
+- `scripts/lfs/check-host.sh` — read-only build-host preflight.
+- `scripts/lfs/build-toolchain-pass1.sh` — experimental Binutils/GCC cross-toolchain Pass 1.
+- `scripts/lfs/validate-mate-stack.sh` — validates the MATE target manifest.
+- `scripts/lfs/test-mate-config.sh` — tests MATE session configuration and safety guards.
+- `scripts/lfs/check-mate-target.sh` — read-only inspection of an installed MATE target.
+- `scripts/lfs/validate-package-manager.sh` — validates the APT/dpkg integration plan.
 
-If QEMU is already available, open Command Prompt in the folder containing
-the ISO and run:
+The LFS source preparation and cross-toolchain Pass 1 are intermediate
+milestones. They do not yet produce a complete LFS userspace.
+
+## Build and CI
+
+GitHub Actions validates shell syntax, the MATE configuration and the
+package-manager plan on pushes and pull requests. The expensive rescue ISO
+build runs manually or on pushes to `main`. The manual workflow also offers
+LFS source preparation and the experimental toolchain Pass 1.
+
+A successful validation job is **not** proof that MATE or APT has been built.
+A successful rescue ISO job is **not** a desktop ISO.
+
+## Test the current rescue ISO with QEMU
+
+If QEMU is installed:
 
 ```bat
 qemu-system-x86_64.exe -m 1024 -cdrom GLITCH-CORE.iso -boot d
 ```
 
-## Project layout
+## Architecture
 
-- `.github/workflows/build.yml` — cloud build and validation workflow
-- `scripts/build.sh` — builds kernel, BusyBox, initramfs and rescue ISO
-- `scripts/build-lfs.sh` — prepares verified LFS sources
-- `scripts/lfs/` — LFS and MATE build/integration scripts
-- `config/` — kernel, MATE and desktop configuration
-- `dist/` — generated ISO output (not committed)
+- Target architecture: x86_64
+- Intended base: LFS 13.1-systemd
+- Desktop: MATE
+- Display server: Xorg
+- Login manager: LightDM
+- Package management target: dpkg + APT, using GLITCH//CORE repositories
+- Current bootable milestone: Linux kernel + static BusyBox + initramfs + GRUB
 
-## Important limitations
-
-- Current ISO target: x86_64.
-- The LFS work is incomplete; no complete LFS root filesystem is produced yet.
-- MATE packages are not yet compiled into the ISO.
-- APT is not yet implemented. Debian's APT cannot simply be copied into an
-  arbitrary LFS system; package management needs a compatible package format,
-  dependency database, repository metadata and package build pipeline.
-- The GitHub-hosted runner is a temporary build environment and does not
-  install Linux on your Windows computer.
+The GitHub-hosted Ubuntu runner is only a temporary build machine. It does
+not install Ubuntu or Debian into GLITCH//CORE and does not install Linux on
+your Windows computer.

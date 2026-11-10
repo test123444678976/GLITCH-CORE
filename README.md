@@ -38,8 +38,7 @@ apply the session configuration:
 bash scripts/lfs/install-mate-config.sh /absolute/path/to/target-rootfs
 ```
 
-The script refuses to target `/` and checks for the required desktop,
-display-server and LightDM files before changing the target.
+The script resolves symlinks and `..` before refusing the host root, then checks for the required desktop, display-server and LightDM files before changing the target. Use `scripts/lfs/check-mate-target.sh` for a read-only inspection of an installed target rootfs.
 
 ## LFS preparation
 
@@ -51,7 +50,8 @@ See:
 - `scripts/lfs/check-host.sh` — read-only host preflight
 - `scripts/lfs/build-toolchain-pass1.sh` — Binutils/GCC cross-toolchain Pass 1
 - `scripts/lfs/validate-mate-stack.sh` — validates the MATE target manifest
-- `scripts/lfs/test-mate-config.sh` — checks MATE integration configuration\n- `scripts/lfs/check-mate-target.sh` — read-only check of an installed MATE rootfs before integration
+- `scripts/lfs/test-mate-config.sh` — checks MATE integration configuration
+- `scripts/lfs/check-mate-target.sh` — read-only check of an installed MATE rootfs before integration
 
 ## Build the rescue ISO
 

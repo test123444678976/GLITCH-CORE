@@ -29,6 +29,28 @@ check_optional() {
   if [[ -e "$TARGET/$path" ]]; then printf '[ OK ] %s\n' "$label"; ok=$((ok + 1)); else printf '[OPT ] %s not installed (%s)\n' "$label" "$path"; optional_missing=$((optional_missing + 1)); fi
 }
 
+check_any() {
+  local kind="$1" label="$2"; shift 2
+  local path candidate found=0
+  for path in "$@"; do
+    candidate="$TARGET/$path"
+    case "$kind" in
+      executable) [[ -f "$candidate" && -x "$candidate" ]] && found=1 ;;
+      file)       [[ -f "$candidate" ]] && found=1 ;;
+      directory)  [[ -d "$candidate" ]] && found=1 ;;
+      *) fail "Internal checker error: unknown check kind '$kind'." ;;
+    esac
+    if (( found )); then
+      printf '[ OK ] %s (%s)\n' "$label" "$path"
+      ok=$((ok + 1))
+      return 0
+    fi
+  done
+  printf '[MISS] %s (expected %s; checked: %s)\n' "$label" "$kind" "$*"
+  missing=$((missing + 1))
+  return 0
+}
+
 echo "GLITCH//CORE — MATE target rootfs inspection"
 echo "Target: $TARGET"
 echo

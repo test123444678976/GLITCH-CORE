@@ -64,6 +64,8 @@ and package install/upgrade/remove tests pass in the target system.
 - `scripts/lfs/validate-mate-stack.sh` — validates the MATE target manifest.
 - `config/graphics-stack.txt` — explicit Mesa, Xorg, protocol/library and input-stack inventory.
 - `scripts/lfs/validate-graphics-stack.sh` and `test-graphics-stack.sh` — validate the graphics inventory and test missing/duplicate target rejection.
+- `config/graphics-build-order.txt` — staged dependency order and release gates for reproducible Xorg/Mesa builds.
+- `scripts/lfs/check-graphics-target.sh` and `test-graphics-target.sh` — inspect staged Xorg/Mesa files and exercise the checker with fixtures.
 - `scripts/lfs/test-mate-config.sh` — tests MATE session configuration and safety guards.
 - `scripts/lfs/check-mate-target.sh` — read-only inspection of an installed MATE target.
 - `scripts/lfs/validate-package-manager.sh` — validates the APT/dpkg integration plan.

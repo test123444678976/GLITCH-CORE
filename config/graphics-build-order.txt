@@ -1,0 +1,63 @@
+# GLITCH//CORE — Xorg + Mesa implementation order
+# Target: x86_64, LFS 13.1-systemd
+# This is a dependency/build plan, not a source lockfile or completed build.
+# Do not execute source builds until each upstream release, archive URL,
+# cryptographic checksum, patch set and Meson option set is reviewed and pinned.
+
+## Stage A — build-host and target prerequisites
+- Complete the LFS base and install pkgconf, Python 3, Perl, gettext,
+  Meson, Ninja, CMake, make, pkg-config metadata and required compiler tools.
+- Establish a clean DESTDIR staging root and a target sysroot.
+- Export PKG_CONFIG_SYSROOT_DIR, PKG_CONFIG_LIBDIR and compiler/binutils
+  wrappers for cross builds; never resolve target dependencies from host /usr.
+- Keep build logs, config summaries and installed-file manifests per package.
+
+## Stage B — protocol and low-level libraries
+1. xorgproto
+2. xtrans
+3. libxau
+4. util-macros (X.Org build helper)
+5. libxcb and xcb-proto
+6. libx11, libxext, libxrender, libxi, libxrandr, libxfixes,
+   libxcursor, libxinerama, libxxf86vm, libxdamage
+7. libxfont2, libxkbfile, libxcvt
+8. xkeyboard-config and xkbcomp
+
+## Stage C — Mesa dependencies
+1. zlib and expat
+2. libdrm and libpciaccess
+3. libxshmfence
+4. wayland and wayland-protocols (when enabled by the selected Mesa build)
+5. LLVM/Clang (only when required for the selected Gallium drivers)
+6. libepoxy and other dependencies required by the pinned Mesa release
+
+## Stage D — Mesa
+- Pin a Mesa release and verify its upstream archive checksum/signature.
+- Decide the target driver set explicitly: software rasterizer (swrast)
+  as a fallback, plus only hardware drivers supported by the target hardware.
+- Configure GLX, EGL, GBM, Gallium and Vulkan components deliberately;
+  do not assume every API or driver is enabled by default.
+- Build and install into the staging root; retain Meson configure summary.
+- Verify the resulting library and DRI/Vulkan driver paths with the target checker.
+
+## Stage E — Xorg server
+1. Install the X.Org server build helpers and all required protocol headers.
+2. Pin xorg-server and verify its upstream source.
+3. Configure with the modesetting driver where supported.
+4. Build and stage Xorg server, Xorg modules, XKB data and default config.
+5. Add xf86-input-libinput; treat vendor DDX drivers as optional hardware
+   packages rather than universal requirements.
+
+## Stage F — target integration and runtime tests
+- Run scripts/lfs/check-graphics-target.sh against the staged target.
+- Test Xorg on a real target or virtual machine with a known display device.
+- Verify the GL renderer and EGL/GLX contexts from inside the target.
+- Confirm software rendering fallback before enabling hardware acceleration.
+- Only then connect Xorg/Mesa to LightDM and the MATE session.
+
+## Release gates
+- No unpinned source archive may enter a release build.
+- No host graphics libraries may leak into the target sysroot.
+- A passing file-presence check is not proof of working graphics acceleration.
+- Keep the BusyBox rescue ISO boot path available until the graphical target
+  boots and passes interactive display, input, suspend/resume and session tests.

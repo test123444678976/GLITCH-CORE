@@ -39,6 +39,8 @@ grep -q -- "--proto '=https'" "$FETCHER" || fail "Downloader does not restrict c
 grep -q -- "--proto-redir '=https'" "$FETCHER" || fail "Downloader does not restrict redirects to HTTPS."
 grep -q '! -L "$final"' "$FETCHER" || fail "Downloader does not reject symlinked archive destinations."
 grep -q 'validate-graphics-sources.sh' "$FETCHER" || fail "Downloader does not validate its lockfile first."
+grep -q 'PACKAGE_FILTER="${3:-}"' "$FETCHER" || fail "Downloader does not support per-package source selection."
+grep -q 'No package matched the requested source filter' "$FETCHER" || fail "Downloader does not fail when a source filter matches nothing."
 
 # Exercise the symlink-destination guard without network access.
 mkdir -p "$tmp/bin" "$tmp/dest"

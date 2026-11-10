@@ -73,8 +73,11 @@ def load_app(root: Path) -> tuple[dict, list[tuple[str, Path]]]:
     resolved_files: list[tuple[str, Path]] = []
     for relative in normalized:
         candidate = root.joinpath(*PurePosixPath(relative).parts)
-        if candidate.is_symlink():
-            raise AppError(f"symlinks are not allowed: {relative}")
+        current = root
+        for part in PurePosixPath(relative).parts:
+            current = current / part
+            if current.is_symlink():
+                raise AppError(f"symlinks are not allowed: {relative}")
         try:
             resolved = candidate.resolve(strict=True)
             resolved.relative_to(root)

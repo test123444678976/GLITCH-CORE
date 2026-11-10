@@ -11,9 +11,10 @@ declare -A seen=()
 groups=0
 packages=0
 required=(
+  glib gtk3 cairo pango gdk-pixbuf mesa xorg-server
   mate-common mate-desktop mate-menus mate-settings-daemon
   mate-session-manager mate-panel marco caja
-  xorg-server lightdm networkmanager
+  lightdm lightdm-gtk-greeter dbus polkit networkmanager
 )
 
 while IFS= read -r raw || [[ -n "$raw" ]]; do

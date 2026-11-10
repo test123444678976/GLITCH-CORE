@@ -20,7 +20,11 @@ libxrandr
 libxfixes
 libxcursor
 libxinerama
+libxkbfile
+libxfont2
 xkeyboard-config
+xkbcomp
+libepoxy
 mesa
 
 [gtk-foundations]
@@ -34,6 +38,7 @@ harfbuzz
 fribidi
 atk
 at-spi2-core
+at-spi2-atk
 gtk3
 gdk-pixbuf
 librsvg
@@ -43,6 +48,7 @@ desktop-file-utils
 hicolor-icon-theme
 adwaita-icon-theme
 gsettings-desktop-schemas
+gnome-themes-extra
 dconf
 
 [display-server]
@@ -51,6 +57,11 @@ xorg-xinit
 xorg-xauth
 
 [desktop-core]
+libcanberra
+startup-notification
+libwnck
+libmatekbd
+libmatemixer
 mate-common
 mate-desktop
 mate-menus

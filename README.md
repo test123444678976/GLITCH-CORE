@@ -114,3 +114,34 @@ qemu-system-x86_64.exe -m 1024 -cdrom GLITCH-CORE.iso -boot d
 The GitHub-hosted Ubuntu runner is only a temporary build machine. It does
 not install Ubuntu or Debian into GLITCH//CORE and does not install Linux on
 your Windows computer.
+
+
+## GLITCH application development (initial SDK)
+
+The first host-side application SDK is available under `scripts/glitch-sdk/`.
+It uses Python's standard library and defines an initial `.gcpkg` archive
+format. The SDK currently validates source directories, creates application
+archives and inspects archives without executing their contents.
+
+Try the example app:
+
+```bash
+python3 scripts/glitch-sdk/glitch.py validate examples/apps/hello-world
+python3 scripts/glitch-sdk/glitch.py pack examples/apps/hello-world --output /tmp/hello.gcpkg
+python3 scripts/glitch-sdk/glitch.py inspect /tmp/hello.gcpkg
+python3 examples/apps/hello-world/main.py
+```
+
+Run the SDK regression tests:
+
+```bash
+python3 scripts/glitch-sdk/test-sdk.py
+```
+
+Application metadata lives in `glitch-app.json`. See
+`config/app-package-format.txt` for the v1 package contract.
+
+**Current limitation:** this is developer tooling, not an OS package installer.
+There is no system-wide installation, signature verification, dependency
+resolver, sandbox or application store yet. Do not treat untrusted packages
+as safe to execute. The SDK is not yet integrated into the rescue ISO.

@@ -33,6 +33,11 @@ jobs:
           bash scripts/lfs/test-graphics-target.sh
           bash scripts/lfs/test-graphics-sources.sh
 
+      - name: Validate GLITCH application SDK
+        run: |
+          python3 scripts/glitch-sdk/test-sdk.py
+          python3 scripts/glitch-sdk/glitch.py validate examples/apps/hello-world
+
       - name: Validate APT and dpkg integration plan
         run: |
           bash scripts/lfs/test-package-manager.sh

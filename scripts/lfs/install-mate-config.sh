@@ -27,6 +27,9 @@ TARGET="$(realpath -e "$TARGET_INPUT")"
 [[ -e "$TARGET/usr/lib/systemd/system/dbus.service" || -e "$TARGET/lib/systemd/system/dbus.service" ]] || fail "D-Bus systemd service is missing."
 command -v systemctl >/dev/null 2>&1 || fail "systemctl is required on the build host."
 
+# Do not configure a graphical login until the Xorg + Mesa target passes preflight.
+bash "$ROOT/scripts/lfs/check-graphics-target.sh" "$TARGET"
+
 install -D -m 0644 "$ROOT/config/lightdm/lightdm.conf" \
   "$TARGET/etc/lightdm/lightdm.conf"
 install -D -m 0644 "$ROOT/config/xsessions/mate.desktop" \

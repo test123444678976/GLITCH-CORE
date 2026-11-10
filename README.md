@@ -22,9 +22,12 @@ The intended stack includes:
 - Marco window manager and Caja file manager
 - LightDM with the GTK greeter
 - D-Bus, systemd-logind, Polkit and NetworkManager
+- GVFS, UDisks2, UPower, AccountsService and keyring/secret integration
+- libinput and Xorg input support, with optional hardware-specific video drivers
 
 The MATE manifests, LightDM session files and guarded target-rootfs
-configuration scripts are in this branch. They are configuration and
+configuration scripts are in this branch. The target installer enables
+D-Bus and LightDM, and enables NetworkManager when its unit is present. They are configuration and
 validation work only: **MATE has not yet been compiled into the target rootfs
 or included in a bootable desktop ISO**.
 
@@ -62,6 +65,7 @@ and package install/upgrade/remove tests pass in the target system.
 - `scripts/lfs/test-mate-config.sh` — tests MATE session configuration and safety guards.
 - `scripts/lfs/check-mate-target.sh` — read-only inspection of an installed MATE target.
 - `scripts/lfs/validate-package-manager.sh` — validates the APT/dpkg integration plan.
+- `scripts/lfs/test-package-manager.sh` — positive/negative tests for the package plan and repository safety policy.
 
 The LFS source preparation and cross-toolchain Pass 1 are intermediate
 milestones. They do not yet produce a complete LFS userspace.

@@ -1,0 +1,46 @@
+name: Validate GLITCH//CORE MATE integration
+
+on:
+  push:
+    branches:
+      - feature/mate-desktop
+    paths:
+      - ".github/workflows/mate-validation.yml"
+      - "config/mate-stack.txt"
+      - "config/mate-build-order.txt"
+      - "config/lightdm/**"
+      - "config/xsessions/**"
+      - "scripts/lfs/**"
+  pull_request:
+    paths:
+      - ".github/workflows/mate-validation.yml"
+      - "config/mate-stack.txt"
+      - "config/mate-build-order.txt"
+      - "config/lightdm/**"
+      - "config/xsessions/**"
+      - "scripts/lfs/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate MATE configuration (no package build)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check shell syntax
+        run: |
+          find scripts -type f -name '*.sh' -print0 |
+            while IFS= read -r -d '' script; do
+              echo "Checking $script"
+              bash -n "$script"
+            done
+
+      - name: Validate MATE manifest and integration
+        run: |
+          bash scripts/lfs/test-mate-config.sh

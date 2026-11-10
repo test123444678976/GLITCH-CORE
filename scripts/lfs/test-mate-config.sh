@@ -9,7 +9,8 @@ bash "$ROOT/scripts/lfs/validate-mate-stack.sh"
 for file in \
   "$ROOT/config/lightdm/lightdm.conf" \
   "$ROOT/config/xsessions/mate.desktop" \
-  "$ROOT/scripts/lfs/install-mate-config.sh"; do
+  "$ROOT/scripts/lfs/install-mate-config.sh" \
+  "$ROOT/config/mate-build-order.txt"; do
   [[ -s "$file" ]] || fail "Missing or empty integration file: $file"
 done
 
@@ -22,4 +23,4 @@ grep -q 'systemctl --root=.* enable lightdm.service' "$ROOT/scripts/lfs/install-
 bash -n "$ROOT/scripts/lfs/install-mate-config.sh"
 
 echo "MATE integration configuration: OK"
-echo "NOTE: this test validates configuration only; it does not build MATE or create a desktop ISO."
+echo "NOTE: these checks do not compile MATE or create a desktop ISO."

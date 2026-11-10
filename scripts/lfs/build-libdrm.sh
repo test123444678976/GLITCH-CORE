@@ -25,7 +25,7 @@ src="$SOURCES/libdrm-$version"; build="$BUILD_ROOT/libdrm-$version"
 meson setup "$build" "$src" --prefix=/usr --libdir=lib --buildtype=release -Dtests=false
 ninja -C "$build"
 DESTDIR="$STAGE" ninja -C "$build" install
-if ! find "$STAGE/usr/lib" "$STAGE/usr/lib64" -type f -name 'libdrm.so*' -print -quit 2>/dev/null | grep -q .; then
+if ! find "$STAGE" -type f -name 'libdrm.so*' -print -quit 2>/dev/null | grep -q .; then
   fail "No libdrm shared library was staged."
 fi
 mkdir -p "$STAGE/usr/share/glitch-core"

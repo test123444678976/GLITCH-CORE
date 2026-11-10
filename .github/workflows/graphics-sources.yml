@@ -1,0 +1,30 @@
+name: Prepare verified GLITCH//CORE graphics sources
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-graphics-sources:
+    name: Download and verify pinned Mesa/Xorg archives
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download and verify locked archives
+        run: |
+          chmod +x scripts/lfs/*.sh
+          bash scripts/lfs/test-graphics-sources.sh
+          bash scripts/lfs/fetch-graphics-sources.sh
+
+      - name: Upload verified graphics source archives
+        uses: actions/upload-artifact@v4
+        with:
+          name: glitch-core-graphics-sources-partial
+          path: work-lfs/graphics-sources/
+          if-no-files-found: error
+          retention-days: 7

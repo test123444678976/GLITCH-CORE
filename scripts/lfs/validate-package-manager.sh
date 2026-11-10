@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-MANIFEST="$ROOT/config/package-manager.txt"
+MANIFEST="${1:-$ROOT/config/package-manager.txt}"
 
 fail() { echo "ERROR: $*" >&2; exit 1; }
 [[ -s "$MANIFEST" ]] || fail "Package-manager manifest is missing or empty."

@@ -54,12 +54,6 @@ audit_manifest(){
     esac
   done < "$manifest"
 
-  for required in \
-    "$stage/usr/bin/dpkg" "$stage/usr/bin/dpkg-deb" "$stage/usr/bin/dpkg-query" \
-    "$stage/usr/bin/apt-get" "$stage/usr/bin/apt-cache"; do
-    # Each required binary is checked against its own package manifest below.
-    [[ -e "$required" ]] || continue
-  done
 }
 
 echo "GLITCH//CORE — native package-manager staging audit"

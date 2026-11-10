@@ -35,6 +35,7 @@ jobs:
           bash scripts/lfs/test-graphics-sources.sh
           bash scripts/lfs/test-xorgproto-build.sh
           bash scripts/lfs/test-package-manager-build.sh
+          bash scripts/lfs/test-package-manager-config.sh
 
       - name: Validate GLITCH application SDK
         run: |

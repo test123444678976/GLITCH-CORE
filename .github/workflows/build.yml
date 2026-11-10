@@ -3,13 +3,42 @@ name: Build GLITCH//CORE ISO
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [ main, feature/mate-desktop ]
+  pull_request:
+    branches: [ main, feature/mate-desktop ]
 
 permissions:
   contents: read
 
 jobs:
+  validate-project:
+    name: Validate MATE, package manager and shell scripts
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout selected branch
+        uses: actions/checkout@v4
+
+      - name: Check shell script syntax
+        run: |
+          find scripts -type f -name '*.sh' -print0 | while IFS= read -r -d '' file; do
+            echo "Checking $file"
+            bash -n "$file"
+          done
+
+      - name: Validate MATE desktop configuration
+        run: |
+          chmod +x scripts/lfs/*.sh
+          bash scripts/lfs/test-mate-config.sh
+
+      - name: Validate APT and dpkg integration plan
+        run: |
+          bash scripts/lfs/validate-package-manager.sh
+
   build:
+    name: Build rescue ISO
+    # Keep expensive kernel/BusyBox builds off pull requests and feature pushes.
+    # Run them manually or after changes reach main.
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 360
 
@@ -35,12 +64,12 @@ jobs:
             grub-efi-amd64-bin \
             file patch unzip
 
-      - name: Build GLITCH//CORE
+      - name: Build GLITCH//CORE rescue ISO
         run: |
           chmod +x scripts/*.sh
           ./scripts/build.sh
 
-      - name: Upload ISO
+      - name: Upload rescue ISO
         if: success()
         uses: actions/upload-artifact@v4
         with:
@@ -48,7 +77,7 @@ jobs:
           path: dist/GLITCH-CORE.iso
           if-no-files-found: error
           retention-days: 7
-                
+
   prepare-lfs-sources:
     name: Prepare GLITCH//CORE LFS 13.1
     if: github.event_name == 'workflow_dispatch'
@@ -82,8 +111,6 @@ jobs:
             work-lfs/LFS-VERSION
           if-no-files-found: error
           retention-days: 7
-
-
 
   build-lfs-toolchain-pass1:
     name: Build GLITCH//CORE LFS toolchain Pass 1
@@ -158,16 +185,3 @@ jobs:
             work-lfs/lfs/tools/
           if-no-files-found: error
           retention-days: 7
-
-  validate-mate-stack:
-    name: Validate GLITCH//CORE MATE stack
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout selected branch
-        uses: actions/checkout@v4
-
-      - name: Validate MATE desktop integration
-        run: |
-          chmod +x scripts/lfs/*.sh
-          bash scripts/lfs/test-mate-config.sh

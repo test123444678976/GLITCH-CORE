@@ -34,6 +34,15 @@ echo "Target: $TARGET"
 echo
 echo "== Desktop runtime =="
 check_file "MATE session" usr/bin/mate-session executable
+check_any file "GTK 3 runtime library" usr/lib/libgtk-3.so.0 usr/lib64/libgtk-3.so.0 usr/lib/x86_64-linux-gnu/libgtk-3.so.0
+check_any file "GDK 3 runtime library" usr/lib/libgdk-3.so.0 usr/lib64/libgdk-3.so.0 usr/lib/x86_64-linux-gnu/libgdk-3.so.0
+check_any file "GLib runtime library" usr/lib/libglib-2.0.so.0 usr/lib64/libglib-2.0.so.0 usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
+check_any file "GObject runtime library" usr/lib/libgobject-2.0.so.0 usr/lib64/libgobject-2.0.so.0 usr/lib/x86_64-linux-gnu/libgobject-2.0.so.0
+check_any file "Cairo runtime library" usr/lib/libcairo.so.2 usr/lib64/libcairo.so.2 usr/lib/x86_64-linux-gnu/libcairo.so.2
+check_any file "Pango runtime library" usr/lib/libpango-1.0.so.0 usr/lib64/libpango-1.0.so.0 usr/lib/x86_64-linux-gnu/libpango-1.0.so.0
+check_any file "GdkPixbuf runtime library" usr/lib/libgdk_pixbuf-2.0.so.0 usr/lib64/libgdk_pixbuf-2.0.so.0 usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so.0
+check_file "Compiled GLib schemas" usr/share/glib-2.0/schemas/gschemas.compiled
+check_file "MATE session" usr/bin/mate-session executable
 check_file "Marco window manager" usr/bin/marco executable
 check_file "Caja file manager" usr/bin/caja executable
 check_file "MATE session desktop entry" usr/share/xsessions/mate.desktop
@@ -51,7 +60,8 @@ check_file "LightDM executable" usr/sbin/lightdm executable
 if [[ ! -x "$TARGET/usr/sbin/lightdm" && -x "$TARGET/usr/bin/lightdm" ]]; then
   printf '[ OK ] LightDM executable (usr/bin/lightdm)\n'; ok=$((ok + 1)); missing=$((missing - 1))
 fi
-check_file "LightDM GTK greeter" usr/share/xgreeters/lightdm-gtk-greeter.desktop
+check_file "LightDM GTK greeter desktop entry" usr/share/xgreeters/lightdm-gtk-greeter.desktop
+check_any executable "LightDM GTK greeter executable" usr/sbin/lightdm-gtk-greeter usr/bin/lightdm-gtk-greeter
 check_file "LightDM service unit" usr/lib/systemd/system/lightdm.service
 if [[ ! -e "$TARGET/usr/lib/systemd/system/lightdm.service" && -e "$TARGET/lib/systemd/system/lightdm.service" ]]; then
   printf '[ OK ] LightDM service unit (lib/systemd)\n'; ok=$((ok + 1)); missing=$((missing - 1))

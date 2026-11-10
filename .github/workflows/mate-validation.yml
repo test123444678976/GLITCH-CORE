@@ -17,6 +17,7 @@ on:
       - ".github/workflows/mate-validation.yml"
       - "config/mate-stack.txt"
       - "config/mate-build-order.txt"
+      - "config/graphics-sources.lock"
       - "config/lightdm/**"
       - "config/xsessions/**"
       - "scripts/lfs/**"

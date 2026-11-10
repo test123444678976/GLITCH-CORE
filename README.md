@@ -67,11 +67,16 @@ and package install/upgrade/remove tests pass in the target system.
 - `config/graphics-stack.txt` — explicit Mesa, Xorg, protocol/library and input-stack inventory.
 - `scripts/lfs/validate-graphics-stack.sh` and `test-graphics-stack.sh` — validate the graphics inventory and test missing/duplicate target rejection.
 - `config/graphics-build-order.txt` — staged dependency order and release gates for reproducible Xorg/Mesa builds.
+- `config/graphics-sources.lock` — initial partial source lock for Mesa 26.2.6, libdrm 2.4.134, Xorg server 21.1.25 and xorgproto 2026.1, with HTTPS URLs and SHA-256 values.
+- `scripts/lfs/validate-graphics-sources.sh` and `test-graphics-sources.sh` — validate pinned source metadata and reject unsafe or incomplete entries.
+- `scripts/lfs/fetch-graphics-sources.sh` — download only the locked archives over HTTPS and verify SHA-256 before keeping them; this does not compile packages.
 - `scripts/lfs/check-graphics-target.sh` and `test-graphics-target.sh` — inspect staged Xorg/Mesa file types and exercise standard/alternate layouts, missing components and safety guards with fixtures.
 - `scripts/lfs/test-mate-config.sh` — tests MATE session configuration and safety guards.
 - `scripts/lfs/check-mate-target.sh` — read-only inspection of an installed MATE target.
 - `scripts/lfs/validate-package-manager.sh` — validates the APT/dpkg integration plan.
 - `scripts/lfs/test-package-manager.sh` — positive/negative tests for the package plan and repository safety policy.
+
+The graphics source lock is intentionally **partial**: it pins four upstream archives only, not every dependency in the graphics inventory. The remaining packages, signatures, patches, build options and target dependency closure still need review before a complete Xorg/Mesa build can be enabled.
 
 The LFS source preparation and cross-toolchain Pass 1 are intermediate
 milestones. They do not yet produce a complete LFS userspace.

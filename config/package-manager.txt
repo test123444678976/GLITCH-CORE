@@ -1,0 +1,56 @@
+# GLITCH//CORE package-management target
+# Target: native LFS 13.1-systemd x86_64 userspace.
+# This is a source/build plan, NOT an installed package database.
+#
+# Goal: provide APT-compatible .deb package management without using Debian
+# as the operating-system base. Build dpkg and APT from upstream source
+# against GLITCH//CORE's own LFS libraries and publish a signed native repo.
+#
+# Do NOT copy Debian/Ubuntu binaries or point the default sources at Debian.
+
+[package-format]
+dpkg
+apt
+
+[apt-runtime-dependencies]
+curl
+gnutls
+gcrypt
+lz4
+lzma
+zstd
+bz2
+xxhash
+seccomp
+systemd
+
+[repository-tools]
+gpgme
+gnupg
+ca-certificates
+
+[repository-metadata]
+Packages
+Packages.gz
+Packages.xz
+Release
+InRelease
+Release.gpg
+
+[repository-policy]
+architecture=amd64
+component=core
+suite=stable
+origin=GLITCH//CORE
+signed-by=GLITCH//CORE archive key
+default-source=GLITCH//CORE official repository only
+
+[implementation-requirements]
+- Build dpkg and APT from upstream source in the LFS target.
+- Resolve and pin every source release and checksum before compilation.
+- Integrate package ownership and dependency state with dpkg's database.
+- Generate Packages indexes from the repository's .deb files.
+- Sign Release metadata and verify signatures before package installation.
+- Support install, remove, upgrade, query, dependency resolution and rollback-safe unpack/configure.
+- Never use host apt to install packages into the target rootfs.
+- Do not claim APT is available until dpkg, apt-get, apt-cache and a signed repository pass integration tests.

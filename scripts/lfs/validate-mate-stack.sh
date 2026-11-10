@@ -16,6 +16,8 @@ required=(
   libcanberra startup-notification libwnck libmatekbd libmatemixer
   mate-session-manager mate-panel marco caja
   lightdm lightdm-gtk-greeter dbus polkit networkmanager
+  gvfs udisks2 upower accountsservice libsecret gnome-keyring libnotify
+  libxklavier libgtop libatasmart libinput xf86-input-libinput
 )
 
 while IFS= read -r raw || [[ -n "$raw" ]]; do

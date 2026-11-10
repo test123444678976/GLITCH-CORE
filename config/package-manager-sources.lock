@@ -1,0 +1,6 @@
+# GLITCH//CORE native package manager source lock
+# Source archives only. These are compiled against the GLITCH//CORE LFS base;
+# no Debian/Ubuntu binary packages are copied into the target.
+# Format: package|version|archive|https-url|sha256
+dpkg|1.23.11|dpkg_1.23.11.tar.xz|https://deb.debian.org/debian/pool/main/d/dpkg/dpkg_1.23.11.tar.xz|4baf0632157bfac430b7dc1fe8800ea0787dac91f8bb272404ae19d98e569dd3
+apt|3.0.4|apt_3.0.4.tar.xz|https://deb.debian.org/debian/pool/main/a/apt/apt_3.0.4.tar.xz|e853aec49afbe520ebcd4dbcbc98e1c55262c6bf1c119cf43e6aec69752443c6

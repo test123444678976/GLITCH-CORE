@@ -1,0 +1,48 @@
+# GLITCH//CORE — proposed MATE build sequence
+# Target: x86_64, LFS 13.1-systemd
+# This is a planning manifest, NOT a list of completed builds.
+# Each stage must be built and tested before the next one.
+#
+# Stage 0 — complete LFS base
+# Linux API headers, man-pages, glibc, zlib, bzip2, xz, zstd,
+# file, readline, m4, bc, flex, bison, libtool, gmp, mpfr, mpc,
+# pkgconf, ncurses, attr, acl, libcap, shadow, gcc, make, gettext,
+# bash, coreutils, diffutils, findutils, gawk, grep, gzip, sed,
+# tar, texinfo, util-linux, xfsprogs, systemd, dbus, sudo.
+#
+# Stage 1 — graphics and graphics dependencies
+# libpng, freetype, fontconfig, pixman, libxau, xcb-proto,
+# libxcb, libx11, xtrans, libxext, libxrender, libxi, libxrandr,
+# libxfixes, libxcursor, libxinerama, libxkbfile, libxfont2,
+# xkeyboard-config, xkbcomp, libepoxy, mesa, xorg-server.
+#
+# Stage 2 — GTK and desktop foundations
+# glib, pcre2, libffi, gobject-introspection, cairo, pango,
+# harfbuzz, fribidi, atk, at-spi2-core, at-spi2-atk, gtk3,
+# gdk-pixbuf, librsvg, libxml2, shared-mime-info, desktop-file-utils,
+# hicolor-icon-theme, adwaita-icon-theme, gsettings-desktop-schemas,
+# gnome-themes-extra, dconf, gconf (only if required by selected releases).
+#
+# Stage 3 — session and MATE core
+# libcanberra, startup-notification, libwnck, libmatekbd,
+# libmatemixer, mate-menus, mate-desktop, mate-session-manager,
+# mate-settings-daemon, marco, mate-panel, mate-control-center,
+# mate-notification-daemon, mate-polkit, mate-common.
+#
+# Stage 4 — file manager and utilities
+# caja, caja-extensions, engrampa, atril, eom, pluma, mate-terminal,
+# mate-system-monitor, mate-screenshot, mate-utils, mozo, mate-calc,
+# mate-applets, mate-backgrounds, mate-icon-theme, mate-themes,
+# mate-power-manager, mate-screensaver, mate-media.
+#
+# Stage 5 — login, networking and system integration
+# lightdm, lightdm-gtk-greeter, networkmanager, polkit, elogind
+# (only if the selected desktop stack requires it; prefer systemd-logind
+# on this systemd build).
+#
+# Before implementation:
+# - Pin every source to a release and checksum.
+# - Resolve actual upstream dependencies from each package's build system.
+# - Build in dependency order with DESTDIR staging and logged configure flags.
+# - Do not substitute Ubuntu/Debian binary packages into the LFS target.
+# - Keep the BusyBox rescue ISO separate until the LFS rootfs boots reliably.

@@ -1,13 +1,54 @@
 # GLITCH//CORE MATE desktop stack
 # Target: LFS 13.1-systemd, x86_64
-# This is an integration target list, NOT an installed package list.
-# Build only after the complete LFS base and its development toolchain exist.
+# This is a target inventory, NOT an installed package list.
+# Build all dependencies in config/mate-build-order.txt order.
+
+[graphics-foundations]
+libpng
+freetype
+fontconfig
+pixman
+libxau
+xcb-proto
+libxcb
+libx11
+xtrans
+libxext
+libxrender
+libxi
+libxrandr
+libxfixes
+libxcursor
+libxinerama
+xkeyboard-config
+mesa
+
+[gtk-foundations]
+glib
+pcre2
+libffi
+gobject-introspection
+cairo
+pango
+harfbuzz
+fribidi
+atk
+at-spi2-core
+gtk3
+gdk-pixbuf
+librsvg
+libxml2
+shared-mime-info
+desktop-file-utils
+hicolor-icon-theme
+adwaita-icon-theme
+gsettings-desktop-schemas
+dconf
 
 [display-server]
 xorg-server
 xorg-xinit
 xorg-xauth
-mesa
 
 [desktop-core]
 mate-common

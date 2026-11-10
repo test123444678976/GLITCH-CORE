@@ -72,6 +72,9 @@ check_optional "MATE terminal" usr/bin/mate-terminal
 check_optional "MATE file manager extensions directory" usr/lib/caja/extensions
 
 echo
+echo "== Xorg + Mesa graphics gate =="
+bash "$ROOT/scripts/lfs/check-graphics-target.sh" "$TARGET"
+
 echo "== Result =="
 echo "Present: $ok | Required missing: $missing | Optional missing: $optional_missing"
 if (( missing > 0 )); then

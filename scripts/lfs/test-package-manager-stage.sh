@@ -43,11 +43,11 @@ audit_manifest(){
   local -A seen=()
   while IFS= read -r path || [[ -n "$path" ]]; do
     [[ -n "$path" ]] || fail "Empty entry in $manifest"
-    [[ "$path" == "$stage/"* ]] || fail "Manifest path is not inside its staging tree: $path"
+    [[ "$path" == ./* && "$path" != *"/../"* && "$path" != */.. ]] || fail "Manifest entry must be a normalized relative path: $path"
     [[ -z "${seen[$path]+x}" ]] || fail "Duplicate manifest entry: $path"
     seen["$path"]=1
-    [[ -f "$path" && ! -L "$path" ]] || fail "Manifest entry is not a regular file: $path"
-    resolved="$(realpath -e "$path")"
+    [[ -f "$stage/$path" && ! -L "$stage/$path" ]] || fail "Manifest entry is not a regular staged file: $path"
+    resolved="$(realpath -e "$stage/$path")"
     case "$resolved" in
       "$stage"/*) ;;
       *) fail "Resolved manifest entry escapes its staging tree: $path -> $resolved" ;;
@@ -66,10 +66,10 @@ check_executable "$APT" apt-cache apt-build-info apt
 audit_manifest "$DPKG"
 audit_manifest "$APT"
 
-for required in "$DPKG/usr/bin/dpkg" "$DPKG/usr/bin/dpkg-deb" "$DPKG/usr/bin/dpkg-query" "$DPKG/usr/share/glitch-core/dpkg-build-info"; do
+for required in ./usr/bin/dpkg ./usr/bin/dpkg-deb ./usr/bin/dpkg-query ./usr/share/glitch-core/dpkg-build-info; do
   grep -Fxq "$required" "$DPKG/installed-files.txt" || fail "dpkg manifest omits required output: $required"
 done
-for required in "$APT/usr/bin/apt-get" "$APT/usr/bin/apt-cache" "$APT/usr/share/glitch-core/apt-build-info"; do
+for required in ./usr/bin/apt-get ./usr/bin/apt-cache ./usr/share/glitch-core/apt-build-info; do
   grep -Fxq "$required" "$APT/installed-files.txt" || fail "APT manifest omits required output: $required"
 done
 

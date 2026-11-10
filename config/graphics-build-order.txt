@@ -12,7 +12,11 @@
   wrappers for cross builds; never resolve target dependencies from host /usr.
 - Keep build logs, config summaries and installed-file manifests per package.
 
-## Stage B — protocol and low-level libraries\n\nCI has now compiled xorgproto and libdrm from their pinned source archives into\nseparate host-side DESTDIR artifacts. These are build checkpoints only; they\nhave not been merged into the LFS target sysroot.
+## Stage B — protocol and low-level libraries
+
+CI has compiled xorgproto, xtrans and libdrm from pinned source archives into
+separate host-side DESTDIR artifacts. These are build checkpoints only; they
+have not been merged into the LFS target sysroot.
 1. xorgproto
 2. xtrans
 3. libxau

@@ -1,7 +1,7 @@
 # GLITCH//CORE LFS systemd toolchain source contract.
-# Tracks the current upstream LFS 13.1-systemd book revision used by the
-# official stable-systemd source manifest. Update only alongside recipe review.
-LFS_BOOK=r13.1-39-systemd
+# Pins the released LFS 13.1-systemd book and its official stable-systemd
+# source manifest. Update only alongside a reviewed recipe and source refresh.
+LFS_BOOK=13.1-systemd
 LFS_SERIES=13.1-systemd
 TARGET=x86_64-lfs-linux-gnu
 

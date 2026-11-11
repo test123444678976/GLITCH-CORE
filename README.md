@@ -68,7 +68,7 @@ and package install/upgrade/remove tests pass in the target system.
 - `config/graphics-stack.txt` — explicit Mesa, Xorg, protocol/library and input-stack inventory.
 - `scripts/lfs/validate-graphics-stack.sh` and `test-graphics-stack.sh` — validate the graphics inventory and test missing/duplicate target rejection.
 - `config/graphics-build-order.txt` — staged dependency order and release gates for reproducible Xorg/Mesa builds.
-- `config/graphics-sources.lock` — initial partial source lock for Mesa 26.2.6, libdrm 2.4.134, Xorg server 21.1.25 and xorgproto 2026.1, with HTTPS URLs and SHA-256 values.
+- `config/graphics-sources.lock` — initial partial source lock for Mesa 26.2.6, libdrm 2.4.134, Xorg server 21.1.25, xorgproto 2026.1 and xtrans 1.6.0, with HTTPS URLs and SHA-256 values.
 - `docs/GRAPHICS-SOURCE-PINS.md` — provenance for the pinned archive checksums and remaining source-lock work.
 - `scripts/lfs/validate-graphics-sources.sh` and `test-graphics-sources.sh` — validate pinned source metadata and reject unsafe or incomplete entries.
 - `scripts/lfs/fetch-graphics-sources.sh` — download locked archives over HTTPS and verify SHA-256; supports selecting one package so build jobs do not fetch the entire partial lock unnecessarily.
@@ -83,9 +83,17 @@ and package install/upgrade/remove tests pass in the target system.
 - `scripts/lfs/check-mate-target.sh` — read-only inspection of an installed MATE target. It also checks GTK 3 runtime libraries, compiled GLib schemas and the LightDM GTK greeter executable.
 - `scripts/lfs/test-mate-target.sh` — fixture-based regression tests for complete/incomplete desktop targets, GTK runtime and greeter detection.
 - `scripts/lfs/validate-package-manager.sh` — validates the APT/dpkg integration plan.
-- `config/package-manager-sources.lock` — pinned dpkg 1.23.11 and APT 3.0.4 source archives with SHA-256 digests; these are source-only inputs, not Debian binary packages.\n- `scripts/lfs/validate-package-manager-sources.sh` and `fetch-package-manager-sources.sh` — validate and fetch the pinned native package-manager source archives.\n- `scripts/lfs/build-dpkg.sh` and `build-apt.sh` — native source-build recipes that stage outputs with DESTDIR, without installing into the host or target rootfs.\n- `scripts/lfs/test-package-manager-build.sh` — source-lock and build-recipe safety regression tests.\n- `config/apt/apt.conf` and `config/apt/sources.list` — conservative target defaults with repositories disabled until the GLITCH//CORE signing key is installed.\n- `scripts/lfs/install-package-manager-config.sh` — initializes APT/dpkg directories in an LFS target only after target-native dpkg and APT executables are present.\n- `scripts/lfs/test-package-manager-config.sh` — fixture tests for target initialization and unsafe-root rejection.\n- `scripts/lfs/build-libdrm.sh` — compiles the pinned libdrm prerequisite into an isolated staging tree.\n- `.github/workflows/build.yml` — compiles dpkg/APT and libdrm into separate short-lived CI artifacts for review; CI runner packages are build dependencies only.
+- `config/package-manager-sources.lock` — pinned dpkg 1.23.11 and APT 3.0.4 source archives with SHA-256 digests; these are source-only inputs, not Debian binary packages.
+- `scripts/lfs/validate-package-manager-sources.sh` and `fetch-package-manager-sources.sh` — validate and fetch the pinned native package-manager source archives.
+- `scripts/lfs/build-dpkg.sh` and `build-apt.sh` — native source-build recipes that stage outputs with DESTDIR, without installing into the host or target rootfs.
+- `scripts/lfs/test-package-manager-build.sh` — source-lock and build-recipe safety regression tests.
+- `config/apt/apt.conf` and `config/apt/sources.list` — conservative target defaults with repositories disabled until the GLITCH//CORE signing key is installed.
+- `scripts/lfs/install-package-manager-config.sh` — initializes APT/dpkg directories in an LFS target only after target-native dpkg and APT executables are present.
+- `scripts/lfs/test-package-manager-config.sh` — fixture tests for target initialization and unsafe-root rejection.
+- `scripts/lfs/build-libdrm.sh` — compiles the pinned libdrm prerequisite into an isolated staging tree.
+- `.github/workflows/build.yml` — compiles dpkg/APT and libdrm into separate short-lived CI artifacts for review; CI runner packages are build dependencies only.
 
-The graphics source lock is intentionally **partial**: it pins four upstream archives only, not every dependency in the graphics inventory. xorgproto, xtrans and libdrm now have individual source-build recipes and CI artifacts; Mesa and Xorg still require their full dependency closure and target integration. The remaining packages, signatures, patches, build options and target dependency closure still need review before a complete Xorg/Mesa build can be enabled.
+The graphics source lock is intentionally **partial**: it currently pins five upstream archives, not every dependency in the graphics inventory. xorgproto, xtrans and libdrm now have individual source-build recipes and CI artifacts; Mesa and Xorg still require their full dependency closure and target integration. The remaining packages, signatures, patches, build options and target dependency closure still need review before a complete Xorg/Mesa build can be enabled.
 
 The LFS source preparation and cross-toolchain Pass 1 are intermediate
 milestones. They do not yet produce a complete LFS userspace.

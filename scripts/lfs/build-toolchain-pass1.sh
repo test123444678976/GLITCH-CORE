@@ -45,9 +45,11 @@ umask 022
 
 archive() {
     local pattern="$1"
-    local found
-    found="$(find "$SOURCES" -maxdepth 1 -type f -name "$pattern" -print -quit)"
-    [[ -n "$found" ]] || fail "Required source archive missing ($pattern). Run scripts/build-lfs.sh first."
+    local -a matches=()
+    mapfile -t matches < <(find "$SOURCES" -maxdepth 1 -type f -name "$pattern" -print | LC_ALL=C sort)
+    (( ${#matches[@]} == 1 )) || fail "Expected exactly one source archive matching $pattern; found ${#matches[@]}."
+    local found="${matches[0]}"
+    bash "$ROOT/scripts/lfs/verify-lfs-archive.sh" "$SOURCES" "$(basename "$found")"
     printf '%s\n' "$found"
 }
 

@@ -12,6 +12,8 @@ for script in build-dpkg.sh build-apt.sh; do
   grep -q 'DESTDIR=' "$ROOT/scripts/lfs/$script" || fail "$script must stage, not install directly."
   grep -q 'sha256sum --check --status' "$ROOT/scripts/lfs/$script" || fail "$script must verify its source."
   grep -q 'id -u' "$ROOT/scripts/lfs/$script" || fail "$script must refuse root execution."
+  grep -q 'rm -rf -- "$src"' "$ROOT/scripts/lfs/$script" || fail "$script must re-extract verified source into a clean tree."
+  grep -q 'rm -rf -- "$build"' "$ROOT/scripts/lfs/$script" || fail "$script must discard stale build caches."
 done
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 cp "$ROOT/config/package-manager-sources.lock" "$tmp/lock"

@@ -9,6 +9,9 @@ on:
       - "scripts/lfs/build-toolchain-*.sh"
       - "scripts/lfs/check-host.sh"
       - "scripts/lfs/verify-lfs-archive.sh"
+      - "scripts/lfs/test-toolchain-chapter5.sh"
+      - "config/lfs-toolchain.lock"
+      - ".github/workflows/lfs-toolchain.yml"
 
 permissions:
   contents: read
@@ -93,6 +96,11 @@ jobs:
           test -w "$LFS/tools"
           echo "LFS=$LFS"
           echo "LFS_TGT=$LFS_TGT"
+
+      - name: Run Chapter 5 regression tests
+        run: |
+          chmod +x scripts/lfs/test-toolchain-chapter5.sh
+          bash scripts/lfs/test-toolchain-chapter5.sh
 
       - name: Build complete LFS Chapter 5
         run: |

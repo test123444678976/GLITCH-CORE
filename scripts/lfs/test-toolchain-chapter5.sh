@@ -43,7 +43,7 @@ for required in \
   'LFS_BOOK=r13.1-39-systemd' \
   'BINUTILS=2.47' \
   'GCC=16.2.0' \
-  'LINUX_API_HEADERS=7.3.1' \
+  'LINUX_API_HEADERS=7.1.8' \
   'GLIBC=2.44' \
   'GLIBC_PATCHES=glibc-fhs-1.patch,glibc-2.44-upstream_fixes-1.patch'; do
   grep -Fxq -- "$required" "$LOCK" || fail "Pinned LFS toolchain contract mismatch: $required"

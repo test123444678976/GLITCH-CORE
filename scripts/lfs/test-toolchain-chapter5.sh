@@ -40,7 +40,7 @@ if LFS="$tmp/lfs" LFS_TGT=x86_64-lfs-linux-gnu bash "$SCRIPT" >/dev/null 2>&1; t
 fi
 
 for required in \
-  'LFS_BOOK=r13.1-39-systemd' \
+  'LFS_BOOK=13.1-systemd' \
   'BINUTILS=2.47' \
   'GCC=16.2.0' \
   'LINUX_API_HEADERS=7.1.8' \

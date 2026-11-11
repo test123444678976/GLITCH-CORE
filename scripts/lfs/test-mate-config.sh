@@ -124,12 +124,12 @@ for relative in etc usr/share; do
   outside="$tmpdir/outside-$relative"
   mkdir -p "$linked/etc" "$linked/usr/bin" "$outside"
   for bin in mate-session marco caja dbus-daemon lightdm-gtk-greeter; do
-    printf '#!/bin/sh\\nexit 0\\n' > "$linked/usr/bin/$bin"
+    printf '#!/bin/sh\nexit 0\n' > "$linked/usr/bin/$bin"
     chmod +x "$linked/usr/bin/$bin"
   done
-  printf '#!/bin/sh\\nexit 0\\n' > "$linked/usr/bin/Xorg"
+  printf '#!/bin/sh\nexit 0\n' > "$linked/usr/bin/Xorg"
   chmod +x "$linked/usr/bin/Xorg"
-  printf '#!/bin/sh\\nexit 0\\n' > "$linked/usr/bin/lightdm"
+  printf '#!/bin/sh\nexit 0\n' > "$linked/usr/bin/lightdm"
   chmod +x "$linked/usr/bin/lightdm"
   mkdir -p "$linked/usr/lib/xorg/modules" "$linked/usr/lib/dri" \\
     "$linked/usr/lib/systemd/system" "$linked/usr/share/xgreeters"

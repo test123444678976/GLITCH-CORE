@@ -40,7 +40,7 @@ umask 022
 verify_source() {
   local name="$1"
   [[ "$name" == "$(basename "$name")" && "$name" != "." && "$name" != ".." ]] || fail "Unsafe source filename: $name"
-  bash "$ROOT/scripts/lfs/verify-lfs-archive.sh" "$SOURCES" "$name"
+  bash "$ROOT/scripts/lfs/verify-lfs-archive.sh" "$SOURCES" "$name" >/dev/null
 }
 
 source_archive() {

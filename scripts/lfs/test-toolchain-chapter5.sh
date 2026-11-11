@@ -3,10 +3,12 @@ set -Eeuo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 SCRIPT="$ROOT/scripts/lfs/build-toolchain-chapter5.sh"
 PASS1="$ROOT/scripts/lfs/build-toolchain-pass1.sh"
+LOCK="$ROOT/config/lfs-toolchain.lock"
 fail(){ echo "ERROR: $*" >&2; exit 1; }
 
 bash -n "$SCRIPT" || fail "Chapter 5 toolchain script has invalid Bash syntax."
 bash -n "$PASS1" || fail "Pass 1 script has invalid Bash syntax."
+test -s "$LOCK" || fail "Pinned LFS toolchain contract is missing."
 
 for required in \
   'BINUTILS_VERSION="2.47"' \
@@ -36,5 +38,15 @@ mkdir -p "$tmp/lfs/sources" "$tmp/lfs/tools"
 if LFS="$tmp/lfs" LFS_TGT=x86_64-lfs-linux-gnu bash "$SCRIPT" >/dev/null 2>&1; then
   fail "Chapter 5 build accepted an empty LFS source workspace."
 fi
+
+for required in \
+  'LFS_BOOK=r13.1-39-systemd' \
+  'BINUTILS=2.47' \
+  'GCC=16.2.0' \
+  'LINUX_API_HEADERS=7.3.1' \
+  'GLIBC=2.44' \
+  'GLIBC_PATCHES=glibc-fhs-1.patch,glibc-2.44-upstream_fixes-4.patch'; do
+  grep -Fxq -- "$required" "$LOCK" || fail "Pinned LFS toolchain contract mismatch: $required"
+done
 
 echo "LFS Chapter 5 toolchain regression tests: OK"

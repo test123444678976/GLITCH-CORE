@@ -118,6 +118,40 @@ fi
 [[ ! -e "$bad_gtk/etc/lightdm/lightdm.conf" ]] ||
   fail "Installer wrote configuration without GTK 3."
 
+# Configuration destinations must not escape the selected rootfs via symlinks.
+for relative in etc usr/share; do
+  linked="$tmpdir/symlink-target-$relative"
+  outside="$tmpdir/outside-$relative"
+  mkdir -p "$linked/etc" "$linked/usr/bin" "$outside"
+  for bin in mate-session marco caja dbus-daemon lightdm-gtk-greeter; do
+    printf '#!/bin/sh\\nexit 0\\n' > "$linked/usr/bin/$bin"
+    chmod +x "$linked/usr/bin/$bin"
+  done
+  printf '#!/bin/sh\\nexit 0\\n' > "$linked/usr/bin/Xorg"
+  chmod +x "$linked/usr/bin/Xorg"
+  printf '#!/bin/sh\\nexit 0\\n' > "$linked/usr/bin/lightdm"
+  chmod +x "$linked/usr/bin/lightdm"
+  mkdir -p "$linked/usr/lib/xorg/modules" "$linked/usr/lib/dri" \\
+    "$linked/usr/lib/systemd/system" "$linked/usr/share/xgreeters"
+  touch "$linked/usr/lib/libgtk-3.so.0" "$linked/usr/lib/libGL.so.1" \\
+    "$linked/usr/lib/libEGL.so.1" "$linked/usr/lib/libgbm.so.1" \\
+    "$linked/usr/lib/dri/swrast_dri.so" "$linked/usr/share/xgreeters/lightdm-gtk-greeter.desktop" \\
+    "$linked/usr/lib/systemd/system/lightdm.service" "$linked/usr/lib/systemd/system/dbus.service"
+  if [[ "$relative" == "etc" ]]; then
+    rm -rf "$linked/etc"
+    ln -s "$outside" "$linked/etc"
+  else
+    mkdir -p "$linked/usr"
+    rm -rf "$linked/usr/share"
+    ln -s "$outside" "$linked/usr/share"
+  fi
+  if bash "$ROOT/scripts/lfs/install-mate-config.sh" "$linked" >/dev/null 2>&1; then
+    fail "Installer accepted symlinked destination path: $relative"
+  fi
+  [[ -z "$(find "$outside" -mindepth 1 -print -quit)" ]] ||
+    fail "Installer wrote outside the target through $relative symlink."
+done
+
 echo "MATE integration configuration: OK"
 echo "MATE installer runtime preflight tests: OK"
 echo "NOTE: fixture tests do not compile MATE or launch a graphical session."

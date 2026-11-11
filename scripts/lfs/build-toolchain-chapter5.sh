@@ -14,7 +14,7 @@ JOBS="${JOBS:-2}"
 
 BINUTILS_VERSION="2.47"
 GCC_VERSION="16.2.0"
-LINUX_VERSION="7.3.1"
+LINUX_VERSION="7.1.8"
 GLIBC_VERSION="2.44"
 
 fail() { echo "ERROR: $*" >&2; exit 1; }
@@ -89,10 +89,10 @@ build_glibc() {
   log "Building cross Glibc $GLIBC_VERSION"
   extract_source "$(source_archive "glibc-$GLIBC_VERSION.tar.xz")" "$src"
   verify_source "glibc-fhs-1.patch"
-  verify_source "glibc-$GLIBC_VERSION-upstream_fixes-4.patch"
+  verify_source "glibc-$GLIBC_VERSION-upstream_fixes-1.patch"
   cd "$src"
   patch -Np1 -i "$SOURCES/glibc-fhs-1.patch"
-  patch -Np1 -i "$SOURCES/glibc-$GLIBC_VERSION-upstream_fixes-4.patch"
+  patch -Np1 -i "$SOURCES/glibc-$GLIBC_VERSION-upstream_fixes-1.patch"
 
   case "$(uname -m)" in
     x86_64)

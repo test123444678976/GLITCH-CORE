@@ -18,6 +18,8 @@ printf '%s  %s\n' "$checksum" "$file" | sha256sum --check --status || fail "APT 
 for p in "$STAGE_INPUT" "$BUILD_ROOT"; do [[ "$p" == /* && "$p" != "/" ]] || fail "Paths must be absolute and not /."; done
 mkdir -p "$STAGE_INPUT" "$BUILD_ROOT"
 STAGE="$(realpath -e "$STAGE_INPUT")"; BUILD_ROOT="$(realpath -e "$BUILD_ROOT")"
+# Check canonical paths as well as the user-supplied paths: a symlink to /\n# must never turn DESTDIR into a host-root installation target.
+[[ "$STAGE" != "/" && "$BUILD_ROOT" != "/" ]] || fail "Refusing a stage or build directory resolving to the host root (/)."
 [[ "$STAGE" != "$BUILD_ROOT" ]] || fail "Stage and build paths must differ."
 src="$SOURCES/apt-$version"; build="$BUILD_ROOT/apt-$version"
 # Always unpack the checksum-verified archive into a fresh source tree.

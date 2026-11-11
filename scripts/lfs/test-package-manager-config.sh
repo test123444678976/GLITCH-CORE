@@ -25,6 +25,24 @@ if grep -Eq '^[[:space:]]*deb(-src)?[[:space:]]' "$TMP/target/etc/apt/sources.li
   fail "An external repository must not be enabled by default."
 fi
 
+# Existing target path components must not redirect writes outside the rootfs.
+for component in etc var; do
+  linked="$TMP/symlink-$component"
+  outside="$TMP/outside-$component"
+  mkdir -p "$linked/etc" "$linked/usr/bin" "$outside"
+  for bin in dpkg dpkg-deb apt-get apt-cache; do
+    printf '#!/bin/sh\nexit 0\n' > "$linked/usr/bin/$bin"
+    chmod +x "$linked/usr/bin/$bin"
+  done
+  rm -rf "$linked/$component"
+  ln -s "$outside" "$linked/$component"
+  if bash "$SCRIPT" "$linked" >/dev/null 2>&1; then
+    fail "Accepted a symlinked target $component directory."
+  fi
+  [[ -z "$(find "$outside" -mindepth 1 -print -quit)" ]] ||
+    fail "Wrote package-manager configuration outside the target through $component symlink."
+done
+
 # A target without native dpkg/APT executables must be rejected before writes.
 mkdir -p "$TMP/incomplete/etc" "$TMP/incomplete/usr/bin"
 if bash "$SCRIPT" "$TMP/incomplete" >/dev/null 2>&1; then

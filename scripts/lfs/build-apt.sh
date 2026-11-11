@@ -20,7 +20,16 @@ mkdir -p "$STAGE_INPUT" "$BUILD_ROOT"
 STAGE="$(realpath -e "$STAGE_INPUT")"; BUILD_ROOT="$(realpath -e "$BUILD_ROOT")"
 [[ "$STAGE" != "$BUILD_ROOT" ]] || fail "Stage and build paths must differ."
 src="$SOURCES/apt-$version"; build="$BUILD_ROOT/apt-$version"
-[[ -d "$src" ]] || tar -xf "$file" -C "$SOURCES"
+# Always unpack the checksum-verified archive into a fresh source tree.
+# Never trust a pre-existing extracted directory from an earlier or external run.
+[[ ! -L "$src" ]] || fail "Refusing symlinked apt source tree: $src"
+rm -rf -- "$src"
+tar -xf "$file" -C "$SOURCES"
+[[ -d "$src" && ! -L "$src" ]] || fail "Expected apt source directory was not extracted: $src"
+# Reconfigure from scratch so stale Make/CMake caches cannot affect the build.
+[[ ! -L "$build" ]] || fail "Refusing symlinked apt build directory: $build"
+rm -rf -- "$build"
+mkdir -p "$build"
 [[ -f "$src/CMakeLists.txt" ]] || fail "APT CMakeLists.txt missing."
 cmake -S "$src" -B "$build" -G Ninja \
   -DCMAKE_BUILD_TYPE=Release \

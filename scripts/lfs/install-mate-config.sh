@@ -14,6 +14,14 @@ TARGET="$(realpath -e "$TARGET_INPUT")"
 [[ "$TARGET" != "/" ]] || fail "Refusing to modify the host root filesystem."
 [[ -d "$TARGET/etc" && -d "$TARGET/usr" ]] || fail "Target does not look like an installed LFS root filesystem."
 
+# Refuse symlinked destination components: configuration writes and systemctl
+# enable operations must remain contained inside the selected target rootfs.
+for relative in \
+  etc etc/lightdm etc/systemd etc/systemd/system \
+  usr usr/share usr/share/xsessions; do
+  [[ ! -L "$TARGET/$relative" ]] || fail "Refusing symlink in MATE configuration path: $relative"
+done
+
 # Check all runtime components before writing any configuration.
 [[ -x "$TARGET/usr/bin/mate-session" ]] || fail "MATE session executable is missing."
 [[ -x "$TARGET/usr/bin/marco" ]] || fail "Marco window manager is missing."

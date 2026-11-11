@@ -13,6 +13,11 @@ on:
 permissions:
   contents: read
 
+# Prevent duplicate expensive Chapter 5 builds for the same branch.
+concurrency:
+  group: lfs-toolchain-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   prepare-lfs-sources:
     name: Download and verify official LFS 13.1 sources

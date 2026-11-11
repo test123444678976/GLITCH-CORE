@@ -5,12 +5,10 @@ on:
   push:
     branches: [ feature/mate-desktop ]
     paths:
-      - ".github/workflows/lfs-toolchain.yml"
       - "scripts/build-lfs.sh"
       - "scripts/lfs/build-toolchain-*.sh"
       - "scripts/lfs/check-host.sh"
       - "scripts/lfs/verify-lfs-archive.sh"
-      - "scripts/lfs/test-toolchain-*.sh"
 
 permissions:
   contents: read

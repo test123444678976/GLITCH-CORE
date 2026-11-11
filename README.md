@@ -64,6 +64,8 @@ and package install/upgrade/remove tests pass in the target system.
 - `scripts/lfs/check-host.sh` — read-only build-host preflight.
 - `scripts/lfs/check-desktop-build-host.sh` — read-only preflight for the graphical build host (Meson, Ninja, CMake, GTK/MATE build tooling and available resources). The manual `build.yml` workflow installs these host tools and runs the check; this still does not compile the desktop.
 - `scripts/lfs/build-toolchain-pass1.sh` — experimental Binutils/GCC cross-toolchain Pass 1.
+- `scripts/lfs/verify-lfs-archive.sh` — verifies each LFS toolchain source archive against the official downloaded LFS checksum manifest immediately before extraction; rejects duplicate/missing entries and symlinked archives.
+- `scripts/lfs/test-toolchain-pass1.sh` — regression tests for correct, incorrect, duplicate and missing checksums, symlink rejection and path traversal; included in the main CI validation job.
 - `scripts/lfs/validate-mate-stack.sh` — validates the MATE target manifest.
 - `config/graphics-stack.txt` — explicit Mesa, Xorg, protocol/library and input-stack inventory.
 - `scripts/lfs/validate-graphics-stack.sh` and `test-graphics-stack.sh` — validate the graphics inventory and test missing/duplicate target rejection.

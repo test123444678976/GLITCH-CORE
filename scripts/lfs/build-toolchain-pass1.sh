@@ -49,7 +49,7 @@ archive() {
     mapfile -t matches < <(find "$SOURCES" -maxdepth 1 -type f -name "$pattern" -print | LC_ALL=C sort)
     (( ${#matches[@]} == 1 )) || fail "Expected exactly one source archive matching $pattern; found ${#matches[@]}."
     local found="${matches[0]}"
-    bash "$ROOT/scripts/lfs/verify-lfs-archive.sh" "$SOURCES" "$(basename "$found")"
+    bash "$ROOT/scripts/lfs/verify-lfs-archive.sh" "$SOURCES" "$(basename "$found")" >/dev/null
     printf '%s\n' "$found"
 }
 

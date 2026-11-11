@@ -70,7 +70,7 @@ if grep -qi 'lfs-bootscripts-' "$SOURCES/wget-list" ||
 fi
 
 echo "==> Downloading LFS 13.1-systemd source packages"
-wget --continue --tries=3 \
+wget --https-only --continue --tries=3 \
     --input-file="$SOURCES/wget-list" \
     --directory-prefix="$SOURCES"
 

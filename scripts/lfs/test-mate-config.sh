@@ -131,11 +131,11 @@ for relative in etc usr/share; do
   chmod +x "$linked/usr/bin/Xorg"
   printf '#!/bin/sh\nexit 0\n' > "$linked/usr/bin/lightdm"
   chmod +x "$linked/usr/bin/lightdm"
-  mkdir -p "$linked/usr/lib/xorg/modules" "$linked/usr/lib/dri" \\
+  mkdir -p "$linked/usr/lib/xorg/modules" "$linked/usr/lib/dri" \
     "$linked/usr/lib/systemd/system" "$linked/usr/share/xgreeters"
-  touch "$linked/usr/lib/libgtk-3.so.0" "$linked/usr/lib/libGL.so.1" \\
-    "$linked/usr/lib/libEGL.so.1" "$linked/usr/lib/libgbm.so.1" \\
-    "$linked/usr/lib/dri/swrast_dri.so" "$linked/usr/share/xgreeters/lightdm-gtk-greeter.desktop" \\
+  touch "$linked/usr/lib/libgtk-3.so.0" "$linked/usr/lib/libGL.so.1" \
+    "$linked/usr/lib/libEGL.so.1" "$linked/usr/lib/libgbm.so.1" \
+    "$linked/usr/lib/dri/swrast_dri.so" "$linked/usr/share/xgreeters/lightdm-gtk-greeter.desktop" \
     "$linked/usr/lib/systemd/system/lightdm.service" "$linked/usr/lib/systemd/system/dbus.service"
   if [[ "$relative" == "etc" ]]; then
     rm -rf "$linked/etc"

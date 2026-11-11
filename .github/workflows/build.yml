@@ -37,6 +37,7 @@ jobs:
           bash scripts/lfs/test-xtrans-build.sh
           bash scripts/lfs/test-package-manager-build.sh
           bash scripts/lfs/test-package-manager-config.sh
+          bash scripts/lfs/test-package-manager-config.sh
           bash scripts/lfs/test-toolchain-pass1.sh
 
       - name: Validate GLITCH application SDK

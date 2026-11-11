@@ -1,0 +1,136 @@
+name: GLITCH//CORE LFS 13.1 Toolchain
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ feature/mate-desktop ]
+    paths:
+      - ".github/workflows/lfs-toolchain.yml"
+      - "scripts/build-lfs.sh"
+      - "scripts/lfs/build-toolchain-*.sh"
+      - "scripts/lfs/check-host.sh"
+      - "scripts/lfs/verify-lfs-archive.sh"
+      - "scripts/lfs/test-toolchain-*.sh"
+
+permissions:
+  contents: read
+
+jobs:
+  prepare-lfs-sources:
+    name: Download and verify official LFS 13.1 sources
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+
+      - name: Install LFS source preparation dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential bison gawk perl python3 \
+            patch diffutils findutils file xz-utils wget ca-certificates
+
+      - name: Download and verify official LFS source set
+        run: |
+          chmod +x scripts/build-lfs.sh
+          ./scripts/build-lfs.sh
+
+      - name: Upload verified source checkpoint
+        uses: actions/upload-artifact@v4
+        with:
+          name: glitch-core-lfs-13.1-verified-sources
+          path: |
+            work-lfs/lfs/sources/
+            work-lfs/LFS-VERSION
+          if-no-files-found: error
+          retention-days: 7
+
+  build-lfs-chapter5:
+    name: Build complete LFS Chapter 5 cross-toolchain
+    needs: prepare-lfs-sources
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      LFS: ${{ github.workspace }}/work-lfs/lfs
+      LFS_TGT: x86_64-lfs-linux-gnu
+      JOBS: "2"
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+
+      - name: Download verified source checkpoint
+        uses: actions/download-artifact@v4
+        with:
+          name: glitch-core-lfs-13.1-verified-sources
+          path: work-lfs
+
+      - name: Install LFS build host dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential bison gawk m4 texinfo perl python3 \
+            patch diffutils findutils grep sed file gzip xz-utils \
+            wget ca-certificates
+
+      - name: Inspect build runner resources
+        run: |
+          echo "Runner: $RUNNER_OS / $ImageOS"
+          echo "CPU cores: $(nproc)"
+          free -h
+          df -h "$GITHUB_WORKSPACE"
+
+      - name: Run read-only LFS host preflight
+        run: bash scripts/lfs/check-host.sh
+
+      - name: Prepare isolated target workspace
+        run: |
+          mkdir -p "$LFS/sources" "$LFS/tools"
+          test -s "$LFS/sources/md5sums"
+          test -w "$LFS/tools"
+          echo "LFS=$LFS"
+          echo "LFS_TGT=$LFS_TGT"
+
+      - name: Build complete LFS Chapter 5
+        run: |
+          chmod +x scripts/lfs/build-toolchain-pass1.sh scripts/lfs/build-toolchain-chapter5.sh
+          bash scripts/lfs/build-toolchain-chapter5.sh
+
+      - name: Verify cross-toolchain and target C/C++ runtime
+        run: |
+          "$LFS/tools/bin/$LFS_TGT-ld" --version
+          "$LFS/tools/bin/$LFS_TGT-gcc" -dumpmachine
+          test -f "$LFS/tools/.glitchcore-binutils-pass1-complete"
+          test -f "$LFS/tools/.glitchcore-gcc-pass1-complete"
+          test -f "$LFS/tools/.glitchcore-linux-headers-complete"
+          test -f "$LFS/tools/.glitchcore-glibc-complete"
+          test -f "$LFS/tools/.glitchcore-libstdcxx-complete"
+          test -s "$LFS/usr/include/linux/version.h"
+          test -s "$LFS/usr/lib/libc.so.6"
+          test -s "$LFS/usr/lib/libstdc++.so.6"
+
+      - name: Write Chapter 5 build provenance
+        run: |
+          {
+            echo "GLITCH//CORE LFS 13.1-systemd — Chapter 5 cross-toolchain"
+            echo "Branch: $GITHUB_REF_NAME"
+            echo "Commit: $GITHUB_SHA"
+            echo "Target: $LFS_TGT"
+            echo "Stages: Binutils Pass 1, GCC Pass 1, Linux API headers, Glibc, Libstdc++"
+            echo "Status: built and verified in this GitHub Actions job"
+          } > "$LFS/CHAPTER-5-BUILD-INFO.txt"
+
+      - name: Upload Chapter 5 cross-toolchain checkpoint
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: glitch-core-lfs-toolchain-chapter5-x86_64
+          path: |
+            work-lfs/LFS-VERSION
+            work-lfs/lfs/sources/
+            work-lfs/lfs/tools/
+            work-lfs/lfs/usr/
+            work-lfs/lfs/lib64/
+            work-lfs/lfs/CHAPTER-5-BUILD-INFO.txt
+          if-no-files-found: error
+          retention-days: 7

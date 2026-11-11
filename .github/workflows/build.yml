@@ -388,3 +388,72 @@ jobs:
           path: work-lfs/graphics-stage/libdrm/
           if-no-files-found: error
           retention-days: 14
+
+  collect-bootstrap-components:
+    name: Collect verified desktop and package-manager build outputs
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/feature/mate-desktop'
+    needs:
+      - validate-project
+      - desktop-build-host-preflight
+      - build-xorgproto
+      - build-xtrans
+      - native-package-manager-build
+      - build-libdrm
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Download staged xorgproto headers
+        uses: actions/download-artifact@v4
+        with:
+          name: glitch-core-xorgproto-x86_64
+          path: work-lfs/desktop-stage/xorgproto
+
+      - name: Download staged xtrans headers
+        uses: actions/download-artifact@v4
+        with:
+          name: glitch-core-xtrans-x86_64
+          path: work-lfs/desktop-stage/xtrans
+
+      - name: Download staged libdrm graphics foundation
+        uses: actions/download-artifact@v4
+        with:
+          name: glitch-core-libdrm-x86_64
+          path: work-lfs/desktop-stage/libdrm
+
+      - name: Download native dpkg and APT build archive
+        uses: actions/download-artifact@v4
+        with:
+          name: glitch-core-native-dpkg-apt-x86_64
+          path: work-lfs/package-manager
+
+      - name: Create reproducibility manifest and component bundle
+        run: |
+          set -Eeuo pipefail
+          test -d work-lfs/desktop-stage/xorgproto
+          test -d work-lfs/desktop-stage/xtrans
+          test -d work-lfs/desktop-stage/libdrm
+          test -s work-lfs/package-manager/glitch-core-native-dpkg-apt-x86_64.tar.gz
+          {
+            echo "GLITCH//CORE staged component bundle"
+            echo "Architecture: x86_64"
+            echo "Branch: feature/mate-desktop"
+            echo "Commit: $GITHUB_SHA"
+            echo "Important: these are staging outputs, not an installed LFS rootfs."
+            echo "The dpkg/APT binaries were compiled on the Ubuntu CI host."
+          } > work-lfs/desktop-stage/BUILD-INFO.txt
+          (
+            cd work-lfs
+            find desktop-stage package-manager -type f -print0 |
+              sort -z |
+              xargs -0 sha256sum
+          ) > work-lfs/desktop-stage/SHA256SUMS
+          tar -C work-lfs -czf work-lfs/glitch-core-bootstrap-components-x86_64.tar.gz \
+            desktop-stage package-manager
+          sha256sum work-lfs/glitch-core-bootstrap-components-x86_64.tar.gz
+
+      - name: Upload combined bootstrap component bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: glitch-core-bootstrap-components-x86_64
+          path: work-lfs/glitch-core-bootstrap-components-x86_64.tar.gz
+          if-no-files-found: error
+          retention-days: 14

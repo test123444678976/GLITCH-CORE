@@ -13,7 +13,7 @@ test -s "$LOCK" || fail "Pinned LFS toolchain contract is missing."
 for required in \
   'BINUTILS_VERSION="2.47"' \
   'GCC_VERSION="16.2.0"' \
-  'LINUX_VERSION="7.3.1"' \
+  'LINUX_VERSION="7.1.8"' \
   'GLIBC_VERSION="2.44"' \
   'build_linux_headers' \
   'build_glibc' \
@@ -45,7 +45,7 @@ for required in \
   'GCC=16.2.0' \
   'LINUX_API_HEADERS=7.3.1' \
   'GLIBC=2.44' \
-  'GLIBC_PATCHES=glibc-fhs-1.patch,glibc-2.44-upstream_fixes-4.patch'; do
+  'GLIBC_PATCHES=glibc-fhs-1.patch,glibc-2.44-upstream_fixes-1.patch'; do
   grep -Fxq -- "$required" "$LOCK" || fail "Pinned LFS toolchain contract mismatch: $required"
 done
 

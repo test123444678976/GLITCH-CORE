@@ -56,11 +56,14 @@ archive() {
 extract_once() {
     local archive_path="$1"
     local expected_dir="$2"
-    if [[ ! -d "$expected_dir" ]]; then
-        log "Extracting $(basename "$archive_path")"
-        tar -xf "$archive_path" -C "$SOURCES"
-    fi
-    [[ -d "$expected_dir" ]] || fail "Expected source directory was not created: $expected_dir"
+    [[ "$expected_dir" == "$SOURCES/"* && "$expected_dir" != "$SOURCES" ]] || fail "Refusing to extract outside the LFS sources directory: $expected_dir"
+    [[ ! -L "$expected_dir" ]] || fail "Refusing a symlinked source directory: $expected_dir"
+    # The archive is checksum-verified by archive(). Re-extract every time so
+    # an interrupted or modified source/build tree cannot silently be reused.
+    rm -rf -- "$expected_dir"
+    log "Extracting verified source $(basename "$archive_path") into a clean tree"
+    tar -xf "$archive_path" -C "$SOURCES"
+    [[ -d "$expected_dir" && ! -L "$expected_dir" ]] || fail "Expected source directory was not created: $expected_dir"
 }
 
 build_binutils() {

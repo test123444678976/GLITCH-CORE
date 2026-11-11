@@ -38,6 +38,7 @@ jobs:
           bash scripts/lfs/test-package-manager-build.sh
           bash scripts/lfs/test-package-manager-config.sh
           bash scripts/lfs/test-toolchain-pass1.sh
+          bash scripts/lfs/test-toolchain-chapter5.sh
 
       - name: Validate GLITCH application SDK
         run: |
@@ -132,7 +133,7 @@ jobs:
           retention-days: 7
 
   build-lfs-toolchain-pass1:
-    name: Build GLITCH//CORE LFS toolchain Pass 1
+    name: Build GLITCH//CORE LFS Chapter 5 cross-toolchain
     if: github.event_name == 'workflow_dispatch'
     needs: prepare-lfs-sources
     runs-on: ubuntu-24.04
@@ -186,22 +187,35 @@ jobs:
           chmod +x scripts/lfs/build-toolchain-pass1.sh
           bash scripts/lfs/build-toolchain-pass1.sh all
 
-      - name: Verify cross-toolchain outputs
+      - name: Complete LFS Chapter 5 cross-toolchain
+        run: |
+          chmod +x scripts/lfs/build-toolchain-chapter5.sh
+          bash scripts/lfs/build-toolchain-chapter5.sh
+
+      - name: Verify complete Chapter 5 cross-toolchain outputs
         run: |
           "$LFS/tools/bin/$LFS_TGT-ld" --version
           "$LFS/tools/bin/$LFS_TGT-gcc" -dumpmachine
           test -f "$LFS/tools/.glitchcore-binutils-pass1-complete"
           test -f "$LFS/tools/.glitchcore-gcc-pass1-complete"
+          test -f "$LFS/tools/.glitchcore-linux-headers-complete"
+          test -f "$LFS/tools/.glitchcore-glibc-complete"
+          test -f "$LFS/tools/.glitchcore-libstdcxx-complete"
+          test -s "$LFS/usr/include/linux/version.h"
+          test -s "$LFS/usr/lib/libc.so.6"
+          test -s "$LFS/usr/lib/libstdc++.so.6"
 
-      - name: Upload LFS Pass 1 checkpoint
+      - name: Upload LFS Chapter 5 checkpoint
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: glitch-core-lfs-toolchain-pass1
+          name: glitch-core-lfs-toolchain-chapter5
           path: |
             work-lfs/LFS-VERSION
             work-lfs/lfs/sources/
             work-lfs/lfs/tools/
+            work-lfs/lfs/usr/
+            work-lfs/lfs/lib64/
           if-no-files-found: error
           retention-days: 7
 

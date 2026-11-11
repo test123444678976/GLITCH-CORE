@@ -1,0 +1,19 @@
+# GLITCH//CORE LFS systemd toolchain source contract.
+# Tracks the current upstream LFS 13.1-systemd book revision used by the
+# official stable-systemd source manifest. Update only alongside recipe review.
+LFS_BOOK=r13.1-39-systemd
+LFS_SERIES=13.1-systemd
+TARGET=x86_64-lfs-linux-gnu
+
+BINUTILS=2.47
+GCC=16.2.0
+GMP=6.3.0
+MPFR=4.2.2
+MPC=1.4.1
+LINUX_API_HEADERS=7.3.1
+GLIBC=2.44
+GLIBC_PATCHES=glibc-fhs-1.patch,glibc-2.44-upstream_fixes-4.patch
+
+CHAPTER5_STAGES=binutils-pass1,gcc-pass1,linux-api-headers,glibc,libstdcxx
+CHAPTER6_STAGES=temporary-tools,binutils-pass2,gcc-pass2
+CHAPTER7_STAGES=chroot-temporary-tools

@@ -7,6 +7,13 @@ ARCHIVE="ncurses-6.6.tar.gz"
 fail() { echo "ERROR: $*" >&2; exit 1; }
 
 bash -n "$HELPER" || fail "ncurses source fallback helper has invalid Bash syntax."
+BUILD_SCRIPT="$ROOT/scripts/build-lfs.sh"
+grep -Fq 'wget-list.without-ncurses' "$BUILD_SCRIPT" ||
+  fail "Bulk LFS download must use a filtered list that excludes the unreliable ncurses mirror."
+grep -Fq 'grep -viE' "$BUILD_SCRIPT" ||
+  fail "Bulk LFS download must filter the ncurses archive by URL basename."
+grep -Fq 'ensure-ncurses-source.sh' "$BUILD_SCRIPT" ||
+  fail "Filtered ncurses archive must still pass through the checksum-gated mirror helper."
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 SOURCES="$tmp/sources"

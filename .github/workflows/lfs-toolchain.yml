@@ -16,7 +16,7 @@ on:
 permissions:
   contents: read
 
-# Prevent duplicate expensive Chapter 5 builds for the same branch.
+# Prevent duplicate expensive LFS toolchain builds for the same branch.
 concurrency:
   group: lfs-toolchain-${{ github.ref }}
   cancel-in-progress: true

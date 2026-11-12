@@ -70,9 +70,16 @@ if grep -qi 'lfs-bootscripts-' "$SOURCES/wget-list" ||
 fi
 
 echo "==> Downloading LFS 13.1-systemd source packages"
+download_status=0
 wget --https-only --continue --tries=3 \
     --input-file="$SOURCES/wget-list" \
-    --directory-prefix="$SOURCES"
+    --directory-prefix="$SOURCES" || download_status=$?
+
+if [[ "$download_status" -ne 0 ]]; then
+    echo "WARNING: one or more primary source downloads failed (wget exit $download_status)."
+    echo "==> Checking the ncurses 6.6 HTTPS mirror fallback before the full checksum audit"
+fi
+bash "$ROOT/scripts/lfs/ensure-ncurses-source.sh" "$SOURCES"
 
 echo "==> Verifying official MD5 checksums"
 (

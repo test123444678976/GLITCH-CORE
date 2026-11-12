@@ -5,7 +5,7 @@ set -Eeuo pipefail
 # Downloads and verifies the official LFS systemd source set.
 # This stage does NOT compile LFS or replace the rescue ISO.
 
-ROOT="$(cd "$(dirname "\${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORK="$ROOT/work-lfs"
 LFS="$WORK/lfs"
 SOURCES="$LFS/sources"
@@ -14,7 +14,7 @@ LFS_VERSION="13.1"
 LFS_BASE_URL="https://www.linuxfromscratch.org/lfs/downloads/stable-systemd"
 
 echo "======================================"
-echo " GLITCH//CORE - LFS \${LFS_VERSION}-systemd"
+echo " GLITCH//CORE - LFS ${LFS_VERSION}-systemd"
 echo " Source preparation"
 echo "======================================"
 
@@ -24,7 +24,7 @@ REQUIRED_TOOLS=(
 )
 
 echo "==> Checking host tools"
-for tool in "\${REQUIRED_TOOLS[@]}"; do
+for tool in "${REQUIRED_TOOLS[@]}"; do
     if ! command -v "$tool" >/dev/null 2>&1; then
         echo "ERROR: Missing host tool: $tool"
         exit 1

@@ -145,3 +145,85 @@ jobs:
             work-lfs/lfs/CHAPTER-5-BUILD-INFO.txt
           if-no-files-found: error
           retention-days: 7
+
+  build-lfs-chapter6:
+    name: Build LFS Chapter 6 temporary tools and GCC Pass 2
+    needs: build-lfs-chapter5
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      LFS: ${{ github.workspace }}/work-lfs/lfs
+      LFS_TGT: x86_64-lfs-linux-gnu
+      JOBS: "2"
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+
+      - name: Download Chapter 5 cross-toolchain checkpoint
+        uses: actions/download-artifact@v4
+        with:
+          name: glitch-core-lfs-toolchain-chapter5-x86_64
+          path: work-lfs
+
+      - name: Install Chapter 6 build host dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \\
+            build-essential bison gawk m4 texinfo perl python3 \\
+            patch diffutils findutils grep sed file gzip xz-utils \\
+            wget ca-certificates
+
+      - name: Inspect Chapter 6 runner resources
+        run: |
+          echo "Runner: $RUNNER_OS / $ImageOS"
+          echo "CPU cores: $(nproc)"
+          free -h
+          df -h "$GITHUB_WORKSPACE"
+          df -Pk "$GITHUB_WORKSPACE"
+
+      - name: Run Chapter 6 regression tests
+        run: |
+          chmod +x scripts/lfs/test-toolchain-chapter6.sh
+          bash scripts/lfs/test-toolchain-chapter6.sh
+
+      - name: Build LFS Chapter 6 temporary tools
+        run: |
+          chmod +x scripts/lfs/build-toolchain-chapter6.sh
+          bash scripts/lfs/build-toolchain-chapter6.sh
+
+      - name: Verify Chapter 6 cross tools and completion markers
+        run: |
+          test -f "$LFS/tools/.glitchcore-chapter6-complete"
+          test -f "$LFS/tools/.glitchcore-binutils-pass2-complete"
+          test -f "$LFS/tools/.glitchcore-gcc-pass2-complete"
+          test -x "$LFS/usr/bin/bash"
+          test -x "$LFS/usr/bin/gcc"
+          test -x "$LFS/usr/sbin/chroot"
+          "$LFS/usr/bin/gcc" -dumpmachine | grep -Fx "$LFS_TGT"
+          "$LFS/usr/bin/bash" --version | head -n 1
+
+      - name: Write Chapter 6 build provenance
+        run: |
+          {
+            echo "GLITCH//CORE LFS 13.1-systemd — Chapter 6 temporary tools"
+            echo "Branch: $GITHUB_REF_NAME"
+            echo "Commit: $GITHUB_SHA"
+            echo "Target: $LFS_TGT"
+            echo "Stages: temporary tools, Binutils Pass 2, GCC Pass 2"
+            echo "Status: built and verified in this GitHub Actions job"
+          } > "$LFS/CHAPTER-6-BUILD-INFO.txt"
+
+      - name: Upload Chapter 6 temporary-tools checkpoint
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: glitch-core-lfs-toolchain-chapter6-x86_64
+          path: |
+            work-lfs/LFS-VERSION
+            work-lfs/lfs/sources/
+            work-lfs/lfs/tools/
+            work-lfs/lfs/usr/
+            work-lfs/lfs/lib64/
+            work-lfs/lfs/CHAPTER-6-BUILD-INFO.txt
+          if-no-files-found: error
+          retention-days: 7

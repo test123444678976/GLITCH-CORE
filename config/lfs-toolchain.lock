@@ -15,5 +15,6 @@ GLIBC=2.44
 GLIBC_PATCHES=glibc-fhs-1.patch,glibc-2.44-upstream_fixes-1.patch
 
 CHAPTER5_STAGES=binutils-pass1,gcc-pass1,linux-api-headers,glibc,libstdcxx
+CHAPTER6_PACKAGES=m4-1.4.21,ncurses-6.6,bash-5.3,coreutils-9.11,diffutils-3.12,file-5.48,findutils-4.11.0,gawk-5.4.1,grep-3.12,gzip-1.14,make-4.4.1,patch-2.8,sed-4.10,tar-1.35,xz-5.8.3
 CHAPTER6_STAGES=temporary-tools,binutils-pass2,gcc-pass2
 CHAPTER7_STAGES=chroot-temporary-tools

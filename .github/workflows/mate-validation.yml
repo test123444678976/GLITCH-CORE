@@ -49,3 +49,11 @@ jobs:
           bash scripts/lfs/test-graphics-stack.sh
           bash scripts/lfs/test-graphics-target.sh
           bash scripts/lfs/test-graphics-sources.sh
+          bash scripts/lfs/validate-mate-stack.sh
+          bash scripts/lfs/validate-graphics-stack.sh
+          bash scripts/lfs/validate-graphics-sources.sh
+          bash scripts/lfs/validate-package-manager.sh
+          bash scripts/lfs/test-mate-target.sh
+          bash scripts/lfs/test-package-manager.sh
+          bash scripts/lfs/test-package-manager-build.sh
+          bash scripts/lfs/test-package-manager-config.sh

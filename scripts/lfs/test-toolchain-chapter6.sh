@@ -51,4 +51,15 @@ if LFS="$tmp/lfs" LFS_TGT=x86_64-lfs-linux-gnu bash "$SCRIPT" >/dev/null 2>&1; t
   fail "Chapter 6 build accepted a workspace without Chapter 5 markers."
 fi
 
+WORKFLOW="$ROOT/.github/workflows/lfs-toolchain.yml"
+awk '
+/sudo apt-get install -y/ {
+  trailing = 0
+  for (i = length($0); i > 0 && substr($0, i, 1) == "\\\\"; i--) trailing++
+  if (trailing != 1) exit 1
+  count++
+}
+END { if (count != 3) exit 1 }
+' "$WORKFLOW" || fail "LFS workflow install commands must use one line-continuation backslash."
+
 echo "LFS Chapter 6 temporary-tools regression tests: OK"

@@ -98,8 +98,8 @@ echo "==> Verifying official MD5 checksums"
 
 cat > "$WORK/LFS-VERSION" <<EOF
 GLITCH//CORE LFS
-LFS_VERSION=\${LFS_VERSION}-systemd
-SOURCE=\${LFS_BASE_URL}
+LFS_VERSION=$LFS_VERSION-systemd
+SOURCE=$LFS_BASE_URL
 EOF
 
 echo

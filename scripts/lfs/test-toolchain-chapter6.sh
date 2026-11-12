@@ -24,11 +24,12 @@ for required in \
   'sed 4.10 sed-4.10.tar.xz' \
   'tar 1.35 tar-1.35.tar.xz' \
   'xz 5.8.3 xz-5.8.3.tar.xz' \
+  'mpc-1.4.1.tar.xz' \
   'Binutils Pass 2' \
   'GCC Pass 2' \
   '.glitchcore-binutils-pass2-complete' \
   '.glitchcore-gcc-pass2-complete' \
-  'mpc-1.4.1.tar.xz' \\\n  'target_configargs=gcc_cv_target_thread_file=posix'; do
+  'target_configargs=gcc_cv_target_thread_file=posix'; do
   grep -Fq -- "$required" "$SCRIPT" || fail "Chapter 6 recipe or checkpoint is missing: $required"
 done
 
@@ -36,6 +37,8 @@ for required in \
   'LFS_BOOK=13.1-systemd' \
   'BINUTILS=2.47' \
   'GCC=16.2.0' \
+  'MPC=1.4.1' \
+  'CHAPTER6_PACKAGES=m4-1.4.21,ncurses-6.6,bash-5.3,coreutils-9.11,diffutils-3.12,file-5.48,findutils-4.11.0,gawk-5.4.1,grep-3.12,gzip-1.14,make-4.4.1,patch-2.8,sed-4.10,tar-1.35,xz-5.8.3' \
   'CHAPTER6_STAGES=temporary-tools,binutils-pass2,gcc-pass2'; do
   grep -Fxq -- "$required" "$LOCK" || fail "Pinned Chapter 6 contract mismatch: $required"
 done

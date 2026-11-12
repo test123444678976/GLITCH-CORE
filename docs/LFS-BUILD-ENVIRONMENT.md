@@ -8,8 +8,8 @@
 - Build reference: [official LFS systemd book](https://www.linuxfromscratch.org/lfs/view/stable-systemd/)
 
 The host is only a temporary build environment. It does not become the
-GLITCH//CORE base distribution. LFS itself is built from source in an
-isolated target filesystem.
+GLITCH//CORE base distribution. LFS is built from source in an isolated
+target filesystem.
 
 ## Host preflight
 
@@ -33,66 +33,106 @@ bash scripts/build-lfs.sh
 
 It downloads the official LFS 13.1-systemd source manifest and archives and
 verifies their published MD5 checksums. Before downloading, it checks that
-the manifest contains the LFS 13.1 toolchain versions (Binutils 2.47 and
-GCC 16.2.0). It also filters the legacy LFS-Bootscripts archive from both
-download and checksum manifests: that package belongs to the System V
-boot process and is not part of the systemd edition. This step does not
-compile the system.
+the manifest contains the pinned LFS 13.1 toolchain versions (Binutils 2.47
+and GCC 16.2.0). It filters the legacy LFS-Bootscripts archive from both
+download and checksum manifests because that package belongs to the System V
+boot process, not the systemd edition.
 
-## Chapter 5: first cross-toolchain stages
+The source-preparation job also tests the checksum-verified ncurses mirror
+fallback. A mirror archive is accepted only when it matches the checksum
+from the official LFS manifest. Source preparation does not compile or
+install the operating system.
 
-The first actual compilation steps are Binutils Pass 1 followed by GCC
-Pass 1. The implementation is in
-`scripts/lfs/build-toolchain-pass1.sh`.
+## Chapter 5: cross-toolchain
+
+The Chapter 5 build is implemented by:
+
+- `scripts/lfs/build-toolchain-pass1.sh`: Binutils Pass 1 and GCC Pass 1.
+- `scripts/lfs/build-toolchain-chapter5.sh`: the complete Chapter 5 sequence,
+  including Linux API headers, cross Glibc and target Libstdc++.
 
 Prepare a dedicated LFS target directory and its `tools` directory as
-described in the official LFS book. The `tools` directory must be writable
-by the unprivileged build account. Do not use the host's root filesystem as
-the target, and do not run the compiler script as root.
+described in the official LFS book. The workspace must be writable by the
+unprivileged build account. Never use the host's root filesystem as the
+target, and do not run the LFS build scripts as root.
 
-With the LFS build account and its clean LFS environment active, set the target and put the cross-tools first in `PATH`:
+For a local build, set the target and put the cross-tools first in `PATH`:
 
 ```bash
 export LFS=/absolute/path/to/work-lfs/lfs
 export LFS_TGT=x86_64-lfs-linux-gnu
 export PATH="$LFS/tools/bin:$PATH"
-export JOBS=4
+export JOBS=2
 
-bash scripts/lfs/build-toolchain-pass1.sh binutils
-bash scripts/lfs/build-toolchain-pass1.sh gcc
+bash scripts/lfs/build-toolchain-chapter5.sh
 ```
 
-The GCC Pass 1 step also applies the x86_64 library-directory adjustment
-required by the LFS 13.1 instructions. The script does not install host
-packages or modify the host system.
+The scripts verify source archives against the downloaded LFS checksum
+manifest, reject unsafe workspace paths, and create completion markers
+under `$LFS/tools`. A failed stage should be investigated from its build
+logs before it is retried. Do not delete a checkpoint to conceal a failed
+build.
 
-Or run both stages in order:
+## Chapter 6: temporary tools
 
-```bash
-LFS=/absolute/path/to/work-lfs/lfs JOBS=4 bash scripts/lfs/build-toolchain-pass1.sh all
-```
+The Chapter 6 implementation is
+`scripts/lfs/build-toolchain-chapter6.sh`. It requires the verified Chapter 5
+checkpoint and builds the LFS temporary tools, Binutils Pass 2 and GCC Pass 2.
+The regression test is `scripts/lfs/test-toolchain-chapter6.sh`.
 
-The script is x86_64-only, requires the verified source archives, checks
-that it is not running as root, and writes only under the LFS workspace.
-Successful stages create marker files in `$LFS/tools` so completed stages
-are skipped on later runs. A failed stage can be re-run after correcting
-the cause; inspect its build directory and logs first.
+Chapter 6 is run in a separate CI job. It downloads the Chapter 5 checkpoint
+as an artifact, reconstructs the isolated workspace, verifies the required
+completion markers, then runs the Chapter 6 regression tests before building.
+The Chapter 6 output is another checkpoint; it is not the final LFS rootfs.
 
-## Build milestones
+## GitHub Actions
 
-1. Host preflight and preparation of a dedicated LFS workspace.
-2. Download the LFS source manifest and verify checksums.
-3. Build Binutils Pass 1 and GCC Pass 1.
-4. Build Linux API headers, Glibc, and target Libstdc++.
-5. Build temporary tools (LFS Chapter 6).
-6. Enter chroot and build the final userspace (Chapters 7–8).
-7. Configure systemd, networking, filesystem layout and kernel (Chapters 9–10).
-8. Boot-test the base system in QEMU.
-9. Add BLFS components for graphics and MATE only after the base boots.
+The LFS pipeline is the separate workflow
+`.github/workflows/lfs-toolchain.yml`, named **GLITCH//CORE LFS 13.1
+Toolchain**. It supports manual dispatch and push events on
+`feature/mate-desktop` when one of its watched LFS scripts, tests, source
+lock files or the workflow itself changes. It is independent of the
+BusyBox rescue ISO workflow.
 
-The LFS book is updated over time. Keep package versions, source manifests,
-and build instructions pinned to the same exact LFS book revision for a
-reproducible build. Review the official book before updating any version.
+The workflow is split into three jobs:
+
+1. **Prepare sources:** downloads the official LFS 13.1-systemd source set,
+   verifies its manifest checksums and uploads
+   `glitch-core-lfs-13.1-verified-sources`.
+2. **Build Chapter 5:** consumes that source checkpoint, runs the Chapter 5
+   regression tests, builds Binutils Pass 1, GCC Pass 1, Linux API headers,
+   Glibc and Libstdc++, verifies the target compiler/runtime, and uploads
+   `glitch-core-lfs-toolchain-chapter5-x86_64`.
+3. **Build Chapter 6:** consumes the Chapter 5 checkpoint, runs the Chapter 6
+   regression tests, builds temporary tools plus Binutils Pass 2 and GCC
+   Pass 2, verifies the expected tools and markers, and uploads
+   `glitch-core-lfs-toolchain-chapter6-x86_64`.
+
+The workflow records runner resources and build provenance. Check each run's
+job logs and artifact manifest rather than treating a green earlier job as
+proof that later stages completed. Checkpoint artifacts currently have a
+seven-day retention period.
+
+## What these checkpoints do not mean
+
+A successful Chapter 5 or Chapter 6 CI job means those stages were built and
+verified in that isolated GitHub Actions workspace. It does **not** mean the
+checkpoint is installed in the persistent GLITCH//CORE rootfs, that the
+Chapter 7/8 final userspace exists, or that the system boots.
+
+The following milestones remain separate:
+
+1. Enter chroot and build the final userspace (Chapters 7–8).
+2. Configure systemd, networking, filesystem layout and kernel (Chapters 9–10).
+3. Boot-test the LFS base system in QEMU.
+4. Build and install BLFS graphics, GTK and MATE components in the LFS target.
+5. Integrate target-native dpkg/APT and test package operations inside that rootfs.
+6. Produce and boot-test a desktop LFS ISO.
+
+The MATE integration gate remains: first complete and boot-test the LFS base,
+then provide the final target toolchain and development libraries, graphics
+stack, D-Bus, GTK and desktop dependencies. MATE manifests and CI host-side
+staging artifacts are not evidence that MATE is installed.
 
 ## Safety and build isolation
 
@@ -101,34 +141,5 @@ reproducible build. Review the official book before updating any version.
 - Use a dedicated virtual disk or isolated build volume for the target.
 - Do not run package compilation as root when the LFS book specifies the
   unprivileged `lfs` user.
-- Keep all new work on `feature/mate-desktop` until it is reviewed and tested.
-
-## GitHub Actions: first LFS toolchain build
-
-The LFS pipeline is a job in the existing manually dispatched
-`.github/workflows/build.yml` workflow. Keeping it in that existing
-workflow makes it available through the repository's current Actions
-entry point without adding a new workflow file to the default branch.
-Open **Actions → Build GLITCH//CORE ISO → Run workflow** and select
-`feature/mate-desktop`. The LFS jobs run only for manual dispatch;
-ordinary pushes to `main` continue to run the existing ISO build.
-
-The LFS job:
-
-1. Prints runner CPU, memory, and available disk information.
-2. Installs the host tools needed for the first LFS stages.
-3. Runs the read-only host preflight.
-4. Downloads and verifies the official LFS 13.1-systemd source set.
-5. Builds Binutils Pass 1, then GCC Pass 1, as the non-root runner user.
-6. Verifies the cross-linker, compiler target, and completion markers.
-7. Uploads a seven-day artifact named `glitch-core-lfs-toolchain-pass1`
-   containing the source/build workspace and `$LFS/tools` checkpoint.
-
-This is an initial hosted-runner pipeline, not yet a complete resumable
-multi-stage LFS build system. GitHub-hosted runner disk and memory limits
-may cause the build to fail; inspect the workflow logs and available
-resources before changing parallelism or splitting later stages. A green
-workflow means only that these two Pass 1 stages passed their checks; it
-does not mean the base distribution, MATE, APT, or a bootable LFS ISO is
-complete.
-\n\nThe Chapter 6 runner uses a separate Ubuntu job with the Chapter 5 artifact as its input. The current hosted runner exposes substantially more disk space than the initial build environment; the job prints disk and memory figures before compilation. GCC Pass 2 is the largest Chapter 6 stage, so a green Chapter 5 result must not be mistaken for Chapter 6 completion.\n
+- Do not copy Debian/Ubuntu binaries from the CI host into the LFS target.
+- Keep this work on `feature/mate-desktop` until it is reviewed and tested.

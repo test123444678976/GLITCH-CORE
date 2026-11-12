@@ -131,3 +131,4 @@ resources before changing parallelism or splitting later stages. A green
 workflow means only that these two Pass 1 stages passed their checks; it
 does not mean the base distribution, MATE, APT, or a bootable LFS ISO is
 complete.
+\n\nThe Chapter 6 runner uses a separate Ubuntu job with the Chapter 5 artifact as its input. The current hosted runner exposes substantially more disk space than the initial build environment; the job prints disk and memory figures before compilation. GCC Pass 2 is the largest Chapter 6 stage, so a green Chapter 5 result must not be mistaken for Chapter 6 completion.\n

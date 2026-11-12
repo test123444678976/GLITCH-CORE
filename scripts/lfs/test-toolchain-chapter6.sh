@@ -54,8 +54,9 @@ fi
 WORKFLOW="$ROOT/.github/workflows/lfs-toolchain.yml"
 awk '
 /sudo apt-get install -y/ {
+  slash = sprintf("%c", 92)
   trailing = 0
-  for (i = length($0); i > 0 && substr($0, i, 1) == "\\\\"; i--) trailing++
+  for (i = length($0); i > 0 && substr($0, i, 1) == slash; i--) trailing++
   if (trailing != 1) exit 1
   count++
 }

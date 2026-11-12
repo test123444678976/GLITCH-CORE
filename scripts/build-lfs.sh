@@ -5,7 +5,7 @@ set -Eeuo pipefail
 # Downloads and verifies the official LFS systemd source set.
 # This stage does NOT compile LFS or replace the rescue ISO.
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$(cd "$(dirname "\${BASH_SOURCE[0]}")/.." && pwd)"
 WORK="$ROOT/work-lfs"
 LFS="$WORK/lfs"
 SOURCES="$LFS/sources"
@@ -14,7 +14,7 @@ LFS_VERSION="13.1"
 LFS_BASE_URL="https://www.linuxfromscratch.org/lfs/downloads/stable-systemd"
 
 echo "======================================"
-echo " GLITCH//CORE - LFS ${LFS_VERSION}-systemd"
+echo " GLITCH//CORE - LFS \${LFS_VERSION}-systemd"
 echo " Source preparation"
 echo "======================================"
 
@@ -24,7 +24,7 @@ REQUIRED_TOOLS=(
 )
 
 echo "==> Checking host tools"
-for tool in "${REQUIRED_TOOLS[@]}"; do
+for tool in "\${REQUIRED_TOOLS[@]}"; do
     if ! command -v "$tool" >/dev/null 2>&1; then
         echo "ERROR: Missing host tool: $tool"
         exit 1
@@ -70,37 +70,12 @@ if grep -qi 'lfs-bootscripts-' "$SOURCES/wget-list" ||
 fi
 
 echo "==> Downloading LFS 13.1-systemd source packages"
-# ncurses is fetched separately through the checksum-gated mirror helper below.
-# The upstream wget-list currently points at invisible-mirror.net, which can
-# time out on GitHub-hosted runners and make wget return exit code 4 even
-# though every other archive downloaded successfully.
-grep -viE '(^|/)ncurses-6\\.6\\.tar\\.gz
-if [[ "$download_status" -ne 0 ]]; then
-    echo "WARNING: one or more primary source downloads failed (wget exit $download_status)."
-    echo "==> Checking the ncurses 6.6 HTTPS mirror fallback before the full checksum audit"
-fi
-bash "$ROOT/scripts/lfs/ensure-ncurses-source.sh" "$SOURCES"
 
-echo "==> Verifying official MD5 checksums"
-(
-    cd "$SOURCES"
-    md5sum -c md5sums
-)
-
-cat > "$WORK/LFS-VERSION" <<EOF
-GLITCH//CORE LFS
-LFS_VERSION=${LFS_VERSION}-systemd
-SOURCE=${LFS_BASE_URL}
-EOF
-
-echo
-echo "======================================"
-echo " LFS SOURCE PREPARATION COMPLETED"
-echo "======================================"
-echo "Workspace: $LFS"
-echo "Sources:   $SOURCES"
-echo "All listed LFS 13.1-systemd source checksums passed."
- "$SOURCES/wget-list" > "$SOURCES/wget-list.without-ncurses"
+# The upstream wget-list points ncurses at invisible-mirror.net, which
+# repeatedly times out on GitHub-hosted runners. Download all other sources
+# normally, then fetch ncurses through the dedicated checksum-gated fallback.
+grep -viE '(^|/)ncurses-6\.6\.tar\.gz$' \
+    "$SOURCES/wget-list" > "$SOURCES/wget-list.without-ncurses"
 test -s "$SOURCES/wget-list.without-ncurses"
 
 download_status=0
@@ -110,8 +85,9 @@ wget --https-only --continue --tries=3 --timeout=30 --waitretry=5 \
 
 if [[ "$download_status" -ne 0 ]]; then
     echo "WARNING: one or more primary source downloads failed (wget exit $download_status)."
-    echo "==> Checking the ncurses 6.6 HTTPS mirror fallback before the full checksum audit"
+    echo "The full official checksum audit below will identify any missing archives."
 fi
+
 bash "$ROOT/scripts/lfs/ensure-ncurses-source.sh" "$SOURCES"
 
 echo "==> Verifying official MD5 checksums"
@@ -122,8 +98,8 @@ echo "==> Verifying official MD5 checksums"
 
 cat > "$WORK/LFS-VERSION" <<EOF
 GLITCH//CORE LFS
-LFS_VERSION=${LFS_VERSION}-systemd
-SOURCE=${LFS_BASE_URL}
+LFS_VERSION=\${LFS_VERSION}-systemd
+SOURCE=\${LFS_BASE_URL}
 EOF
 
 echo

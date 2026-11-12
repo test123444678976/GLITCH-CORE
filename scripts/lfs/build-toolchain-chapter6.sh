@@ -197,7 +197,7 @@ if [[ ! -f "$TOOLS/.glitchcore-gcc-pass2-complete" ]]; then
   done
   tar -xf "$(archive mpfr-4.2.2.tar.xz)" -C "$SOURCES"; mv "$SOURCES/mpfr-4.2.2" mpfr
   tar -xf "$(archive gmp-6.3.0.tar.xz)" -C "$SOURCES"; mv "$SOURCES/gmp-6.3.0" gmp
-  tar -xf "$(archive mpc-1.4.1.tar.gz)" -C "$SOURCES"; mv "$SOURCES/mpc-1.4.1" mpc
+  tar -xf "$(archive mpc-1.4.1.tar.xz)" -C "$SOURCES"; mv "$SOURCES/mpc-1.4.1" mpc
   sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64
   mkdir -p build && cd build
   unset CFLAGS CXXFLAGS LDFLAGS

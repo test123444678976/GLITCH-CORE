@@ -151,6 +151,7 @@ jobs:
             work-lfs/lfs/CHAPTER-5-BUILD-INFO.txt
           if-no-files-found: error
           retention-days: 7
+          include-hidden-files: true
 
   build-lfs-chapter6:
     name: Build LFS Chapter 6 temporary tools and GCC Pass 2
@@ -233,3 +234,4 @@ jobs:
             work-lfs/lfs/CHAPTER-6-BUILD-INFO.txt
           if-no-files-found: error
           retention-days: 7
+          include-hidden-files: true

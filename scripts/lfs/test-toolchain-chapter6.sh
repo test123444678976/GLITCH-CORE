@@ -52,6 +52,24 @@ if LFS="$tmp/lfs" LFS_TGT=x86_64-lfs-linux-gnu bash "$SCRIPT" >/dev/null 2>&1; t
 fi
 
 WORKFLOW="$ROOT/.github/workflows/lfs-toolchain.yml"
+
+# Chapter 5/6 use dot-prefixed completion markers. Keep them inside the
+# cross-job checkpoints; upload-artifact excludes hidden files by default.
+awk '
+/^      - name:/ { chapter5 = 0; chapter6 = 0 }
+/^      - name: Upload Chapter 5 cross-toolchain checkpoint/ { chapter5 = 1 }
+/^      - name: Upload Chapter 6 temporary-tools checkpoint/ { chapter6 = 1 }
+chapter5 && /include-hidden-files: true/ { chapter5_hidden = 1 }
+chapter6 && /include-hidden-files: true/ { chapter6_hidden = 1 }
+END { if (!chapter5_hidden || !chapter6_hidden) exit 1 }
+' "$WORKFLOW" || fail "LFS toolchain checkpoints must preserve hidden completion markers."
+
+grep -Fq 'mv -f "$LFS/usr/bin/chroot" "$LFS/usr/sbin/chroot"' "$SCRIPT" || fail "Coreutils chroot must be moved to /usr/sbin."
+grep -Fq 'test -x "$LFS/usr/sbin/chroot"' "$SCRIPT" || fail "Chapter 6 must verify chroot at /usr/sbin/chroot."
+if grep -Fq 'test -x "$LFS/usr/bin/chroot"' "$SCRIPT"; then
+  fail "Chapter 6 still checks the pre-move /usr/bin/chroot path."
+fi
+
 awk '
 /sudo apt-get install -y/ {
   slash = sprintf("%c", 92)

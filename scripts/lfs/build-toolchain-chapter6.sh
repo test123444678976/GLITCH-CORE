@@ -94,10 +94,21 @@ if [[ ! -f "$TOOLS/.glitchcore-ch6-ncurses-complete" ]]; then
     make -C progs tic
     install -m755 progs/tic "$TOOLS/bin"
   popd >/dev/null
-  ./configure --prefix=/usr --host="$LFS_TGT" --build="$(./config.guess)" \
+  if ! ./configure --prefix=/usr --host="$LFS_TGT" --build="$(./config.guess)" \
     --mandir=/usr/share/man --with-manpage-format=normal --with-shared \
     --without-normal --with-cxx-shared --without-debug --without-ada \
-    --disable-stripping AWK=gawk
+    --disable-stripping AWK=gawk; then
+    echo "ERROR: ncurses target configure failed; printing config.log diagnostics." >&2
+    if [[ -f config.log ]]; then
+      tail -n 160 config.log >&2
+    else
+      echo "No config.log was produced." >&2
+    fi
+    echo "Cross compiler: $(command -v "$LFS_TGT-gcc" || true)" >&2
+    "$LFS_TGT-gcc" -dumpmachine >&2 || true
+    "$LFS_TGT-gcc" -print-sysroot >&2 || true
+    exit 1
+  fi
   make -j"$JOBS"
   make DESTDIR="$LFS" install
   ln -sfv libncursesw.so "$LFS/usr/lib/libncurses.so"

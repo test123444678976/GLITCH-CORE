@@ -29,7 +29,9 @@ for required in \
   'GCC Pass 2' \
   '.glitchcore-binutils-pass2-complete' \
   '.glitchcore-gcc-pass2-complete' \
-  'target_configargs=gcc_cv_target_thread_file=posix'; do
+  'target_configargs=gcc_cv_target_thread_file=posix' \
+  'printing config.log diagnostics' \
+  'tail -n 160 config.log'; do
   grep -Fq -- "$required" "$SCRIPT" || fail "Chapter 6 recipe or checkpoint is missing: $required"
 done
 

@@ -357,6 +357,25 @@ jobs:
           chmod +x scripts/lfs/test-package-manager-stage.sh
           bash scripts/lfs/test-package-manager-stage.sh
 
+      - name: Smoke-test native dpkg and APT on the build host
+        run: |
+          set -Eeuo pipefail
+          for binary in \
+            work-lfs/package-manager-stage/dpkg/usr/bin/dpkg \
+            work-lfs/package-manager-stage/dpkg/usr/bin/dpkg-deb \
+            work-lfs/package-manager-stage/dpkg/usr/bin/dpkg-query \
+            work-lfs/package-manager-stage/apt/usr/bin/apt-get \
+            work-lfs/package-manager-stage/apt/usr/bin/apt-cache; do
+            echo "==> Checking runtime libraries for $binary"
+            ldd "$binary" | tee "$RUNNER_TEMP/native-package-manager-ldd.txt"
+            if grep -q 'not found' "$RUNNER_TEMP/native-package-manager-ldd.txt"; then
+              echo "ERROR: unresolved runtime library for $binary" >&2
+              exit 1
+            fi
+            echo "==> Running $binary --version"
+            "$binary" --version
+          done
+
       - name: Package native dpkg and APT staging trees
         run: |
           tar -C work-lfs/package-manager-stage -czf work-lfs/glitch-core-native-dpkg-apt-x86_64.tar.gz dpkg apt

@@ -220,7 +220,7 @@ fi
 "$LFS/usr/bin/make" --version >/dev/null
 "$LFS/usr/bin/gcc" -dumpmachine | grep -Fx "$LFS_TGT" >/dev/null
 test -s "$LFS/usr/lib/libncursesw.so"
-test -x "$LFS/usr/bin/chroot"
+test -x "$LFS/usr/sbin/chroot"
 test -f "$TOOLS/.glitchcore-binutils-pass2-complete"
 test -f "$TOOLS/.glitchcore-gcc-pass2-complete"
 touch "$TOOLS/.glitchcore-chapter6-complete"

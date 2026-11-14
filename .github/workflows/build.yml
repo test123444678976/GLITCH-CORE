@@ -38,7 +38,9 @@ jobs:
           bash scripts/lfs/test-package-manager-build.sh
           bash scripts/lfs/test-package-manager-config.sh
           bash scripts/lfs/test-toolchain-pass1.sh
-          bash scripts/lfs/test-toolchain-chapter5.sh          bash scripts/lfs/test-toolchain-chapter6.sh
+          bash scripts/lfs/test-toolchain-chapter5.sh
+          bash scripts/lfs/test-toolchain-chapter6.sh
+          bash scripts/lfs/test-lfs-source-mirror-rewrite.sh
           bash scripts/lfs/test-lfs-source-mirror-rewrite.sh
 
       - name: Validate GLITCH application SDK

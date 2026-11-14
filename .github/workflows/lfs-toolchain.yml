@@ -144,7 +144,7 @@ jobs:
       - name: Package Chapter 5 checkpoint with Unix permissions
         run: |
           set -Eeuo pipefail
-          tar -C work-lfs -czf work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz LFS-VERSION lfs/sources lfs/tools lfs/usr lfs/lib64 lfs/CHAPTER-5-BUILD-INFO.txt
+          tar -czf work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz -C work-lfs LFS-VERSION lfs/sources lfs/tools lfs/usr lfs/lib64 lfs/CHAPTER-5-BUILD-INFO.txt
           tar -tzf work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz >/dev/null
           test -s work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz
 
@@ -237,7 +237,7 @@ jobs:
       - name: Package Chapter 6 checkpoint with Unix permissions
         run: |
           set -Eeuo pipefail
-          tar -C work-lfs -czf work-lfs/glitch-core-lfs-toolchain-chapter6-x86_64.tar.gz LFS-VERSION lfs/sources lfs/tools lfs/usr lfs/lib64 lfs/CHAPTER-6-BUILD-INFO.txt
+          tar -czf work-lfs/glitch-core-lfs-toolchain-chapter6-x86_64.tar.gz -C work-lfs LFS-VERSION lfs/sources lfs/tools lfs/usr lfs/lib64 lfs/CHAPTER-6-BUILD-INFO.txt
           tar -tzf work-lfs/glitch-core-lfs-toolchain-chapter6-x86_64.tar.gz >/dev/null
           test -s work-lfs/glitch-core-lfs-toolchain-chapter6-x86_64.tar.gz
 

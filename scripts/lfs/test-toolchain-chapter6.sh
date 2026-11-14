@@ -58,13 +58,13 @@ WORKFLOW="$ROOT/.github/workflows/lfs-toolchain.yml"
 # GitHub artifact directory uploads do not preserve Unix executable bits.
 # The workflows must upload tar archives and restore Chapter 5 before invoking
 # the cross compiler in the Chapter 6 job.
-for required in 'tar -C work-lfs -czf work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz' 'tar -xzf work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz -C work-lfs' 'path: work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz' 'test -x "$LFS/tools/bin/$LFS_TGT-gcc"' 'tar -C work-lfs -czf work-lfs/glitch-core-lfs-toolchain-chapter6-x86_64.tar.gz' 'path: work-lfs/glitch-core-lfs-toolchain-chapter6-x86_64.tar.gz'; do
+for required in 'tar -czf work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz -C work-lfs' 'tar -xzf work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz -C work-lfs' 'path: work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz' 'test -x "$LFS/tools/bin/$LFS_TGT-gcc"' 'tar -czf work-lfs/glitch-core-lfs-toolchain-chapter6-x86_64.tar.gz -C work-lfs' 'path: work-lfs/glitch-core-lfs-toolchain-chapter6-x86_64.tar.gz'; do
   grep -Fq -- "$required" "$WORKFLOW" || fail "LFS checkpoint archive contract is missing: $required"
 done
 
 # Exercise the same transport with an executable and a dot-prefixed marker.
 tmp_archive="$(mktemp -d)"
-trap 'rm -rf "$tmp_archive"' EXIT
+trap 'rm -rf "$tmp" "$tmp_archive"' EXIT
 mkdir -p "$tmp_archive/source/tools/bin" "$tmp_archive/restored"
 printf '#!/usr/bin/env bash\nexit 0\n' > "$tmp_archive/source/tools/bin/test-cross-tool"
 chmod 755 "$tmp_archive/source/tools/bin/test-cross-tool"

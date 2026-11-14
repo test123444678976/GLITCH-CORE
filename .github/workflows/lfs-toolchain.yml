@@ -12,6 +12,8 @@ on:
       - "scripts/lfs/test-toolchain-chapter5.sh"
       - "scripts/lfs/ensure-ncurses-source.sh"
       - "scripts/lfs/test-ncurses-source-fallback.sh"
+      - "scripts/lfs/rewrite-lfs-gnu-mirrors.sh"
+      - "scripts/lfs/test-lfs-source-mirror-rewrite.sh"
       - "scripts/lfs/test-toolchain-chapter6.sh"
       - "config/lfs-toolchain.lock"
       - ".github/workflows/lfs-toolchain.yml"
@@ -42,6 +44,8 @@ jobs:
 
       - name: Test checksum-verified ncurses mirror fallback
         run: bash scripts/lfs/test-ncurses-source-fallback.sh
+      - name: Test GNU source mirror normalization
+        run: bash scripts/lfs/test-lfs-source-mirror-rewrite.sh
 
       - name: Download and verify official LFS source set
         run: |
@@ -137,21 +141,21 @@ jobs:
             echo "Status: built and verified in this GitHub Actions job"
           } > "$LFS/CHAPTER-5-BUILD-INFO.txt"
 
+      - name: Package Chapter 5 checkpoint with Unix permissions
+        run: |
+          set -Eeuo pipefail
+          tar -C work-lfs -czf work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz LFS-VERSION lfs/sources lfs/tools lfs/usr lfs/lib64 lfs/CHAPTER-5-BUILD-INFO.txt
+          tar -tzf work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz >/dev/null
+          test -s work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz
+
       - name: Upload Chapter 5 cross-toolchain checkpoint
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: glitch-core-lfs-toolchain-chapter5-x86_64
-          path: |
-            work-lfs/LFS-VERSION
-            work-lfs/lfs/sources/
-            work-lfs/lfs/tools/
-            work-lfs/lfs/usr/
-            work-lfs/lfs/lib64/
-            work-lfs/lfs/CHAPTER-5-BUILD-INFO.txt
+          path: work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz
           if-no-files-found: error
           retention-days: 7
-          include-hidden-files: true
 
   build-lfs-chapter6:
     name: Build LFS Chapter 6 temporary tools and GCC Pass 2
@@ -171,6 +175,16 @@ jobs:
         with:
           name: glitch-core-lfs-toolchain-chapter5-x86_64
           path: work-lfs
+      - name: Restore Chapter 5 checkpoint and Unix permissions
+        run: |
+          set -Eeuo pipefail
+          archive=work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz
+          test -s "$archive"
+          tar -tzf "$archive" >/dev/null
+          tar -xzf "$archive" -C work-lfs
+          test -x "$LFS/tools/bin/$LFS_TGT-gcc"
+          test -f "$LFS/tools/.glitchcore-binutils-pass1-complete"
+          test -f "$LFS/tools/.glitchcore-gcc-pass1-complete"
 
       - name: Install Chapter 6 build host dependencies
         run: |
@@ -220,18 +234,18 @@ jobs:
             echo "Status: built and verified in this GitHub Actions job"
           } > "$LFS/CHAPTER-6-BUILD-INFO.txt"
 
+      - name: Package Chapter 6 checkpoint with Unix permissions
+        run: |
+          set -Eeuo pipefail
+          tar -C work-lfs -czf work-lfs/glitch-core-lfs-toolchain-chapter6-x86_64.tar.gz LFS-VERSION lfs/sources lfs/tools lfs/usr lfs/lib64 lfs/CHAPTER-6-BUILD-INFO.txt
+          tar -tzf work-lfs/glitch-core-lfs-toolchain-chapter6-x86_64.tar.gz >/dev/null
+          test -s work-lfs/glitch-core-lfs-toolchain-chapter6-x86_64.tar.gz
+
       - name: Upload Chapter 6 temporary-tools checkpoint
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: glitch-core-lfs-toolchain-chapter6-x86_64
-          path: |
-            work-lfs/LFS-VERSION
-            work-lfs/lfs/sources/
-            work-lfs/lfs/tools/
-            work-lfs/lfs/usr/
-            work-lfs/lfs/lib64/
-            work-lfs/lfs/CHAPTER-6-BUILD-INFO.txt
+          path: work-lfs/glitch-core-lfs-toolchain-chapter6-x86_64.tar.gz
           if-no-files-found: error
           retention-days: 7
-          include-hidden-files: true

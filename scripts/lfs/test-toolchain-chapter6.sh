@@ -55,16 +55,25 @@ fi
 
 WORKFLOW="$ROOT/.github/workflows/lfs-toolchain.yml"
 
-# Chapter 5/6 use dot-prefixed completion markers. Keep them inside the
-# cross-job checkpoints; upload-artifact excludes hidden files by default.
-awk '
-/^      - name:/ { chapter5 = 0; chapter6 = 0 }
-/^      - name: Upload Chapter 5 cross-toolchain checkpoint/ { chapter5 = 1 }
-/^      - name: Upload Chapter 6 temporary-tools checkpoint/ { chapter6 = 1 }
-chapter5 && /include-hidden-files: true/ { chapter5_hidden = 1 }
-chapter6 && /include-hidden-files: true/ { chapter6_hidden = 1 }
-END { if (!chapter5_hidden || !chapter6_hidden) exit 1 }
-' "$WORKFLOW" || fail "LFS toolchain checkpoints must preserve hidden completion markers."
+# GitHub artifact directory uploads do not preserve Unix executable bits.
+# The workflows must upload tar archives and restore Chapter 5 before invoking
+# the cross compiler in the Chapter 6 job.
+for required in 'tar -C work-lfs -czf work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz' 'tar -xzf work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz -C work-lfs' 'path: work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar.gz' 'test -x "$LFS/tools/bin/$LFS_TGT-gcc"' 'tar -C work-lfs -czf work-lfs/glitch-core-lfs-toolchain-chapter6-x86_64.tar.gz' 'path: work-lfs/glitch-core-lfs-toolchain-chapter6-x86_64.tar.gz'; do
+  grep -Fq -- "$required" "$WORKFLOW" || fail "LFS checkpoint archive contract is missing: $required"
+done
+
+# Exercise the same transport with an executable and a dot-prefixed marker.
+tmp_archive="$(mktemp -d)"
+trap 'rm -rf "$tmp_archive"' EXIT
+mkdir -p "$tmp_archive/source/tools/bin" "$tmp_archive/restored"
+printf '#!/usr/bin/env bash\nexit 0\n' > "$tmp_archive/source/tools/bin/test-cross-tool"
+chmod 755 "$tmp_archive/source/tools/bin/test-cross-tool"
+touch "$tmp_archive/source/tools/.glitchcore-test-marker"
+tar -C "$tmp_archive/source" -czf "$tmp_archive/checkpoint.tar.gz" tools
+tar -xzf "$tmp_archive/checkpoint.tar.gz" -C "$tmp_archive/restored"
+[[ -x "$tmp_archive/restored/tools/bin/test-cross-tool" ]] || fail "Tar checkpoint lost executable permissions."
+[[ -f "$tmp_archive/restored/tools/.glitchcore-test-marker" ]] || fail "Tar checkpoint lost hidden completion markers."
+
 
 grep -Fq 'mv -f "$LFS/usr/bin/chroot" "$LFS/usr/sbin/chroot"' "$SCRIPT" || fail "Coreutils chroot must be moved to /usr/sbin."
 grep -Fq 'test -x "$LFS/usr/sbin/chroot"' "$SCRIPT" || fail "Chapter 6 must verify chroot at /usr/sbin/chroot."

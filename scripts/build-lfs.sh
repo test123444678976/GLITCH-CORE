@@ -78,11 +78,15 @@ grep -viE '(^|/)ncurses-6\.6\.tar\.gz$' \
     "$SOURCES/wget-list" > "$SOURCES/wget-list.without-ncurses"
 test -s "$SOURCES/wget-list.without-ncurses"
 
+# Route GNU source archives around the ftpmirror.gnu.org endpoint that timed
+# out on GitHub-hosted runners. Filenames and upstream MD5 values are unchanged.
+bash "$ROOT/scripts/lfs/rewrite-lfs-gnu-mirrors.sh" \
+    "$SOURCES/wget-list.without-ncurses" "$SOURCES/wget-list.normalized"
+
 download_status=0
 wget --https-only --continue --tries=3 --timeout=30 --waitretry=5 \
-    --input-file="$SOURCES/wget-list.without-ncurses" \
+    --input-file="$SOURCES/wget-list.normalized" \
     --directory-prefix="$SOURCES" || download_status=$?
-
 if [[ "$download_status" -ne 0 ]]; then
     echo "WARNING: one or more primary source downloads failed (wget exit $download_status)."
     echo "The full official checksum audit below will identify any missing archives."

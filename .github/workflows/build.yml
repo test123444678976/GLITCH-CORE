@@ -38,7 +38,8 @@ jobs:
           bash scripts/lfs/test-package-manager-build.sh
           bash scripts/lfs/test-package-manager-config.sh
           bash scripts/lfs/test-toolchain-pass1.sh
-          bash scripts/lfs/test-toolchain-chapter5.sh
+          bash scripts/lfs/test-toolchain-chapter5.sh          bash scripts/lfs/test-toolchain-chapter6.sh
+          bash scripts/lfs/test-lfs-source-mirror-rewrite.sh
 
       - name: Validate GLITCH application SDK
         run: |
@@ -360,12 +361,7 @@ jobs:
       - name: Smoke-test native dpkg and APT on the build host
         run: |
           set -Eeuo pipefail
-          for binary in \
-            work-lfs/package-manager-stage/dpkg/usr/bin/dpkg \
-            work-lfs/package-manager-stage/dpkg/usr/bin/dpkg-deb \
-            work-lfs/package-manager-stage/dpkg/usr/bin/dpkg-query \
-            work-lfs/package-manager-stage/apt/usr/bin/apt-get \
-            work-lfs/package-manager-stage/apt/usr/bin/apt-cache; do
+          for binary in work-lfs/package-manager-stage/dpkg/usr/bin/dpkg work-lfs/package-manager-stage/dpkg/usr/bin/dpkg-deb work-lfs/package-manager-stage/dpkg/usr/bin/dpkg-query; do
             echo "==> Checking runtime libraries for $binary"
             ldd "$binary" | tee "$RUNNER_TEMP/native-package-manager-ldd.txt"
             if grep -q 'not found' "$RUNNER_TEMP/native-package-manager-ldd.txt"; then
@@ -374,6 +370,22 @@ jobs:
             fi
             echo "==> Running $binary --version"
             "$binary" --version
+          done
+
+          # APT 3.0.4 ships its own libapt-pkg.so.7.0 and libapt-private.so.0.0.
+          # Resolve those from the isolated staging tree, not Ubuntu's older host APT.
+          APT_LIBDIR="$GITHUB_WORKSPACE/work-lfs/package-manager-stage/apt/usr/lib"
+          test -e "$APT_LIBDIR/libapt-pkg.so.7.0"
+          test -e "$APT_LIBDIR/libapt-private.so.0.0"
+          for binary in work-lfs/package-manager-stage/apt/usr/bin/apt-get work-lfs/package-manager-stage/apt/usr/bin/apt-cache; do
+            echo "==> Checking staged APT runtime libraries for $binary"
+            LD_LIBRARY_PATH="$APT_LIBDIR" ldd "$binary" | tee "$RUNNER_TEMP/native-package-manager-ldd.txt"
+            if grep -q 'not found' "$RUNNER_TEMP/native-package-manager-ldd.txt"; then
+              echo "ERROR: unresolved staged APT runtime library for $binary" >&2
+              exit 1
+            fi
+            echo "==> Running $binary --version with staged APT libraries"
+            LD_LIBRARY_PATH="$APT_LIBDIR" "$binary" --version
           done
 
       - name: Package native dpkg and APT staging trees

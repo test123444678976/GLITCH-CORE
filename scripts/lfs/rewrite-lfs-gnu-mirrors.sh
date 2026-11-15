@@ -14,13 +14,16 @@ mkdir -p "$(dirname "$OUTPUT")"
 tmp="$(mktemp "$OUTPUT.tmp.XXXXXX")"
 trap 'rm -f "$tmp"' EXIT
 
-# ftpmirror.gnu.org resolved to a timed-out Savannah endpoint on the hosted
-# runner. ftp.gnu.org/gnu/ is the canonical GNU archive path; filenames and
-# checksum manifests remain unchanged.
-sed -E 's#^https?://ftpmirror\.gnu\.org/#https://ftp.gnu.org/gnu/#' "$INPUT" > "$tmp"
+# ftp.gnu.org timed out repeatedly on GitHub-hosted runners. The kernel.org
+# mirror publishes the GNU archive tree; the LFS checksum manifest remains
+# authoritative, so stale or corrupted mirror content is rejected later.
+sed -E \
+  -e 's#^https?://ftpmirror\.gnu\.org/#https://mirrors.kernel.org/gnu/#' \
+  -e 's#^https?://ftp\.gnu\.org/gnu/#https://mirrors.kernel.org/gnu/#' \
+  "$INPUT" > "$tmp"
 [[ -s "$tmp" ]] || fail "Normalized wget-list is empty."
 mv -f "$tmp" "$OUTPUT"
 trap - EXIT
 
-count="$(grep -c '^https://ftp\.gnu\.org/gnu/' "$OUTPUT" || true)"
+count="$(grep -c '^https://mirrors\.kernel\.org/gnu/' "$OUTPUT" || true)"
 echo "GNU source URLs normalized: $count"

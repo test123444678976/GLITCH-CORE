@@ -41,7 +41,6 @@ jobs:
           bash scripts/lfs/test-toolchain-chapter5.sh
           bash scripts/lfs/test-toolchain-chapter6.sh
           bash scripts/lfs/test-lfs-source-mirror-rewrite.sh
-          bash scripts/lfs/test-lfs-source-mirror-rewrite.sh
 
       - name: Validate GLITCH application SDK
         run: |

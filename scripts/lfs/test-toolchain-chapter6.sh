@@ -62,6 +62,16 @@ for required in 'tar -czf work-lfs/glitch-core-lfs-toolchain-chapter5-x86_64.tar
   grep -Fq -- "$required" "$WORKFLOW" || fail "LFS checkpoint archive contract is missing: $required"
 done
 
+# Checkpoint archives must preserve the merged-/usr symlink layout required by
+# LFS. Chapter 6 also repairs and validates these links after artifact restore.
+for required in \
+  'lfs/usr lfs/bin lfs/lib lfs/sbin lfs/lib64' \
+  'if [[ -L "$LFS/$path" ]]' \
+  '[[ "$(readlink "$LFS/$path")" == "usr/$path" ]]' \
+  'ln -s "usr/$path" "$LFS/$path"'; do
+  grep -Fq -- "$required" "$WORKFLOW" "$SCRIPT" || fail "Merged-/usr checkpoint layout contract is missing: $required"
+done
+
 # Exercise the same transport with an executable and a dot-prefixed marker.
 tmp_archive="$(mktemp -d)"
 trap 'rm -rf "$tmp" "$tmp_archive"' EXIT

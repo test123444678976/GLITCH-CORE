@@ -119,9 +119,17 @@ fi
 # 6.4 Bash
 build_autoconf bash 5.3 bash-5.3.tar.gz \
   '--prefix=/usr --build="$(sh support/config.guess)" --host="$LFS_TGT" --without-bash-malloc --docdir=/usr/share/doc/bash-5.3'
-# Chapter 5 does not create the legacy /bin directory in this target layout.
-# Ensure it exists before installing the /bin/sh compatibility symlink.
-mkdir -p "$LFS/bin"
+# Restore the canonical LFS merged-/usr layout after the Chapter 5
+# checkpoint transfer. The checkpoint archive may not preserve symlink paths.
+for path in bin lib sbin; do
+  if [[ -L "$LFS/$path" ]]; then
+    [[ "$(readlink "$LFS/$path")" == "usr/$path" ]] || fail "Unexpected LFS layout symlink: $LFS/$path"
+  elif [[ -e "$LFS/$path" ]]; then
+    fail "Refusing to replace unexpected LFS layout path: $LFS/$path"
+  else
+    ln -s "usr/$path" "$LFS/$path"
+  fi
+done
 ln -sfv bash "$LFS/bin/sh"
 
 # 6.5 Coreutils

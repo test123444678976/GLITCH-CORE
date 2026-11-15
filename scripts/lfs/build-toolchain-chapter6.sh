@@ -119,6 +119,9 @@ fi
 # 6.4 Bash
 build_autoconf bash 5.3 bash-5.3.tar.gz \
   '--prefix=/usr --build="$(sh support/config.guess)" --host="$LFS_TGT" --without-bash-malloc --docdir=/usr/share/doc/bash-5.3'
+# Chapter 5 does not create the legacy /bin directory in this target layout.
+# Ensure it exists before installing the /bin/sh compatibility symlink.
+mkdir -p "$LFS/bin"
 ln -sfv bash "$LFS/bin/sh"
 
 # 6.5 Coreutils

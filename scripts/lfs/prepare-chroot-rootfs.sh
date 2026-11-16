@@ -178,10 +178,6 @@ fi
 
 touch "$TARGET/var/log/btmp" "$TARGET/var/log/lastlog" \
   "$TARGET/var/log/faillog" "$TARGET/var/log/wtmp"
-chgrp 13 "$TARGET/var/log/lastlog"
-chmod 664 "$TARGET/var/log/lastlog"
-chmod 600 "$TARGET/var/log/btmp"
-
 # The Chapter 7 temporary system is owned by root; source archives remain inputs.
 chown -h root:root "$TARGET"
 chown -hR root:root \
@@ -191,6 +187,9 @@ chown -hR root:root \
   "$TARGET/run" "$TARGET/tmp"
 chown -h root:root "$TARGET/bin" "$TARGET/lib" "$TARGET/sbin"
 install -o 101 -g 101 -m 0755 -d "$TARGET/home/tester"
+chgrp 13 "$TARGET/var/log/lastlog"
+chmod 664 "$TARGET/var/log/lastlog"
+chmod 600 "$TARGET/var/log/btmp"
 
 [[ "$(stat -c '%a' "$TARGET/tmp")" == 1777 ]] || fail "/tmp must have mode 1777."
 [[ "$(stat -c '%a' "$TARGET/var/tmp")" == 1777 ]] || fail "/var/tmp must have mode 1777."

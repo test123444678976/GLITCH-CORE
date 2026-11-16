@@ -7,6 +7,8 @@ fail() { echo "ERROR: $*" >&2; exit 1; }
 
 [[ "$(id -u)" -eq 0 ]] || fail "Run this regression test as root."
 bash -n "$PREPARE" || fail "Chroot preparation script has invalid Bash syntax."
+grep -Fq 'if mountpoint -q "$TARGET/$relative"; then' "$PREPARE" || fail "Existing mountpoints must be rejected explicitly."
+if grep -Fq 'mountpoint -q "$TARGET/$relative" && fail' "$PREPARE"; then fail "Mountpoint guard masks its own failure."; fi
 
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
@@ -16,8 +18,9 @@ make_fixture() {
   mkdir -p "$target/tools" "$target/usr/bin" "$target/usr/sbin" \
     "$target/usr/lib" "$target/lib64"
   touch "$target/tools/.glitchcore-chapter6-complete"
-  touch "$target/usr/lib/libc.so.6" "$target/usr/lib/libstdc++.so.6" \
-    "$target/usr/lib/ld-linux-x86-64.so.2"
+  printf 'fixture\n' > "$target/usr/lib/libc.so.6"
+  printf 'fixture\n' > "$target/usr/lib/libstdc++.so.6"
+  printf 'fixture\n' > "$target/usr/lib/ld-linux-x86-64.so.2"
   for binary in env bash gcc as ld false head; do
     printf '#!/bin/sh\nexit 0\n' > "$target/usr/bin/$binary"
     chmod 755 "$target/usr/bin/$binary"

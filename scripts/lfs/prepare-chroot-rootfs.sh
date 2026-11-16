@@ -209,7 +209,9 @@ for cmd in mount umount mountpoint chroot realpath; do
   command -v "$cmd" >/dev/null 2>&1 || fail "Missing host command: $cmd"
 done
 for relative in dev proc sys run; do
-  mountpoint -q "$TARGET/$relative" && fail "Refusing to reuse an existing mount at $TARGET/$relative" || true
+  if mountpoint -q "$TARGET/$relative"; then
+    fail "Refusing to reuse an existing mount at $TARGET/$relative"
+  fi
 done
 
 MOUNT_DEV=0

@@ -40,6 +40,7 @@ jobs:
           bash scripts/lfs/test-toolchain-pass1.sh
           bash scripts/lfs/test-toolchain-chapter5.sh
           bash scripts/lfs/test-toolchain-chapter6.sh
+          sudo bash scripts/lfs/test-chroot-rootfs.sh
           bash scripts/lfs/test-lfs-source-mirror-rewrite.sh
 
       - name: Validate GLITCH application SDK

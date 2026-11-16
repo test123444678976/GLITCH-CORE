@@ -15,6 +15,8 @@ on:
       - "scripts/lfs/rewrite-lfs-gnu-mirrors.sh"
       - "scripts/lfs/test-lfs-source-mirror-rewrite.sh"
       - "scripts/lfs/test-toolchain-chapter6.sh"
+      - "scripts/lfs/prepare-chroot-rootfs.sh"
+      - "scripts/lfs/test-chroot-rootfs.sh"
       - "config/lfs-toolchain.lock"
       - ".github/workflows/lfs-toolchain.yml"
 
@@ -247,5 +249,75 @@ jobs:
         with:
           name: glitch-core-lfs-toolchain-chapter6-x86_64
           path: work-lfs/glitch-core-lfs-toolchain-chapter6-x86_64.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+
+  prepare-lfs-chroot:
+    name: Prepare LFS Chapter 7 chroot bootstrap
+    needs: build-lfs-chapter6
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      LFS: ${{ github.workspace }}/work-lfs/lfs
+      LFS_TGT: x86_64-lfs-linux-gnu
+      JOBS: "2"
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+
+      - name: Download Chapter 6 temporary-tools checkpoint
+        uses: actions/download-artifact@v4
+        with:
+          name: glitch-core-lfs-toolchain-chapter6-x86_64
+          path: work-lfs
+
+      - name: Restore Chapter 6 checkpoint and Unix permissions
+        run: |
+          set -Eeuo pipefail
+          archive=work-lfs/glitch-core-lfs-toolchain-chapter6-x86_64.tar.gz
+          test -s "$archive"
+          tar -tzf "$archive" >/dev/null
+          tar -xzf "$archive" -C work-lfs
+          test -f "$LFS/tools/.glitchcore-chapter6-complete"
+
+      - name: Test Chapter 7 chroot preparation guards
+        run: sudo bash scripts/lfs/test-chroot-rootfs.sh
+
+      - name: Prepare rootfs and perform native chroot smoke test
+        run: sudo bash scripts/lfs/prepare-chroot-rootfs.sh "$LFS"
+
+      - name: Verify Chapter 7 chroot bootstrap
+        run: |
+          set -Eeuo pipefail
+          test -f "$LFS/tools/.glitchcore-chroot-ready"
+          grep -Fxq "LFS_BOOK=13.1-systemd" "$LFS/CHAPTER-7-CHROOT-PREP-INFO.txt"
+          grep -Fxq "TARGET=$LFS_TGT" "$LFS/CHAPTER-7-CHROOT-PREP-INFO.txt"
+          grep -Fxq "CHROOT_SMOKE=passed" "$LFS/CHAPTER-7-CHROOT-PREP-INFO.txt"
+          grep -Fxq "CHAPTER7_TEMPORARY_PACKAGES=not-built" "$LFS/CHAPTER-7-CHROOT-PREP-INFO.txt"
+          test ! -e "$LFS/usr/lib64"
+          test -L "$LFS/etc/mtab"
+          test -L "$LFS/var/run"
+          test -L "$LFS/var/lock"
+
+      - name: Package Chapter 7 chroot bootstrap checkpoint
+        run: |
+          set -Eeuo pipefail
+          archive=work-lfs/glitch-core-lfs-chapter7-chroot-bootstrap-x86_64.tar.gz
+          tar -czf "$archive" -C work-lfs \
+            LFS-VERSION \
+            lfs/sources lfs/tools lfs/usr lfs/bin lfs/lib lfs/sbin lfs/lib64 \
+            lfs/etc lfs/var lfs/home lfs/root lfs/tmp lfs/run lfs/dev lfs/proc lfs/sys \
+            lfs/boot lfs/mnt lfs/opt lfs/srv lfs/media \
+            lfs/CHAPTER-6-BUILD-INFO.txt lfs/CHAPTER-7-CHROOT-PREP-INFO.txt
+          tar -tzf "$archive" >/dev/null
+          test -s "$archive"
+
+      - name: Upload Chapter 7 chroot bootstrap checkpoint
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: glitch-core-lfs-chapter7-chroot-bootstrap-x86_64
+          path: work-lfs/glitch-core-lfs-chapter7-chroot-bootstrap-x86_64.tar.gz
           if-no-files-found: error
           retention-days: 7

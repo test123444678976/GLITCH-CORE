@@ -90,8 +90,15 @@ checkpoint_target="$checkpoint_work/lfs"
 make_fixture "$checkpoint_target"
 bash "$PREPARE" --prepare-only "$checkpoint_target" >/dev/null
 mkdir -p "$checkpoint_target/sources"
-printf '%s\\n' 'LFS_BOOK=13.1-systemd' > "$checkpoint_work/LFS-VERSION"
-printf '%s\\n' 'Chapter 6 fixture provenance' > "$checkpoint_target/CHAPTER-6-BUILD-INFO.txt"
+printf '%s\n' 'LFS_BOOK=13.1-systemd' > "$checkpoint_work/LFS-VERSION"
+printf '%s\n' 'Chapter 6 fixture provenance' > "$checkpoint_target/CHAPTER-6-BUILD-INFO.txt"
+touch "$checkpoint_target/tools/.glitchcore-chroot-ready"
+cat > "$checkpoint_target/CHAPTER-7-CHROOT-PREP-INFO.txt" <<'EOF'
+LFS_BOOK=13.1-systemd
+TARGET=x86_64-lfs-linux-gnu
+CHROOT_SMOKE=passed
+CHAPTER7_TEMPORARY_PACKAGES=not-built
+EOF
 
 archive="$tmp/chapter7-checkpoint.tar.gz"
 bash "$ROOT/scripts/lfs/package-chroot-checkpoint.sh" "$checkpoint_work" "$archive" 12345 12345

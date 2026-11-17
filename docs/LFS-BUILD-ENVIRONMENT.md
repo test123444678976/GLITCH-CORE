@@ -94,7 +94,7 @@ Toolchain**. It supports manual dispatch and push events on
 lock files or the workflow itself changes. It is independent of the
 BusyBox rescue ISO workflow.
 
-The workflow is split into three jobs:
+The workflow currently has four sequential jobs:
 
 1. **Prepare sources:** downloads the official LFS 13.1-systemd source set,
    verifies its manifest checksums and uploads
@@ -107,6 +107,12 @@ The workflow is split into three jobs:
    regression tests, builds temporary tools plus Binutils Pass 2 and GCC
    Pass 2, verifies the expected tools and markers, and uploads
    `glitch-core-lfs-toolchain-chapter6-x86_64`.
+4. **Prepare Chapter 7 chroot:** restores Chapter 6, prepares the target
+   directory layout, performs a native chroot smoke test, records that no
+   Chapter 7 packages have been built, and uploads a root-owned checkpoint.
+   The archive is created with numeric ownership so private target paths and
+   files such as `/var/log/btmp` retain their metadata; its archive file is
+   handed back to the unprivileged CI account for upload.
 
 The workflow records runner resources and build provenance. Check each run's
 job logs and artifact manifest rather than treating a green earlier job as

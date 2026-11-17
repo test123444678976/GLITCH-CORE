@@ -17,6 +17,7 @@ on:
       - "scripts/lfs/test-toolchain-chapter6.sh"
       - "scripts/lfs/prepare-chroot-rootfs.sh"
       - "scripts/lfs/test-chroot-rootfs.sh"
+      - "scripts/lfs/package-chroot-checkpoint.sh"
       - "config/lfs-toolchain.lock"
       - ".github/workflows/lfs-toolchain.yml"
 
@@ -300,16 +301,12 @@ jobs:
           test -L "$LFS/var/run"
           test -L "$LFS/var/lock"
 
-      - name: Package Chapter 7 chroot bootstrap checkpoint
+      - name: Package Chapter 7 checkpoint with root-owned file metadata
         run: |
           set -Eeuo pipefail
-          archive=work-lfs/glitch-core-lfs-chapter7-chroot-bootstrap-x86_64.tar.gz
-          tar -czf "$archive" -C work-lfs \
-            LFS-VERSION \
-            lfs/sources lfs/tools lfs/usr lfs/bin lfs/lib lfs/sbin lfs/lib64 \
-            lfs/etc lfs/var lfs/home lfs/root lfs/tmp lfs/run lfs/dev lfs/proc lfs/sys \
-            lfs/boot lfs/mnt lfs/opt lfs/srv lfs/media \
-            lfs/CHAPTER-6-BUILD-INFO.txt lfs/CHAPTER-7-CHROOT-PREP-INFO.txt
+          archive="$GITHUB_WORKSPACE/work-lfs/glitch-core-lfs-chapter7-chroot-bootstrap-x86_64.tar.gz"
+          sudo bash scripts/lfs/package-chroot-checkpoint.sh \
+            "$GITHUB_WORKSPACE/work-lfs" "$archive" "$(id -u)" "$(id -g)"
           tar -tzf "$archive" >/dev/null
           test -s "$archive"
 

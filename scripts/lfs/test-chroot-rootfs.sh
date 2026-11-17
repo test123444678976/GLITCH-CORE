@@ -82,5 +82,31 @@ if bash "$PREPARE" --prepare-only / >/dev/null 2>&1; then
   fail "Preparation accepted the host root filesystem."
 fi
 
-echo "LFS Chapter 7 chroot preparation regression tests: OK"
-echo "NOTE: fixture tests cover layout and safety; the workflow performs the real chroot smoke test."
+# Exercise the exact checkpoint packager with root-only files. This catches
+# the CI failure mode where an unprivileged tar process cannot read btmp or /root.
+checkpoint_work="$tmp/checkpoint-work"
+mkdir -p "$checkpoint_work"
+checkpoint_target="$checkpoint_work/lfs"
+make_fixture "$checkpoint_target"
+bash "$PREPARE" --prepare-only "$checkpoint_target" >/dev/null
+mkdir -p "$checkpoint_target/sources"
+printf '%s\\n' 'LFS_BOOK=13.1-systemd' > "$checkpoint_work/LFS-VERSION"
+printf '%s\\n' 'Chapter 6 fixture provenance' > "$checkpoint_target/CHAPTER-6-BUILD-INFO.txt"
+
+archive="$tmp/chapter7-checkpoint.tar.gz"
+bash "$ROOT/scripts/lfs/package-chroot-checkpoint.sh" "$checkpoint_work" "$archive" 12345 12345
+[[ "$(stat -c '%u:%g' "$archive")" == 12345:12345 ]] || fail "Checkpoint archive was not handed to the requested CI owner."
+[[ "$(stat -c '%a' "$archive")" == 644 ]] || fail "Checkpoint archive is not readable by the CI upload step."
+tar -tzf "$archive" | grep -Fxq 'lfs/var/log/btmp' || fail "Checkpoint archive omitted btmp."
+tar -tzf "$archive" | grep -Fxq 'lfs/root' || fail "Checkpoint archive omitted /root."
+
+extract="$tmp/checkpoint-extract"
+mkdir -p "$extract"
+tar -xzf "$archive" -C "$extract"
+[[ "$(stat -c '%u:%g:%a' "$extract/lfs/var/log/btmp")" == 0:0:600 ]] || fail "Checkpoint did not preserve btmp ownership/mode."
+[[ "$(stat -c '%u:%g:%a' "$extract/lfs/var/log/lastlog")" == 0:13:664 ]] || fail "Checkpoint did not preserve lastlog ownership/mode."
+[[ "$(stat -c '%u:%g:%a' "$extract/lfs/root")" == 0:0:750 ]] || fail "Checkpoint did not preserve /root ownership/mode."
+[[ -f "$extract/lfs/tools/.glitchcore-chroot-ready" ]] || fail "Checkpoint omitted the Chapter 7 marker."
+
+echo "LFS Chapter 7 chroot preparation and checkpoint packaging regression tests: OK"
+echo "NOTE: fixture tests cover layout, safety and root-owned archive metadata; the workflow performs the real chroot smoke test."

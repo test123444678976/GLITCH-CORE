@@ -105,7 +105,7 @@ bash "$ROOT/scripts/lfs/package-chroot-checkpoint.sh" "$checkpoint_work" "$archi
 [[ "$(stat -c '%u:%g' "$archive")" == 12345:12345 ]] || fail "Checkpoint archive was not handed to the requested CI owner."
 [[ "$(stat -c '%a' "$archive")" == 644 ]] || fail "Checkpoint archive is not readable by the CI upload step."
 tar -tzf "$archive" | grep -Fxq 'lfs/var/log/btmp' || fail "Checkpoint archive omitted btmp."
-tar -tzf "$archive" | grep -Fxq 'lfs/root' || fail "Checkpoint archive omitted /root."
+tar -tzf "$archive" | grep -Exq 'lfs/root/?' || fail "Checkpoint archive omitted /root."
 
 extract="$tmp/checkpoint-extract"
 mkdir -p "$extract"

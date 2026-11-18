@@ -15,6 +15,8 @@ on:
       - "scripts/lfs/rewrite-lfs-gnu-mirrors.sh"
       - "scripts/lfs/test-lfs-source-mirror-rewrite.sh"
       - "scripts/lfs/test-toolchain-chapter6.sh"
+      - "scripts/lfs/validate-toolchain-chapter7-sources.sh"
+      - "scripts/lfs/test-toolchain-chapter7-sources.sh"
       - "scripts/lfs/prepare-chroot-rootfs.sh"
       - "scripts/lfs/test-chroot-rootfs.sh"
       - "scripts/lfs/package-chroot-checkpoint.sh"
@@ -49,11 +51,16 @@ jobs:
         run: bash scripts/lfs/test-ncurses-source-fallback.sh
       - name: Test GNU source mirror normalization
         run: bash scripts/lfs/test-lfs-source-mirror-rewrite.sh
+      - name: Test Chapter 7 temporary-tool source contract
+        run: bash scripts/lfs/test-toolchain-chapter7-sources.sh
 
       - name: Download and verify official LFS source set
         run: |
           chmod +x scripts/build-lfs.sh
           ./scripts/build-lfs.sh
+
+      - name: Verify pinned Chapter 7 temporary-tool sources
+        run: bash scripts/lfs/validate-toolchain-chapter7-sources.sh "$GITHUB_WORKSPACE/work-lfs/lfs/sources"
 
       - name: Upload verified source checkpoint
         uses: actions/upload-artifact@v4

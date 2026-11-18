@@ -17,12 +17,12 @@ done
 packages="$(awk -F= '$1 == "CHAPTER7_TEMPORARY_PACKAGES" { sub(/^[^=]*=/, ""); print; count++ } END { if (count != 1) exit 1 }' "$LOCK")" \
   || fail "Chapter 7 temporary package contract is missing or duplicated."
 IFS=',' read -r -a archives <<< "$packages"
-[[ "\${#archives[@]}" -eq 8 ]] || fail "Expected exactly eight Chapter 7 temporary-tool archives."
+[[ "${#archives[@]}" -eq 8 ]] || fail "Expected exactly eight Chapter 7 temporary-tool archives."
 
 declare -A seen=()
-for archive in "\${archives[@]}"; do
+for archive in "${archives[@]}"; do
   [[ "$archive" =~ ^[A-Za-z0-9._+-]+\.tar\.(xz|gz|bz2)$ ]] || fail "Unsafe Chapter 7 archive name: $archive"
-  [[ -z "\${seen[$archive]+present}" ]] || fail "Duplicate Chapter 7 archive in source contract: $archive"
+  [[ -z "${seen[$archive]+present}" ]] || fail "Duplicate Chapter 7 archive in source contract: $archive"
   seen["$archive"]=1
 
   url_count="$(awk -v expected="$archive" '

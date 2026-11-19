@@ -10,7 +10,7 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 mkdir -p "$tmp/sources" "$tmp/bin"
 printf 'fixture zlib source archive\n' > "$tmp/fixture.tar.gz"
-(cd "$tmp" && md5sum fixture.tar.gz) > "$tmp/sources/md5sums"
+printf "%s  zlib-1.3.2.tar.gz\n" "$(md5sum "$tmp/fixture.tar.gz" | awk '{print $1}')" > "$tmp/sources/md5sums"
 
 cat > "$tmp/bin/wget" <<'EOF'
 #!/usr/bin/env bash

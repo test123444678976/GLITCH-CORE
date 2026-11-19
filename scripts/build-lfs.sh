@@ -93,6 +93,7 @@ if [[ "$download_status" -ne 0 ]]; then
 fi
 
 bash "$ROOT/scripts/lfs/ensure-ncurses-source.sh" "$SOURCES"
+bash "$ROOT/scripts/lfs/ensure-zlib-source.sh" "$SOURCES"
 
 echo "==> Verifying official MD5 checksums"
 (

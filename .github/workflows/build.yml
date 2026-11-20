@@ -1,4 +1,4 @@
-name: Build GLITCH//CORE ISO
+name: Build and validate GLITCH//CORE
 
 on:
   workflow_dispatch:

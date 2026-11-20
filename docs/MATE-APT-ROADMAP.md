@@ -38,6 +38,12 @@ source against the GLITCH//CORE userspace, then create a signed
 GLITCH//CORE package repository. Compatibility with selected Debian
 packages can be evaluated separately; it must never be promised globally.
 
+## Latest CI snapshot — 20 November 2026
+
+- LFS workflow run [44712727722](https://github.com/test123444678976/GLITCH-CORE/actions/runs/44712727722): source verification and Chapter 5 completed successfully; Chapter 6 was still compiling GCC Pass 2 when last inspected. No Chapter 6 or Chapter 7 checkpoint was available yet in that run.
+- Main workflow run [44722991116](https://github.com/test123444678976/GLITCH-CORE/actions/runs/44722991116): validation completed successfully. Its feature-branch configuration intentionally skips the expensive rescue ISO build, so this run did not produce a new ISO.
+- MATE validation run [44712727759](https://github.com/test123444678976/GLITCH-CORE/actions/runs/44712727759): configuration checks passed; this is not a graphical desktop build.
+
 ## Build milestones
 
 1. Keep the current BusyBox ISO as the known-good bootstrap/rescue prototype.

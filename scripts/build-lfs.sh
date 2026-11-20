@@ -94,6 +94,7 @@ fi
 
 bash "$ROOT/scripts/lfs/ensure-ncurses-source.sh" "$SOURCES"
 bash "$ROOT/scripts/lfs/ensure-zlib-source.sh" "$SOURCES"
+bash "$ROOT/scripts/lfs/ensure-coreutils-source.sh" "$SOURCES"
 
 echo "==> Verifying official MD5 checksums"
 (

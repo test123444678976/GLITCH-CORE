@@ -13,6 +13,8 @@ on:
       - "scripts/lfs/ensure-ncurses-source.sh"
       - "scripts/lfs/ensure-zlib-source.sh"
       - "scripts/lfs/test-zlib-source-fallback.sh"
+      - "scripts/lfs/ensure-coreutils-source.sh"
+      - "scripts/lfs/test-coreutils-source-fallback.sh"
       - "scripts/lfs/test-ncurses-source-fallback.sh"
       - "scripts/lfs/rewrite-lfs-gnu-mirrors.sh"
       - "scripts/lfs/test-lfs-source-mirror-rewrite.sh"
@@ -53,6 +55,8 @@ jobs:
         run: bash scripts/lfs/test-ncurses-source-fallback.sh
       - name: Test checksum-verified zlib mirror fallback
         run: bash scripts/lfs/test-zlib-source-fallback.sh
+      - name: Test checksum-verified coreutils mirror fallback
+        run: bash scripts/lfs/test-coreutils-source-fallback.sh
       - name: Test GNU source mirror normalization
         run: bash scripts/lfs/test-lfs-source-mirror-rewrite.sh
       - name: Test Chapter 7 temporary-tool source contract

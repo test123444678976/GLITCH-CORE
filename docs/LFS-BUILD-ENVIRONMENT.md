@@ -85,6 +85,10 @@ as an artifact, reconstructs the isolated workspace, verifies the required
 completion markers, then runs the Chapter 6 regression tests before building.
 The Chapter 6 output is another checkpoint; it is not the final LFS rootfs.
 
+## Latest observed CI run (20 November 2026)
+
+The current LFS workflow run [44712727722](https://github.com/test123444678976/GLITCH-CORE/actions/runs/44712727722) passed source verification and the complete Chapter 5 cross-toolchain job. At the last log inspection, the Chapter 6 job was actively compiling GCC Pass 2; it had not yet uploaded its checkpoint. Chapter 7 chroot preparation is downstream of Chapter 6 and therefore had not started in that run. Re-check the live run before treating these states as current.
+
 ## GitHub Actions
 
 The LFS pipeline is the separate workflow

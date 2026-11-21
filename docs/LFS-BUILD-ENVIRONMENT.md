@@ -85,9 +85,9 @@ as an artifact, reconstructs the isolated workspace, verifies the required
 completion markers, then runs the Chapter 6 regression tests before building.
 The Chapter 6 output is another checkpoint; it is not the final LFS rootfs.
 
-## Latest observed CI run (20 November 2026)
+## Latest observed CI run (21 November 2026)
 
-The current LFS workflow run [44712727722](https://github.com/test123444678976/GLITCH-CORE/actions/runs/44712727722) passed source verification and the complete Chapter 5 cross-toolchain job. At the last log inspection, the Chapter 6 job was actively compiling GCC Pass 2; it had not yet uploaded its checkpoint. Chapter 7 chroot preparation is downstream of Chapter 6 and therefore had not started in that run. Re-check the live run before treating these states as current.
+The LFS workflow run [44712727722](https://github.com/test123444678976/GLITCH-CORE/actions/runs/44712727722) completed successfully. Source verification, the complete Chapter 5 cross-toolchain, Chapter 6 temporary tools (including Binutils Pass 2 and GCC Pass 2), and Chapter 7 chroot preparation all passed. The Chapter 7 job's logs confirm the native chroot smoke test passed and the checkpoint was uploaded. Its provenance deliberately records `CHAPTER7_TEMPORARY_PACKAGES=not-built`: the next implementation stage is to build the Chapter 7 temporary packages inside the chroot. The workflow uploaded separate Chapter 5, Chapter 6 and Chapter 7 checkpoints.
 
 ## GitHub Actions
 
@@ -114,6 +114,7 @@ The workflow currently has four sequential jobs:
 4. **Prepare Chapter 7 chroot:** restores Chapter 6, prepares the target
    directory layout, performs a native chroot smoke test, records that no
    Chapter 7 packages have been built, and uploads a root-owned checkpoint.
+   This job passed in run [44712727722](https://github.com/test123444678976/GLITCH-CORE/actions/runs/44712727722).
    The archive is created with numeric ownership so private target paths and
    files such as `/var/log/btmp` retain their metadata; its archive file is
    handed back to the unprivileged CI account for upload.

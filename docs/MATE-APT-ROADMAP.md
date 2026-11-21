@@ -38,19 +38,21 @@ source against the GLITCH//CORE userspace, then create a signed
 GLITCH//CORE package repository. Compatibility with selected Debian
 packages can be evaluated separately; it must never be promised globally.
 
-## Latest CI snapshot — 20 November 2026
+## Latest CI snapshot — 21 November 2026
 
-- LFS workflow run [44712727722](https://github.com/test123444678976/GLITCH-CORE/actions/runs/44712727722): source verification and Chapter 5 completed successfully; Chapter 6 was still compiling GCC Pass 2 when last inspected. No Chapter 6 or Chapter 7 checkpoint was available yet in that run.
-- Main workflow run [44722991116](https://github.com/test123444678976/GLITCH-CORE/actions/runs/44722991116): validation completed successfully. Its feature-branch configuration intentionally skips the expensive rescue ISO build, so this run did not produce a new ISO.
+- LFS workflow run [44712727722](https://github.com/test123444678976/GLITCH-CORE/actions/runs/44712727722): all four jobs passed — official source verification, complete Chapter 5 cross-toolchain, Chapter 6 temporary tools plus Binutils/GCC Pass 2, and Chapter 7 chroot bootstrap.
+- Chapter 7 logs confirm both the rootfs regression tests and the native chroot smoke test passed. The checkpoint explicitly records `CHAPTER7_TEMPORARY_PACKAGES=not-built`; it is not a completed Chapter 7 userspace.
+- The run uploaded Chapter 5, Chapter 6 and Chapter 7 checkpoints. These are CI artifacts, not a bootable installation.
+- Main workflow run [44724561183](https://github.com/test123444678976/GLITCH-CORE/actions/runs/44724561183): validation completed successfully. Its feature-branch configuration skips the expensive rescue ISO build, so this run did not produce a new ISO.
 - MATE validation run [44712727759](https://github.com/test123444678976/GLITCH-CORE/actions/runs/44712727759): configuration checks passed; this is not a graphical desktop build.
 
 ## Build milestones
 
 1. Keep the current BusyBox ISO as the known-good bootstrap/rescue prototype.
-2. Complete the LFS 13.1 systemd build. The official source set is now
-   checksum-verified in CI, and Chapters 5 and 6 have compiled successfully
-   into CI checkpoints. Chapter 7 chroot preparation is the next stage; its
-   additional temporary packages and Chapters 8+ are not yet built.
+2. Continue the LFS 13.1 systemd build. The official source set and Chapters
+   5 and 6 are verified in CI checkpoints; Chapter 7 rootfs preparation and
+   a native chroot smoke test now pass. Chapter 7 temporary packages and
+   Chapters 8+ are not yet built.
 3. Boot the LFS-built base system in QEMU and verify kernel, init, storage,
    networking and system services.
 4. Resolve and build the dependencies required by `config/mate-stack.txt` against the completed LFS base; then build and integrate MATE, Marco, Caja, Xorg and LightDM. The manifest is a target list, not a package manager or build script.
@@ -67,7 +69,7 @@ packages can be evaluated separately; it must never be promised globally.
 - LFS 13.1-systemd source download and official MD5 verification: completed successfully in CI.
 - LFS Chapter 5 cross-toolchain: Binutils Pass 1, GCC Pass 1, Linux API headers, Glibc and target Libstdc++ built and verified in CI run [43709102523](https://github.com/test123444678976/GLITCH-CORE/actions/runs/43709102523). The uploaded checkpoint is a CI artifact, not a bootable system.
 - LFS Chapter 6 temporary tools: M4, Ncurses, Bash, Coreutils, Diffutils, File, Findutils, Gawk, Grep, Gzip, Make, Patch, Sed, Tar, Xz, Binutils Pass 2 and GCC Pass 2 built and verified in the same CI run. Its checkpoint is also a CI artifact.
-- LFS Chapter 7 chroot bootstrap: rootfs layout, essential account files, virtual-kernel mounts and a native chroot smoke test are being added as a separate checkpoint. This does not mean the Chapter 7 temporary packages have been built.
+- LFS Chapter 7 chroot bootstrap: rootfs layout, essential account files, virtual-kernel mounts and a native chroot smoke test passed in CI run [44712727722](https://github.com/test123444678976/GLITCH-CORE/actions/runs/44712727722). The checkpoint explicitly confirms that Chapter 7 temporary packages are not built yet.
 - Full LFS userspace and bootable LFS ISO: not complete.
 - MATE stack target manifest: present in config/mate-stack.txt (planning/integration input only).
 - MATE manifest validator: present in scripts/lfs/validate-mate-stack.sh and wired into GitHub Actions.

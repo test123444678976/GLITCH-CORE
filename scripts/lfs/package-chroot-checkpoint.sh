@@ -36,13 +36,23 @@ case "$ARCHIVE/" in
   "$ROOTFS/"*) fail "Archive must be outside the target rootfs." ;;
 esac
 
-umask 022
-tar --numeric-owner -czf "$ARCHIVE" -C "$WORK_ROOT" \
-  LFS-VERSION \
-  lfs/sources lfs/tools lfs/usr lfs/bin lfs/lib lfs/sbin lfs/lib64 \
-  lfs/etc lfs/var lfs/home lfs/root lfs/tmp lfs/run lfs/dev lfs/proc lfs/sys \
-  lfs/boot lfs/mnt lfs/opt lfs/srv lfs/media \
+FILES=(
+  LFS-VERSION
+  lfs/sources lfs/tools lfs/usr lfs/bin lfs/lib lfs/sbin lfs/lib64
+  lfs/etc lfs/var lfs/home lfs/root lfs/tmp lfs/run lfs/dev lfs/proc lfs/sys
+  lfs/boot lfs/mnt lfs/opt lfs/srv lfs/media
   lfs/CHAPTER-6-BUILD-INFO.txt lfs/CHAPTER-7-CHROOT-PREP-INFO.txt
+)
+
+# The bootstrap checkpoint is valid before Chapter 7 packages are built.
+# Once the final marker exists, provenance becomes mandatory and is included.
+if [[ -f "$ROOTFS/tools/.glitchcore-chapter7-temporary-tools-complete" ]]; then
+  [[ -s "$ROOTFS/CHAPTER-7-BUILD-INFO.txt" ]] || fail "Chapter 7 build marker exists but build provenance is missing."
+  FILES+=(lfs/CHAPTER-7-BUILD-INFO.txt)
+fi
+
+umask 022
+tar --numeric-owner -czf "$ARCHIVE" -C "$WORK_ROOT" "${FILES[@]}"
 
 tar -tzf "$ARCHIVE" >/dev/null
 test -s "$ARCHIVE"

@@ -7,6 +7,8 @@ on:
     paths:
       - "scripts/build-lfs.sh"
       - "scripts/lfs/build-toolchain-*.sh"
+      - "scripts/lfs/test-toolchain-chapter7.sh"
+      - "scripts/lfs/package-chroot-checkpoint.sh"
       - "scripts/lfs/check-host.sh"
       - "scripts/lfs/verify-lfs-archive.sh"
       - "scripts/lfs/test-toolchain-chapter5.sh"
@@ -61,6 +63,8 @@ jobs:
         run: bash scripts/lfs/test-lfs-source-mirror-rewrite.sh
       - name: Test Chapter 7 temporary-tool source contract
         run: bash scripts/lfs/test-toolchain-chapter7-sources.sh
+      - name: Test Chapter 7 temporary-tools builder preflight
+        run: bash scripts/lfs/test-toolchain-chapter7.sh
 
       - name: Download and verify official LFS source set
         run: |
@@ -333,3 +337,75 @@ jobs:
           path: work-lfs/glitch-core-lfs-chapter7-chroot-bootstrap-x86_64.tar.gz
           if-no-files-found: error
           retention-days: 7
+
+  build-lfs-chapter7:
+    name: Build LFS Chapter 7 temporary tools in chroot
+    needs: prepare-lfs-chroot
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      LFS: ${{ github.workspace }}/work-lfs/lfs
+      LFS_TGT: x86_64-lfs-linux-gnu
+      JOBS: "2"
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+
+      - name: Download Chapter 7 chroot bootstrap checkpoint
+        uses: actions/download-artifact@v4
+        with:
+          name: glitch-core-lfs-chapter7-chroot-bootstrap-x86_64
+          path: work-lfs
+
+      - name: Restore Chapter 7 bootstrap checkpoint
+        run: |
+          set -Eeuo pipefail
+          archive=work-lfs/glitch-core-lfs-chapter7-chroot-bootstrap-x86_64.tar.gz
+          test -s "$archive"
+          tar -tzf "$archive" >/dev/null
+          tar -xzf "$archive" -C work-lfs
+          test -f "$LFS/tools/.glitchcore-chapter6-complete"
+          test -f "$LFS/tools/.glitchcore-chroot-ready"
+          test -s "$LFS/sources/Python-3.14.7.tar.xz"
+
+      - name: Run Chapter 7 builder regression tests
+        run: bash scripts/lfs/test-toolchain-chapter7.sh
+
+      - name: Verify Chapter 7 build preflight
+        run: bash scripts/lfs/build-toolchain-chapter7.sh --check-only "$LFS"
+
+      - name: Build all eight Chapter 7 temporary packages
+        run: sudo --preserve-env=JOBS,GITHUB_SHA,GITHUB_REF_NAME,GITHUB_RUN_ID bash scripts/lfs/build-toolchain-chapter7.sh "$LFS"
+
+      - name: Verify Chapter 7 temporary tools and provenance
+        run: |
+          set -Eeuo pipefail
+          test -f "$LFS/tools/.glitchcore-chapter7-temporary-tools-complete"
+          for package in gettext bison perl zlib mpdecimal python texinfo util-linux; do
+            test -f "$LFS/tools/.glitchcore-ch7-$package-complete"
+          done
+          test -s "$LFS/CHAPTER-7-BUILD-INFO.txt"
+          grep -Fq "Status: all eight temporary packages built and verified" "$LFS/CHAPTER-7-BUILD-INFO.txt"
+          "$LFS/usr/bin/python3" --version
+          "$LFS/usr/bin/bison" --version | head -n 1
+          "$LFS/usr/bin/makeinfo" --version | head -n 1
+          "$LFS/usr/bin/mount" --version | head -n 1
+
+      - name: Package completed Chapter 7 checkpoint
+        run: |
+          set -Eeuo pipefail
+          archive="$GITHUB_WORKSPACE/work-lfs/glitch-core-lfs-toolchain-chapter7-x86_64.tar.gz"
+          sudo bash scripts/lfs/package-chroot-checkpoint.sh \
+            "$GITHUB_WORKSPACE/work-lfs" "$archive" "$(id -u)" "$(id -g)"
+          tar -tzf "$archive" >/dev/null
+          tar -tzf "$archive" | grep -Fxq "lfs/CHAPTER-7-BUILD-INFO.txt"
+          test -s "$archive"
+
+      - name: Upload Chapter 7 temporary-tools checkpoint
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: glitch-core-lfs-toolchain-chapter7-x86_64
+          path: work-lfs/glitch-core-lfs-toolchain-chapter7-x86_64.tar.gz
+          if-no-files-found: error
+          retention-days: 14

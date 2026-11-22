@@ -2,14 +2,16 @@
 
 ## Scope and status
 
-This document translates the official LFS 13.1-systemd Chapter 7 recipes into
-an implementation checklist for the next CI stage. It is a plan, not a build
-script and not evidence that these packages have been compiled.
+This document records the Chapter 7 implementation and its acceptance criteria.
+The host-side builder is `scripts/lfs/build-toolchain-chapter7.sh`; its
+preflight regression suite is `scripts/lfs/test-toolchain-chapter7.sh`.
+The LFS workflow now includes a Chapter 7 build job after the chroot bootstrap.
 
-The current CI checkpoint proves that the Chapter 6 temporary tools are
-available, the Chapter 7 root filesystem layout was prepared, and a native
-chroot smoke test passed. The checkpoint explicitly records
-`CHAPTER7_TEMPORARY_PACKAGES=not-built`.
+The previously completed chroot checkpoint explicitly records
+`CHAPTER7_TEMPORARY_PACKAGES=not-built`. The new build is only considered
+complete after the Chapter 7 GitHub Actions job succeeds and uploads its
+verified checkpoint. A script or queued workflow is not evidence that the
+packages have already been compiled.
 
 ## Pinned package set
 
@@ -87,7 +89,7 @@ Use the exact source versions above.
 
 ## CI acceptance criteria
 
-The future Chapter 7 build job should not pass unless:
+The Chapter 7 workflow job must not pass unless:
 
 - all eight source archives pass checksum validation;
 - all eight package build/install steps complete in order;
@@ -98,6 +100,10 @@ The future Chapter 7 build job should not pass unless:
   ownership, permissions and symlinks;
 - provenance clearly distinguishes a Chapter 7 temporary-tools checkpoint
   from a complete LFS system or bootable ISO.
+
+The current builder implements these checks and creates per-package markers.
+Its real package-build status remains pending until the workflow reports a
+successful Chapter 7 job.
 
 ## Official references
 

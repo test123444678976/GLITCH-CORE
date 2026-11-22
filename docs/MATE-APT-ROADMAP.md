@@ -70,6 +70,8 @@ packages can be evaluated separately; it must never be promised globally.
 - LFS Chapter 5 cross-toolchain: Binutils Pass 1, GCC Pass 1, Linux API headers, Glibc and target Libstdc++ built and verified in CI run [43709102523](https://github.com/test123444678976/GLITCH-CORE/actions/runs/43709102523). The uploaded checkpoint is a CI artifact, not a bootable system.
 - LFS Chapter 6 temporary tools: M4, Ncurses, Bash, Coreutils, Diffutils, File, Findutils, Gawk, Grep, Gzip, Make, Patch, Sed, Tar, Xz, Binutils Pass 2 and GCC Pass 2 built and verified in the same CI run. Its checkpoint is also a CI artifact.
 - LFS Chapter 7 chroot bootstrap: rootfs layout, essential account files, virtual-kernel mounts and a native chroot smoke test passed in CI run [44712727722](https://github.com/test123444678976/GLITCH-CORE/actions/runs/44712727722). The checkpoint explicitly confirms that Chapter 7 temporary packages are not built yet.
+
+- Chapter 7 implementation specification: `docs/LFS-CHAPTER7-IMPLEMENTATION.md` now records the eight pinned temporary packages, the official LFS recipe options, host/chroot safety requirements, checkpoint rules and CI acceptance criteria. This is documentation only; no Chapter 7 package build script or package binaries have been added yet.
 - Full LFS userspace and bootable LFS ISO: not complete.
 - MATE stack target manifest: present in config/mate-stack.txt (planning/integration input only).
 - MATE manifest validator: present in scripts/lfs/validate-mate-stack.sh and wired into GitHub Actions.

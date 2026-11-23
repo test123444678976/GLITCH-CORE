@@ -16,7 +16,7 @@ for p in sources tools usr/bin usr/share; do [[ -d "$LFS/$p" && ! -L "$LFS/$p" ]
 [[ -x "$LFS/usr/bin/bash" && -x "$LFS/usr/bin/make" ]] || fail "Chapter 7 bash/make are missing."
 [[ -L "$LFS/bin" && "$(readlink "$LFS/bin")" == usr/bin ]] || fail "Unexpected merged-/usr layout."
 bash "$ROOT/scripts/lfs/verify-lfs-archive.sh" "$LFS/sources" "$ARCHIVE" >/dev/null
-tar -tzf "$LFS/sources/$ARCHIVE" | grep -Fq 'man-pages-6.18/' || fail "Unexpected Man-pages archive layout."
+tar -tJf "$LFS/sources/$ARCHIVE" | grep -Fq 'man-pages-6.18/' || fail "Unexpected Man-pages archive layout."
 if (( CHECK_ONLY )); then echo "Chapter 8.3 Man-pages preflight: OK"; exit 0; fi
 [[ "$(uname -s)" == Linux && "$(uname -m)" == x86_64 && "$(id -u)" -eq 0 ]] || fail "Build requires root on Linux x86_64."
 for c in mount umount mountpoint chroot realpath tar sha256sum find; do command -v "$c" >/dev/null || fail "Missing command: $c"; done

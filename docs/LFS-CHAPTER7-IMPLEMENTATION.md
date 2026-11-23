@@ -7,11 +7,17 @@ The host-side builder is `scripts/lfs/build-toolchain-chapter7.sh`; its
 preflight regression suite is `scripts/lfs/test-toolchain-chapter7.sh`.
 The LFS workflow now includes a Chapter 7 build job after the chroot bootstrap.
 
-The previously completed chroot checkpoint explicitly records
-`CHAPTER7_TEMPORARY_PACKAGES=not-built`. The new build is only considered
-complete after the Chapter 7 GitHub Actions job succeeds and uploads its
-verified checkpoint. A script or queued workflow is not evidence that the
-packages have already been compiled.
+The original bootstrap checkpoint explicitly recorded
+`CHAPTER7_TEMPORARY_PACKAGES=not-built`. In run
+[45016697312](https://github.com/test123444678976/GLITCH-CORE/actions/runs/45016697312),
+the build step completed all eight package recipes inside chroot and wrote
+the package markers, but the following host-side verification failed when it
+executed the target Python binary outside the LFS rootfs. The packages were
+built in that job, but no final checkpoint artifact was uploaded. The
+verification now runs the target tools inside chroot, and
+`.github/workflows/lfs-chapter7-recovery.yml` can resume from the successful
+Chapter 6 artifact without rebuilding Chapters 5 and 6. Final completion still
+requires a successful verification and uploaded Chapter 7 checkpoint.
 
 ## Pinned package set
 
@@ -101,9 +107,12 @@ The Chapter 7 workflow job must not pass unless:
 - provenance clearly distinguishes a Chapter 7 temporary-tools checkpoint
   from a complete LFS system or bootable ISO.
 
-The current builder implements these checks and creates per-package markers.
-Its real package-build status remains pending until the workflow reports a
-successful Chapter 7 job.
+The builder completed all eight package recipes in the first integrated
+attempt; its internal chroot checks passed. The separate workflow verification
+then exposed a host-versus-target dynamic-library lookup mistake for Python.
+The main workflow verification was corrected to run target binaries inside
+chroot, and a recovery workflow was added to rebuild Chapter 7 from the
+existing Chapter 6 checkpoint and publish a verified artifact.
 
 ## Official references
 

@@ -36,6 +36,7 @@ jobs:
           bash scripts/lfs/test-xorgproto-build.sh
           bash scripts/lfs/test-xtrans-build.sh
           bash scripts/lfs/test-package-manager-build.sh
+          bash scripts/lfs/validate-chapter8-plan.sh
           bash scripts/lfs/test-package-manager-config.sh
           bash scripts/lfs/test-toolchain-pass1.sh
           bash scripts/lfs/test-toolchain-chapter5.sh

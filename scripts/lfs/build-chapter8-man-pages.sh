@@ -16,7 +16,12 @@ for p in sources tools usr/bin usr/share; do [[ -d "$LFS/$p" && ! -L "$LFS/$p" ]
 [[ -x "$LFS/usr/bin/bash" && -x "$LFS/usr/bin/make" ]] || fail "Chapter 7 bash/make are missing."
 [[ -L "$LFS/bin" && "$(readlink "$LFS/bin")" == usr/bin ]] || fail "Unexpected merged-/usr layout."
 bash "$ROOT/scripts/lfs/verify-lfs-archive.sh" "$LFS/sources" "$ARCHIVE" >/dev/null
-tar -tJf "$LFS/sources/$ARCHIVE" | grep -Fq 'man-pages-6.18/' || fail "Unexpected Man-pages archive layout."
+listing="$(mktemp)"
+trap 'rm -f "$listing"' EXIT
+if ! tar -tJf "$LFS/sources/$ARCHIVE" >"$listing"; then rm -f "$listing"; fail "Cannot read Man-pages source archive."; fi
+grep -Fq 'man-pages-6.18/' "$listing" || { rm -f "$listing"; fail "Unexpected Man-pages archive layout."; }
+rm -f "$listing"
+trap - EXIT
 if (( CHECK_ONLY )); then echo "Chapter 8.3 Man-pages preflight: OK"; exit 0; fi
 [[ "$(uname -s)" == Linux && "$(uname -m)" == x86_64 && "$(id -u)" -eq 0 ]] || fail "Build requires root on Linux x86_64."
 for c in mount umount mountpoint chroot realpath tar sha256sum find; do command -v "$c" >/dev/null || fail "Missing command: $c"; done
@@ -27,7 +32,14 @@ tar -xf "$LFS/sources/$ARCHIVE" -C "$LFS/sources"
 [[ -d "$LFS/sources/man-pages-6.18" && ! -L "$LFS/sources/man-pages-6.18" ]] || fail "Source extraction failed."
 chown -hR root:root "$LFS/sources/man-pages-6.18"
 D=0 P=0 S=0 R=0
-cleanup(){ local e=0; (( R )) && { umount "$LFS/run" && R=0 || e=1; }; (( S )) && { umount "$LFS/sys" && S=0 || e=1; }; (( P )) && { umount "$LFS/proc" && P=0 || e=1; }; (( D )) && { umount "$LFS/dev" && D=0 || e=1; }; return "$e"; }
+cleanup(){
+ local e=0
+ if (( R )); then umount "$LFS/run" && R=0 || e=1; fi
+ if (( S )); then umount "$LFS/sys" && S=0 || e=1; fi
+ if (( P )); then umount "$LFS/proc" && P=0 || e=1; fi
+ if (( D )); then umount "$LFS/dev" && D=0 || e=1; fi
+ return "$e"
+}
 finish(){ local s=$?; trap - EXIT; set +e; cleanup || s=1; exit "$s"; }
 trap finish EXIT
 trap 'exit 130' INT

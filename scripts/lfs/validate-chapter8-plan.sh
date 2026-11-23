@@ -24,7 +24,7 @@ for required in \
   '30|gcc|16.2.0' \
   '52|python|3.14.7' \
   '75|systemd|261.2' \
-  '78|e2fsprogs|1.47.4'; do
+  '80|e2fsprogs|1.47.4'; do
   grep -Fxq "$required" "$MANIFEST" || fail "Missing or mismatched LFS 13.1 package pin: $required"
 done
 grep -Fxq 'LFS_BOOK=13.1-systemd' "$LOCK" || fail "Unexpected LFS book version."

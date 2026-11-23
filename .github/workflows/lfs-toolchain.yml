@@ -27,7 +27,6 @@ on:
       - "scripts/lfs/test-chroot-rootfs.sh"
       - "scripts/lfs/package-chroot-checkpoint.sh"
       - "config/lfs-toolchain.lock"
-      - ".github/workflows/lfs-toolchain.yml"
 
 permissions:
   contents: read
@@ -386,10 +385,14 @@ jobs:
           done
           test -s "$LFS/CHAPTER-7-BUILD-INFO.txt"
           grep -Fq "Status: all eight temporary packages built and verified" "$LFS/CHAPTER-7-BUILD-INFO.txt"
-          "$LFS/usr/bin/python3" --version
-          "$LFS/usr/bin/bison" --version | head -n 1
-          "$LFS/usr/bin/makeinfo" --version | head -n 1
-          "$LFS/usr/bin/mount" --version | head -n 1
+          test -s "$LFS/usr/lib/libpython3.14.so.1.0"
+          sudo chroot "$LFS" /usr/bin/env -i PATH=/usr/bin:/usr/sbin /bin/bash -c '
+            set -Eeuo pipefail
+            /usr/bin/python3 --version
+            /usr/bin/bison --version | /usr/bin/head -n 1
+            /usr/bin/makeinfo --version | /usr/bin/head -n 1
+            /usr/bin/mount --version | /usr/bin/head -n 1
+          '
 
       - name: Package completed Chapter 7 checkpoint
         run: |

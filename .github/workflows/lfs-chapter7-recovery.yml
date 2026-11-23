@@ -1,6 +1,10 @@
 name: GLITCH//CORE LFS Chapter 7 Recovery
 
 on:
+  push:
+    branches: [ feature/mate-desktop ]
+    paths:
+      - "docs/CHAPTER7-RECOVERY-TRIGGER.md"
   workflow_dispatch:
     inputs:
       source_run_id:

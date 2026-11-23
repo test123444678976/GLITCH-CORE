@@ -1,36 +1,48 @@
 name: GLITCH//CORE LFS Chapter 8 Start
+
 on:
-  workflow_run:
-    workflows: ["GLITCH//CORE LFS Chapter 7 Recovery"]
-    types: [completed]
-    branches: [feature/mate-desktop]
+  push:
+    branches: [ feature/mate-desktop ]
+    paths:
+      - "docs/CHAPTER8-START-TRIGGER.md"
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: "Successful Chapter 7 recovery run containing the checkpoint artifact"
+        required: true
+        default: "45187793658"
+        type: string
+
 permissions:
   actions: read
   contents: read
+
 concurrency:
   group: glitchcore-lfs-chapter8-start
   cancel-in-progress: false
+
 jobs:
   build-first-package:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Restore Chapter 7 and install Chapter 8.3 Man-pages
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 120
     env:
       LFS: ${{ github.workspace }}/work-lfs/lfs
     steps:
-      - name: Checkout recovery commit
+      - name: Checkout feature branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
-      - name: Download Chapter 7 checkpoint
+          ref: feature/mate-desktop
+
+      - name: Download verified Chapter 7 checkpoint
         uses: actions/download-artifact@v4
         with:
           name: glitch-core-lfs-toolchain-chapter7-x86_64
           path: work-lfs
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ inputs.source_run_id || '45187793658' }}
+
       - name: Restore and verify Chapter 7
         run: |
           set -Eeuo pipefail
@@ -41,20 +53,33 @@ jobs:
           test -f "$LFS/tools/.glitchcore-chapter7-temporary-tools-complete"
           test -s "$LFS/CHAPTER-7-BUILD-INFO.txt"
           grep -Fq "Status: all eight temporary packages built and verified" "$LFS/CHAPTER-7-BUILD-INFO.txt"
+          test -s "$LFS/sources/md5sums"
+
       - name: Test and preflight Chapter 8.3
         run: |
           set -Eeuo pipefail
           bash scripts/lfs/test-chapter8-man-pages.sh
           sudo bash scripts/lfs/build-chapter8-man-pages.sh --check-only "$LFS"
+
       - name: Build Man-pages 6.18 inside LFS chroot
         run: sudo --preserve-env=GITHUB_SHA,GITHUB_REF_NAME,GITHUB_RUN_ID bash scripts/lfs/build-chapter8-man-pages.sh "$LFS"
+
+      - name: Verify Chapter 8.3 installation
+        run: |
+          set -Eeuo pipefail
+          test -f "$LFS/tools/.glitchcore-ch8-man-pages-complete"
+          test -s "$LFS/CHAPTER-8-BUILD-INFO.txt"
+          grep -Fq "Status: Man-pages 6.18 installed and verified inside LFS chroot" "$LFS/CHAPTER-8-BUILD-INFO.txt"
+
       - name: Package Chapter 8.3 checkpoint
         run: |
           set -Eeuo pipefail
           archive="$GITHUB_WORKSPACE/work-lfs/glitch-core-lfs-chapter8-man-pages-x86_64.tar.gz"
           sudo bash scripts/lfs/package-chapter8-checkpoint.sh "$GITHUB_WORKSPACE/work-lfs" "$archive" "$(id -u)" "$(id -g)"
           tar -tzf "$archive" >/dev/null
+          tar -tzf "$archive" | grep -Fxq "lfs/tools/.glitchcore-ch8-man-pages-complete"
           test -s "$archive"
+
       - name: Upload Chapter 8.3 checkpoint
         uses: actions/upload-artifact@v4
         with:

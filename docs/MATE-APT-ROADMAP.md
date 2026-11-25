@@ -47,7 +47,8 @@ layout and maintainer scripts must match GLITCH//CORE.
   installation or Chapter 8.5 checkpoint is claimed until that run passes.
 - **Chapter 8.6 — Zlib 1.3.2:** builder, regression tests and manual checkpoint workflow are prepared on `feature/mate-desktop`. It must wait for a successful Chapter 8.5 Glibc artifact; no Zlib target installation is claimed yet.
 - **Chapter 8.7 — Bzip2 1.0.8:** LFS-recipe builder, source/patch checksum preflight, regression tests and a manual workflow consuming the Chapter 8.6 checkpoint have been added. The workflow has not been dispatched; no Bzip2 installation is claimed.
-- **Chapter 8.8 — Xz 5.8.3:** LFS recipe-based builder, regression preflight, and manual checkpoint workflow are prepared. It is gated on a successful Chapter 8.7 Bzip2 checkpoint; it has not been built or installed yet.
+- **Chapter 8.8 — Xz 5.8.3:** LFS recipe-based builder, regression preflight, and manual checkpoint workflow are prepared. It is gated on a successful Chapter 8.7 Bzip2 checkpoint; it has not been built or installed yet. General CI validation passed in [45621352979](https://github.com/test123444678976/GLITCH-CORE/actions/runs/45621352979); this does not execute the LFS Xz build.
+- **Chapter 8.9 — LZ4 1.10.0:** builder, regression preflight and manual checkpoint workflow are now prepared. It follows the official LFS 13.1-systemd sequence and requires the Chapter 8.8 Xz checkpoint. It has not been built or installed yet.
 - **MATE configuration and integration checks:** passed, including
   [45616614484](https://github.com/test123444678976/GLITCH-CORE/actions/runs/45616614484).
   These are configuration and script checks, not a running desktop.

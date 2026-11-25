@@ -14,8 +14,6 @@ printf 'all:\n\t@true\n' > "$T/src/xz-5.8.3/Makefile.in"
 printf '#!/bin/sh\nexit 0\n' > "$T/src/xz-5.8.3/configure"
 chmod 755 "$T/src/xz-5.8.3/configure"
 tar -cJf "$L/sources/xz-5.8.3.tar.xz" -C "$T/src" xz-5.8.3
-(cd "$L/sources" && sha256sum xz-5.8.3.tar.xz | awk '{print "00000000000000000000000000000000  xz-5.8.3.tar.xz"}' > md5sums)
-# Replace fixture checksum with the real MD5 expected by the shared LFS verifier.
 (cd "$L/sources" && md5sum xz-5.8.3.tar.xz > md5sums)
 bash "$BUILDER" --check-only "$L" >/dev/null || fail "Valid preflight rejected."
 [[ ! -e "$L/tools/.glitchcore-ch8-xz-complete" ]] || fail "Check-only wrote marker."

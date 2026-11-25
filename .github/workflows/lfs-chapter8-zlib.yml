@@ -1,0 +1,84 @@
+name: GLITCH//CORE LFS Chapter 8.6 Zlib
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: "Successful Chapter 8.5 Glibc run with its checkpoint artifact"
+        required: true
+        default: "45616626689"
+        type: string
+      jobs:
+        description: "Parallel jobs inside LFS chroot"
+        required: true
+        default: "2"
+        type: string
+permissions:
+  actions: read
+  contents: read
+concurrency:
+  group: glitchcore-lfs-chapter8-zlib
+  cancel-in-progress: false
+jobs:
+  build-zlib:
+    name: Restore Chapter 8.5 and build Zlib 1.3.2
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      LFS: \${{ github.workspace }}/work-lfs/lfs
+      JOBS: \${{ inputs.jobs || '2' }}
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/mate-desktop
+      - name: Download Chapter 8.5 checkpoint
+        uses: actions/download-artifact@v4
+        with:
+          name: glitch-core-lfs-chapter8-glibc-x86_64
+          path: work-lfs
+          github-token: \${{ github.token }}
+          repository: \${{ github.repository }}
+          run-id: \${{ inputs.source_run_id || '45616626689' }}
+      - name: Restore and verify Chapter 8.5
+        run: |
+          set -Eeuo pipefail
+          archive=work-lfs/glitch-core-lfs-chapter8-glibc-x86_64.tar.gz
+          test -s "$archive"
+          tar -tzf "$archive" >/dev/null
+          tar -xzf "$archive" -C work-lfs
+          for marker in .glitchcore-chapter7-temporary-tools-complete .glitchcore-ch8-man-pages-complete .glitchcore-ch8-iana-etc-complete .glitchcore-ch8-glibc-complete; do
+            test -f "$LFS/tools/$marker"
+          done
+          grep -Fq "Status: Glibc 2.44 built, make check passed, installed and verified inside LFS chroot" "$LFS/CHAPTER-8-BUILD-INFO.txt"
+          test -s "$LFS/sources/md5sums"
+      - name: Test and preflight Zlib
+        run: |
+          set -Eeuo pipefail
+          bash scripts/lfs/test-chapter8-zlib.sh
+          sudo bash scripts/lfs/build-chapter8-zlib.sh --check-only "$LFS"
+      - name: Build and test Zlib 1.3.2 inside LFS
+        run: sudo --preserve-env=JOBS bash scripts/lfs/build-chapter8-zlib.sh "$LFS"
+      - name: Verify Zlib installation
+        run: |
+          set -Eeuo pipefail
+          test -f "$LFS/tools/.glitchcore-ch8-zlib-complete"
+          test -s "$LFS/usr/lib/libz.so"
+          test -s "$LFS/usr/include/zlib.h"
+          test -s "$LFS/usr/lib/pkgconfig/zlib.pc"
+          test -s "$LFS/sources/zlib-1.3.2-make-check.log"
+          test ! -e "$LFS/usr/lib/libz.a"
+          grep -Fq "Status: Zlib 1.3.2 built, make check passed, installed and verified inside LFS chroot" "$LFS/CHAPTER-8-BUILD-INFO.txt"
+      - name: Package Chapter 8.6 checkpoint
+        run: |
+          set -Eeuo pipefail
+          archive="$GITHUB_WORKSPACE/work-lfs/glitch-core-lfs-chapter8-zlib-x86_64.tar.gz"
+          sudo bash scripts/lfs/package-chapter8-checkpoint.sh "$GITHUB_WORKSPACE/work-lfs" "$archive" "$(id -u)" "$(id -g)" ".glitchcore-ch8-zlib-complete"
+          test -s "$archive"
+          tar -tzf "$archive" | grep -Fxq "lfs/tools/.glitchcore-ch8-zlib-complete"
+      - name: Upload Chapter 8.6 checkpoint
+        uses: actions/upload-artifact@v4
+        with:
+          name: glitch-core-lfs-chapter8-zlib-x86_64
+          path: work-lfs/glitch-core-lfs-chapter8-zlib-x86_64.tar.gz
+          if-no-files-found: error
+          retention-days: 14

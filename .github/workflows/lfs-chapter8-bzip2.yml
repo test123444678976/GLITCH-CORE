@@ -1,0 +1,80 @@
+name: GLITCH//CORE LFS Chapter 8.7 Bzip2
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: "Successful Chapter 8.6 Zlib run containing the checkpoint artifact"
+        required: true
+        type: string
+permissions:
+  actions: read
+  contents: read
+concurrency:
+  group: glitchcore-lfs-chapter8-bzip2
+  cancel-in-progress: false
+jobs:
+  build-bzip2:
+    name: Restore Chapter 8.6 and build Bzip2 1.0.8
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      LFS: ${{ github.workspace }}/work-lfs/lfs
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/mate-desktop
+      - name: Download Chapter 8.6 checkpoint
+        uses: actions/download-artifact@v4
+        with:
+          name: glitch-core-lfs-chapter8-zlib-x86_64
+          path: work-lfs
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.source_run_id }}
+      - name: Restore and verify Chapter 8.6
+        run: |
+          set -Eeuo pipefail
+          archive=work-lfs/glitch-core-lfs-chapter8-zlib-x86_64.tar.gz
+          test -s "$archive"
+          tar -tzf "$archive" >/dev/null
+          tar -xzf "$archive" -C work-lfs
+          for marker in .glitchcore-chapter7-temporary-tools-complete .glitchcore-ch8-man-pages-complete .glitchcore-ch8-iana-etc-complete .glitchcore-ch8-glibc-complete .glitchcore-ch8-zlib-complete; do
+            test -f "$LFS/tools/$marker"
+          done
+          grep -Fq "Status: Zlib 1.3.2 built, make check passed, installed and verified inside LFS chroot" "$LFS/CHAPTER-8-BUILD-INFO.txt"
+          test -s "$LFS/sources/md5sums"
+      - name: Test and preflight Bzip2
+        run: |
+          set -Eeuo pipefail
+          bash scripts/lfs/test-chapter8-bzip2.sh
+          sudo bash scripts/lfs/build-chapter8-bzip2.sh --check-only "$LFS"
+      - name: Build and smoke-test Bzip2 1.0.8 inside LFS
+        run: sudo bash scripts/lfs/build-chapter8-bzip2.sh "$LFS"
+      - name: Verify Bzip2 installation
+        run: |
+          set -Eeuo pipefail
+          test -f "$LFS/tools/.glitchcore-ch8-bzip2-complete"
+          test -x "$LFS/usr/bin/bzip2"
+          test -L "$LFS/usr/bin/bzcat"
+          test -L "$LFS/usr/bin/bunzip2"
+          test -s "$LFS/usr/lib/libbz2.so.1.0.8"
+          test -L "$LFS/usr/lib/libbz2.so"
+          test -L "$LFS/usr/lib/libbz2.so.1"
+          test ! -e "$LFS/usr/lib/libbz2.a"
+          test -s "$LFS/usr/share/man/man1/bzip2.1"
+          grep -Fq "Status: Bzip2 1.0.8 built, smoke-tested and installed inside LFS chroot" "$LFS/CHAPTER-8-BUILD-INFO.txt"
+      - name: Package Chapter 8.7 checkpoint
+        run: |
+          set -Eeuo pipefail
+          archive="$GITHUB_WORKSPACE/work-lfs/glitch-core-lfs-chapter8-bzip2-x86_64.tar.gz"
+          sudo bash scripts/lfs/package-chapter8-checkpoint.sh "$GITHUB_WORKSPACE/work-lfs" "$archive" "$(id -u)" "$(id -g)" ".glitchcore-ch8-bzip2-complete"
+          test -s "$archive"
+          tar -tzf "$archive" | grep -Fxq "lfs/tools/.glitchcore-ch8-bzip2-complete"
+      - name: Upload Chapter 8.7 checkpoint
+        uses: actions/upload-artifact@v4
+        with:
+          name: glitch-core-lfs-chapter8-bzip2-x86_64
+          path: work-lfs/glitch-core-lfs-chapter8-bzip2-x86_64.tar.gz
+          if-no-files-found: error
+          retention-days: 14

@@ -5,6 +5,12 @@ BUILDER="$ROOT/scripts/lfs/build-mesa-target.sh"
 fail() { echo "ERROR: $*" >&2; exit 1; }
 
 bash -n "$BUILDER"
+
+# Provenance must record the verified digest variable, never a placeholder.
+grep -Fq '"$MESA_VERSION" "$MESA_SHA256"' "$BUILDER" || fail "Mesa build metadata does not record the verified source checksum."
+if grep -Fq '"$MESA_VERSION" "__MESA_SHA256__"' "$BUILDER"; then
+  fail "Mesa build metadata still contains the literal checksum placeholder."
+fi
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 mkdir -p "$tmp/root/etc" "$tmp/root/usr/bin" "$tmp/root/bin" "$tmp/sources"

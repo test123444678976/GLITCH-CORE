@@ -45,6 +45,7 @@ jobs:
           bash scripts/lfs/test-lfs-source-mirror-rewrite.sh
           bash scripts/lfs/test-chapter8-xz.sh
           bash scripts/lfs/test-chapter8-lz4.sh
+          bash scripts/lfs/test-chapter8-zstd.sh
 
       - name: Validate GLITCH application SDK
         run: |

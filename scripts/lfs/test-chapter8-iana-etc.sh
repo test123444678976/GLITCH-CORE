@@ -9,7 +9,7 @@ L="$T/lfs"; mkdir -p "$L"/{sources,tools,etc}
 touch "$L/tools/.glitchcore-chapter7-temporary-tools-complete" "$L/tools/.glitchcore-ch8-man-pages-complete"
 mkdir -p "$T/src/iana-etc-20260805"
 printf 'http 80/tcp\n' > "$T/src/iana-etc-20260805/services"
-printf 'IP 0 IP\n' > "$T/src/iana-etc-20260805/protocols"
+printf 'hopopt 0 HOPOPT\n' > "$T/src/iana-etc-20260805/protocols"
 tar -czf "$L/sources/iana-etc-20260805.tar.gz" -C "$T/src" iana-etc-20260805
 (cd "$L/sources" && md5sum iana-etc-20260805.tar.gz > md5sums)
 bash "$BUILDER" --check-only "$L" >/dev/null || fail "Valid preflight rejected."
@@ -20,4 +20,13 @@ cp -a "$L" "$T/no-protocols"; mkdir -p "$T/bad/iana-etc-20260805"; printf 'http 
 if bash "$BUILDER" --check-only "$T/no-protocols" >/dev/null 2>&1; then fail "Archive missing protocols accepted."; fi
 cp -a "$L" "$T/bad-sum"; echo tamper >> "$T/bad-sum/sources/iana-etc-20260805.tar.gz"
 if bash "$BUILDER" --check-only "$T/bad-sum" >/dev/null 2>&1; then fail "Bad checksum accepted."; fi
+if [[ "$(id -u)" -eq 0 ]]; then
+  bash "$BUILDER" "$L" >/dev/null || fail "Valid IANA-etc install failed."
+  [[ -f "$L/tools/.glitchcore-ch8-iana-etc-complete" ]] || fail "Install marker missing."
+  cmp -s "$T/src/iana-etc-20260805/services" "$L/etc/services" || fail "services install differs."
+  cmp -s "$T/src/iana-etc-20260805/protocols" "$L/etc/protocols" || fail "protocols install differs."
+  grep -Fq "Status: IANA-etc 20260805 installed and verified" "$L/CHAPTER-8-BUILD-INFO.txt" || fail "Build info missing status."
+else
+  echo "Root install test skipped (run this test under sudo for full coverage)." >&2
+fi
 echo "Chapter 8.4 IANA-etc preflight tests: OK"

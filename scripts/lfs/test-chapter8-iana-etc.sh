@@ -9,7 +9,7 @@ L="$T/lfs"; mkdir -p "$L"/{sources,tools,etc}
 touch "$L/tools/.glitchcore-chapter7-temporary-tools-complete" "$L/tools/.glitchcore-ch8-man-pages-complete"
 mkdir -p "$T/src/iana-etc-20260805"
 printf 'http 80/tcp\n' > "$T/src/iana-etc-20260805/services"
-printf 'ip 0 IP\n' > "$T/src/iana-etc-20260805/protocols"
+printf 'IP 0 IP\n' > "$T/src/iana-etc-20260805/protocols"
 tar -czf "$L/sources/iana-etc-20260805.tar.gz" -C "$T/src" iana-etc-20260805
 (cd "$L/sources" && md5sum iana-etc-20260805.tar.gz > md5sums)
 bash "$BUILDER" --check-only "$L" >/dev/null || fail "Valid preflight rejected."

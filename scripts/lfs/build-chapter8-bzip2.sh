@@ -5,11 +5,10 @@ if [[ "${1:-}" == --check-only ]]; then CHECK_ONLY=1; shift; fi
 [[ $# == 1 ]] || { echo "Usage: $0 [--check-only] /absolute/LFS" >&2; exit 2; }
 INPUT=$1 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 ARCHIVE=bzip2-1.0.8.tar.gz PATCH=bzip2-1.0.8-install_docs-1.patch
-MARKER=.glitchcore-ch8-bzip2-complete JOBS="${JOBS:-2}"
+MARKER=.glitchcore-ch8-bzip2-complete 
 fail(){ echo "ERROR: $*" >&2; exit 1; }
 [[ "$INPUT" == /* && -d "$INPUT" && ! -L "$INPUT" ]] || fail "Unsafe LFS root."
 LFS="$(realpath -e "$INPUT")"; [[ "$LFS" != / ]] || fail "Refusing host root."
-[[ "$JOBS" =~ ^[1-9][0-9]*$ ]] || fail "JOBS must be positive."
 for p in sources tools etc usr/bin usr/lib dev proc sys run; do [[ -d "$LFS/$p" && ! -L "$LFS/$p" ]] || fail "Missing/unsafe directory: $p"; done
 for m in .glitchcore-chapter7-temporary-tools-complete .glitchcore-ch8-man-pages-complete .glitchcore-ch8-iana-etc-complete .glitchcore-ch8-glibc-complete .glitchcore-ch8-zlib-complete; do [[ -f "$LFS/tools/$m" && ! -L "$LFS/tools/$m" ]] || fail "Missing checkpoint: $m"; done
 [[ -x "$LFS/usr/bin/bash" && -x "$LFS/usr/bin/make" && -x "$LFS/usr/bin/gcc" ]] || fail "Native LFS tools missing."
@@ -34,7 +33,7 @@ mount --bind /dev "$LFS/dev"; D=1
 mount -t proc proc "$LFS/proc"; P=1
 mount -t sysfs sysfs "$LFS/sys"; S=1
 mount -t tmpfs tmpfs "$LFS/run"; R=1
-chroot "$LFS" /usr/bin/env -i HOME=/root TERM=dumb PATH=/usr/bin:/usr/sbin LC_ALL=POSIX JOBS="$JOBS" /bin/bash --login -s <<'CHROOT'
+chroot "$LFS" /usr/bin/env -i HOME=/root TERM=dumb PATH=/usr/bin:/usr/sbin LC_ALL=POSIX /bin/bash --login -s <<'CHROOT'
 set -Eeuo pipefail
 cd /sources
 [[ -s bzip2-1.0.8.tar.gz && ! -L bzip2-1.0.8.tar.gz ]] || { echo "Missing Bzip2 source." >&2; exit 1; }
@@ -47,7 +46,7 @@ sed -i 's@\(ln -s -f \)$(PREFIX)/bin/@\1@' Makefile
 sed -i 's@(PREFIX)/man@(PREFIX)/share/man@g' Makefile
 make -f Makefile-libbz2_so
 make clean
-make -j"$JOBS"
+make
 make PREFIX=/usr install
 cp -av libbz2.so.* /usr/lib/
 ln -sfv libbz2.so.1.0.8 /usr/lib/libbz2.so
@@ -74,7 +73,6 @@ trap - EXIT INT TERM
 {
  echo "GLITCH//CORE LFS 13.1-systemd Chapter 8.7 — Bzip2 1.0.8"
  echo "Target: x86_64-lfs-linux-gnu"
- echo "JOBS: $JOBS"
  echo "Bzip2 MD5: $(awk '$2=="bzip2-1.0.8.tar.gz"{print $1}' "$LFS/sources/md5sums")"
  echo "Documentation patch MD5: $(awk '$2=="bzip2-1.0.8-install_docs-1.patch"{print $1}' "$LFS/sources/md5sums")"
  echo "Status: Bzip2 1.0.8 built, smoke-tested and installed inside LFS chroot"

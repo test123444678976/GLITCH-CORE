@@ -30,7 +30,7 @@ trap cleanup EXIT
 tar -xzf "$LFS/sources/$ARCHIVE" -C "$tmp"
 SRC="$tmp/iana-etc-20260805"
 for f in services protocols; do [[ -s "$SRC/$f" && ! -L "$SRC/$f" ]] || fail "Invalid extracted source file: $f"; done
-grep -Eq '(^|[[:space:]])tcp([[:space:]]|$)' "$SRC/services" || fail "services file lacks TCP entries."
+grep -Eq '^[^#[:space:]][^[:space:]]*[[:space:]]+[0-9]+/(tcp|udp)([[:space:]]|$)' "$SRC/services" || fail "services file lacks valid service/port/protocol records."
 grep -Eiq '^[[:space:]]*hopopt[[:space:]]+0[[:space:]]+HOPOPT([[:space:]]|$)' "$SRC/protocols" || fail "protocols file lacks the IANA HOPOPT protocol number 0 entry."
 install -o root -g root -m 0644 "$SRC/services" "$LFS/etc/services.new"
 install -o root -g root -m 0644 "$SRC/protocols" "$LFS/etc/protocols.new"

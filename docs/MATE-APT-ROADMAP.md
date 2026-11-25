@@ -45,6 +45,8 @@ layout and maintainer scripts must match GLITCH//CORE.
   has started; it restores the Chapter 8.4 checkpoint, validates source
   archives/patches and will run the critical Glibc test suite. No Glibc
   installation or Chapter 8.5 checkpoint is claimed until that run passes.
+- **Chapter 8.6 — Zlib 1.3.2:** builder, regression tests and manual checkpoint workflow are prepared on `feature/mate-desktop`. It must wait for a successful Chapter 8.5 Glibc artifact; no Zlib target installation is claimed yet.
+- **Chapter 8.7 — Bzip2 1.0.8:** LFS-recipe builder, source/patch checksum preflight, regression tests and a manual workflow consuming the Chapter 8.6 checkpoint have been added. The workflow has not been dispatched; no Bzip2 installation is claimed.
 - **MATE configuration and integration checks:** passed, including
   [45616614484](https://github.com/test123444678976/GLITCH-CORE/actions/runs/45616614484).
   These are configuration and script checks, not a running desktop.

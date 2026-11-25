@@ -7,3 +7,5 @@ The workflow restores the Man-pages checkpoint, validates the official IANA-etc 
 The installer validates the current IANA protocol-number-zero entry as `hopopt 0 HOPOPT`. The upstream IANA generator derives this record from the protocol-numbers registry; it must not be incorrectly treated as the legacy `ip 0 IP` entry.
 
 The checkpoint packager and workflow validate archive listings through temporary files rather than `tar | grep -q`, avoiding premature pipe closure under `pipefail`.
+
+The installer and regression fixture now validate the canonical services-file shape (`service port/tcp` or `service port/udp`) rather than looking for the protocol token as a standalone word. The regression suite also rejects malformed service records before accepting the checkpoint.

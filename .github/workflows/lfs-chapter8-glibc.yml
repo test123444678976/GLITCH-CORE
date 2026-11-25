@@ -1,0 +1,85 @@
+name: GLITCH//CORE LFS Chapter 8.5 Glibc
+on:
+  push:
+    branches: [ feature/mate-desktop ]
+    paths: [ "docs/CHAPTER8-GLIBC-TRIGGER.md" ]
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: "Successful Chapter 8.4 run with the IANA checkpoint"
+        required: true
+        default: "45596825403"
+        type: string
+      jobs:
+        description: "Parallel jobs inside LFS chroot"
+        required: true
+        default: "2"
+        type: string
+permissions:
+  actions: read
+  contents: read
+concurrency:
+  group: glitchcore-lfs-chapter8-glibc
+  cancel-in-progress: false
+jobs:
+  build-glibc:
+    name: Restore Chapter 8.4 and build Glibc 2.44
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      LFS: ${{ github.workspace }}/work-lfs/lfs
+      JOBS: ${{ inputs.jobs || '2' }}
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/mate-desktop
+      - name: Download Chapter 8.4 checkpoint
+        uses: actions/download-artifact@v4
+        with:
+          name: glitch-core-lfs-chapter8-iana-etc-x86_64
+          path: work-lfs
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.source_run_id || '45596825403' }}
+      - name: Restore and verify Chapter 8.4
+        run: |
+          set -Eeuo pipefail
+          archive=work-lfs/glitch-core-lfs-chapter8-iana-etc-x86_64.tar.gz
+          test -s "$archive"
+          tar -tzf "$archive" >/dev/null
+          tar -xzf "$archive" -C work-lfs
+          test -f "$LFS/tools/.glitchcore-chapter7-temporary-tools-complete"
+          test -f "$LFS/tools/.glitchcore-ch8-man-pages-complete"
+          test -f "$LFS/tools/.glitchcore-ch8-iana-etc-complete"
+          grep -Fq "Status: IANA-etc 20260805 installed and verified" "$LFS/CHAPTER-8-BUILD-INFO.txt"
+          test -s "$LFS/sources/md5sums"
+      - name: Test and preflight Glibc
+        run: |
+          set -Eeuo pipefail
+          bash scripts/lfs/test-chapter8-glibc.sh
+          sudo bash scripts/lfs/build-chapter8-glibc.sh --check-only "$LFS"
+      - name: Build and test Glibc 2.44 inside LFS
+        run: sudo --preserve-env=JOBS bash scripts/lfs/build-chapter8-glibc.sh "$LFS"
+      - name: Verify Glibc installation
+        run: |
+          set -Eeuo pipefail
+          test -f "$LFS/tools/.glitchcore-ch8-glibc-complete"
+          test -s "$LFS/usr/lib/libc.so.6"
+          test -x "$LFS/usr/bin/ldconfig"
+          test -s "$LFS/sources/glibc-2.44-make-check.log"
+          grep -Fq "Status: Glibc 2.44 built, make check passed, installed and verified inside LFS chroot" "$LFS/CHAPTER-8-BUILD-INFO.txt"
+      - name: Package Chapter 8.5 checkpoint
+        run: |
+          set -Eeuo pipefail
+          archive="$GITHUB_WORKSPACE/work-lfs/glitch-core-lfs-chapter8-glibc-x86_64.tar.gz"
+          sudo bash scripts/lfs/package-chapter8-checkpoint.sh "$GITHUB_WORKSPACE/work-lfs" "$archive" "$(id -u)" "$(id -g)" ".glitchcore-ch8-glibc-complete"
+          test -s "$archive"
+          tar -tzf "$archive" | grep -Fxq "lfs/tools/.glitchcore-ch8-glibc-complete"
+      - name: Upload Chapter 8.5 checkpoint
+        uses: actions/upload-artifact@v4
+        with:
+          name: glitch-core-lfs-chapter8-glibc-x86_64
+          path: work-lfs/glitch-core-lfs-chapter8-glibc-x86_64.tar.gz
+          if-no-files-found: error
+          retention-days: 14

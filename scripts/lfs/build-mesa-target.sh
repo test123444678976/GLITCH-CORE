@@ -36,7 +36,7 @@ printf '%s  %s\n' "$checksum" "$SOURCES/$archive" | sha256sum --check --status |
 install -d -m 0755 "$TARGET/sources"
 install -m 0644 "$SOURCES/$archive" "$TARGET/sources/$archive"
 chroot "$TARGET" /usr/bin/env -i HOME=/root TERM="${TERM:-dumb}" PATH=/usr/bin:/bin \
-  MESA_VERSION="$version" MESA_ARCHIVE="$archive" MESA_JOBS="$BUILD_JOBS" \
+  MESA_VERSION="$version" MESA_ARCHIVE="$archive" MESA_JOBS="$BUILD_JOBS" MESA_SHA256="$checksum" \
   /bin/bash -euxc '
     cd /sources
     rm -rf "mesa-$MESA_VERSION" "mesa-build"
@@ -66,8 +66,5 @@ chroot "$TARGET" /usr/bin/env -i HOME=/root TERM="${TERM:-dumb}" PATH=/usr/bin:/
     touch /var/lib/glitch-core-mesa-installed
   '
 
-# Replace the checksum placeholder in the provenance file with the verified pin.
-chroot "$TARGET" /usr/bin/env -i PATH=/usr/bin:/bin MESA_SHA256="$checksum" \
-  /bin/bash -c 'sed -i "s/__MESA_SHA256__/$MESA_SHA256/" /usr/share/glitch-core/mesa-build-info'
 echo "Mesa $version built and installed inside the LFS target rootfs: $TARGET"
 echo "This does not yet prove Xorg starts or MATE can create a graphical session."

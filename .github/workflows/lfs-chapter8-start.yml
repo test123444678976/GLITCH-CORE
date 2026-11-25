@@ -77,7 +77,12 @@ jobs:
           archive="$GITHUB_WORKSPACE/work-lfs/glitch-core-lfs-chapter8-man-pages-x86_64.tar.gz"
           sudo bash scripts/lfs/package-chapter8-checkpoint.sh "$GITHUB_WORKSPACE/work-lfs" "$archive" "$(id -u)" "$(id -g)"
           tar -tzf "$archive" >/dev/null
-          tar -tzf "$archive" | grep -Fx "lfs/tools/.glitchcore-ch8-man-pages-complete" >/dev/null
+          listing="$(mktemp)"
+          trap 'rm -f "$listing"' EXIT
+          tar -tzf "$archive" > "$listing"
+          grep -Fxq "lfs/tools/.glitchcore-ch8-man-pages-complete" "$listing"
+          rm -f "$listing"
+          trap - EXIT
           test -s "$archive"
 
       - name: Upload Chapter 8.3 checkpoint

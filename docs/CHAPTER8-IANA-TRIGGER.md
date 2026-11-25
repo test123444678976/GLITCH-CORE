@@ -1,9 +1,9 @@
 # Chapter 8.4 IANA-etc trigger
 
-This marker starts the next restartable LFS Chapter 8 package after the successful Chapter 8.3 Man-pages checkpoint from workflow run 45365222640.
+This marker starts the next restartable LFS Chapter 8 package after the successful Chapter 8.3 Man-pages checkpoint from workflow run 45586451667.
 
 The workflow restores the Man-pages checkpoint, validates the official IANA-etc 20260805 source archive against the LFS checksum manifest, copies the official services and protocols data into the target /etc directory, verifies both installed files, and uploads a new Chapter 8.4 checkpoint.
 
-This is a separate trigger from the Chapter 8.3 workflow so it does not rebuild Man-pages from Chapter 7.
+The installer validates the current IANA protocol-number-zero entry as `hopopt 0 HOPOPT`. The upstream IANA generator derives this record from the protocol-numbers registry; it must not be incorrectly treated as the legacy `ip 0 IP` entry.
 
-Retry note (2026-11-25): the IANA-etc installer now validates the IP protocol number 0 entry case-insensitively, matching the canonical uppercase protocol name in the upstream data. The test fixture now covers `IP 0 IP`. Retry from the already verified Chapter 8.3 checkpoint run 45365222640.
+The checkpoint packager and workflow validate archive listings through temporary files rather than `tar | grep -q`, avoiding premature pipe closure under `pipefail`.

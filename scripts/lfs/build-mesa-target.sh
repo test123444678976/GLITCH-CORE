@@ -62,7 +62,7 @@ chroot "$TARGET" /usr/bin/env -i HOME=/root TERM="${TERM:-dumb}" PATH=/usr/bin:/
     test -e /usr/lib/dri/virtio_gpu_dri.so
     install -d -m 0755 /usr/share/glitch-core
     printf "package=mesa\\nversion=%s\\nsource_sha256=%s\\ninstall_mode=LFS-chroot\\n" \
-      "$MESA_VERSION" "__MESA_SHA256__" > /usr/share/glitch-core/mesa-build-info
+      "$MESA_VERSION" "$MESA_SHA256" > /usr/share/glitch-core/mesa-build-info
     touch /var/lib/glitch-core-mesa-installed
   '
 

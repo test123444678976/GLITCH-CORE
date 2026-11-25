@@ -18,6 +18,13 @@ being built.
 The logo, wallpaper and blue/purple/pink palette will be applied after the
 graphical session is integrated and boots reliably.
 
+## Graphics implementation status
+
+- A first Mesa target-rootfs builder is now present at `scripts/lfs/build-mesa-target.sh`. It verifies the pinned Mesa source and performs the configure, compile and install from inside the LFS rootfs, rather than treating host-side staging as a target installation.
+- Its initial x86_64 profile enables X11/Wayland, GLX/EGL/GBM, Gallium softpipe and virgl, while leaving LLVM and Vulkan disabled until their target dependencies are available. It requires Meson, Ninja, Python 3, pkg-config and libdrm development files already installed inside the LFS rootfs.
+- The builder has safety/preflight regression tests wired into the MATE validation workflow. This is implementation scaffolding only: it has not yet run against a completed LFS rootfs, and it does not mean Mesa is installed or tested.
+- MATE itself is still an inventory/configuration plan. The full MATE dependency set is not yet source-pinned and built inside the target rootfs. The next stages are target Xorg/Mesa validation, GTK dependencies, then MATE/Marco/Caja/LightDM builders and a real graphical boot test.
+
 ## Package management
 
 APT and dpkg are being built from source as native GLITCH//CORE components.

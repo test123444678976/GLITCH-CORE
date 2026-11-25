@@ -43,6 +43,8 @@ jobs:
           bash scripts/lfs/test-toolchain-chapter6.sh
           sudo bash scripts/lfs/test-chroot-rootfs.sh
           bash scripts/lfs/test-lfs-source-mirror-rewrite.sh
+          bash scripts/lfs/test-chapter8-xz.sh
+          bash scripts/lfs/test-chapter8-lz4.sh
 
       - name: Validate GLITCH application SDK
         run: |

@@ -83,3 +83,11 @@ jobs:
           path: work-lfs/glitch-core-lfs-chapter8-glibc-x86_64.tar.gz
           if-no-files-found: error
           retention-days: 14
+      - name: Upload Glibc test diagnostics
+        if: always() && failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: glitch-core-glibc-2.44-test-diagnostics
+          path: work-lfs/lfs/sources/glibc-2.44-make-check.log
+          if-no-files-found: warn
+          retention-days: 14

@@ -2,7 +2,7 @@ name: GLITCH//CORE LFS Chapter 8.5 Glibc
 on:
   push:
     branches: [ feature/mate-desktop ]
-    paths: [ "docs/CHAPTER8-GLIBC-TRIGGER.md" ]
+    paths: [ "docs/CHAPTER8-GLIBC-TRIGGER.md", "scripts/lfs/build-chapter8-glibc.sh", ".github/workflows/lfs-chapter8-glibc.yml" ]
   workflow_dispatch:
     inputs:
       source_run_id:
@@ -66,7 +66,7 @@ jobs:
           set -Eeuo pipefail
           test -f "$LFS/tools/.glitchcore-ch8-glibc-complete"
           test -s "$LFS/usr/lib/libc.so.6"
-          test -x "$LFS/usr/bin/ldconfig"
+          test -x "$LFS/sbin/ldconfig"
           test -s "$LFS/sources/glibc-2.44-make-check.log"
           grep -Fq "Status: Glibc 2.44 built, full make check completed (only LFS-documented io/tst-lchmod chroot exception permitted), installed and verified inside LFS chroot" "$LFS/CHAPTER-8-BUILD-INFO.txt"
       - name: Package Chapter 8.5 checkpoint

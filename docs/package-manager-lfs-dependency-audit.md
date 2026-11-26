@@ -112,3 +112,8 @@ The run explicitly skipped:
 - LFS Chapter 5 cross-toolchain build.
 
 The dpkg/APT job's steps confirm that it compiled and staged both packages, audited the staged executables/provenance, smoke-tested them on the CI build host and uploaded staging artifacts. This remains a host-side result, not a target-LFS installation or graphical ISO.
+
+
+### libmd source candidate identified
+
+The upstream libmd release archive lists libmd 1.3.0 as the latest release available on 26 November 2026. Its signed-release announcement publishes the source archive SHA-256 `fc0f1eb6b6766470326f2c014693809190e67dba84274a6fbae9d4912d066706` and provides both FreeDesktop and Hadrons download locations. This is a suitable candidate pin for GLITCH//CORE, subject to verifying the archive contents, build system, install layout and test commands before adding a target builder. The source pin and builder have not yet been added to the repository.

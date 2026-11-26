@@ -39,6 +39,8 @@ jobs:
           bash scripts/lfs/validate-chapter8-plan.sh
           sudo bash scripts/lfs/test-chapter8-iana-etc.sh
           bash scripts/lfs/test-chapter8-glibc.sh
+          bash scripts/lfs/test-chapter8-zlib.sh
+          bash scripts/lfs/test-chapter8-bzip2.sh
           bash scripts/lfs/test-package-manager-config.sh
           bash scripts/lfs/test-toolchain-pass1.sh
           bash scripts/lfs/test-toolchain-chapter5.sh

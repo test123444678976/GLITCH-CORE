@@ -116,9 +116,9 @@ cat > /etc/ld.so.conf <<'EOF'
 include /etc/ld.so.conf.d/*.conf
 EOF
 /usr/bin/getent passwd root >/dev/null
-/usr/bin/ldconfig
+/sbin/ldconfig
 test -s /usr/lib/libc.so.6
-test -x /usr/bin/ldconfig
+test -x /sbin/ldconfig
 test -x /usr/bin/localedef
 /usr/bin/ldd --version >/dev/null
 echo "GLITCH//CORE LFS Chapter 8.5 Glibc 2.44: PASSED"

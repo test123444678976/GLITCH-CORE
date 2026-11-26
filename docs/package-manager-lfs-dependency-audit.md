@@ -88,3 +88,27 @@ APT's upstream source also has integration tests. The build plan should distingu
 - APT upstream README and integration-test guidance: https://sources.debian.org/src/apt/3.0.4/README.md
 
 The dpkg configure reference currently available upstream is 1.23.12; any configure option taken from it must be checked against the exact pinned 1.23.11 archive before implementation.
+
+
+## Follow-up verification — 26 November 2026
+
+### Exact dpkg 1.23.11 libmd blocker
+
+A second inspection of the exact dpkg 1.23.11 source archive confirms that libmd is not merely an optional enhancement for this pinned build profile:
+
+- The exact 1.23.11 upstream `debian/control` lists `libmd-dev` as a build dependency.
+- The exact 1.23.11 `m4/dpkg-libs.m4` defines `DPKG_LIB_MD`: it checks for `md5.h`, searches for `MD5Init` in libmd, and terminates configuration with `md5 digest functions not found` if no provider is available.
+- The repository currently has no libmd source pin or Chapter 8 libmd builder. Therefore a native dpkg build cannot be responsibly implemented by simply reusing the existing host-side staging recipe.
+
+The next concrete dependency task is to add and validate an LFS-native MD5 provider. The preferred path is a pinned libmd source build inside the LFS chroot, with its source checksum, install manifest, smoke test and completion marker. The builder must be based on the exact selected libmd release and its own upstream build instructions.
+
+### Latest CI result for the audit commit
+
+GitHub Actions run 45845142305 (commit `a90529d604667d9adf9ed59e61d2dd7b36e3551e`) completed successfully. All executed validation, host preflight, xorgproto, xtrans, host-side dpkg/APT staging, libdrm and artifact collection jobs succeeded.
+
+The run explicitly skipped:
+- rescue ISO build;
+- LFS 13.1 source preparation;
+- LFS Chapter 5 cross-toolchain build.
+
+The dpkg/APT job's steps confirm that it compiled and staged both packages, audited the staged executables/provenance, smoke-tested them on the CI build host and uploaded staging artifacts. This remains a host-side result, not a target-LFS installation or graphical ISO.

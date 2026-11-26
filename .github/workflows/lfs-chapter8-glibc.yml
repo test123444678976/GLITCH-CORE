@@ -88,6 +88,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: glitch-core-glibc-2.44-test-diagnostics
-          path: work-lfs/lfs/sources/glibc-2.44-make-check.log
+          path: |
+            work-lfs/lfs/sources/glibc-2.44-make-check.log
+            work-lfs/lfs/sources/glibc-2.44-failed-tests.txt
+            work-lfs/lfs/sources/glibc-2.44-failed-tests.tar.gz
           if-no-files-found: warn
           retention-days: 14

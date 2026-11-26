@@ -13,3 +13,5 @@ Diagnostic rerun: preserve the complete make-check log as an artifact if the
 test suite fails, so all failing test details can be investigated.
 
 Failure diagnostics now also archive the individual `.out` and `.test-result` files for every test reported as `FAIL`, alongside the complete `make check` log. This allows the next investigation to identify the actual assertion or environment error for each failing test.
+
+The chroot setup now mounts devpts at `/dev/pts` (`gid=5,mode=0620`) before `make check`, so terminal and pseudo-terminal tests use the LFS chroot's own devpts instance. The mount is explicitly unmounted during cleanup.

@@ -54,7 +54,7 @@ jobs:
           for marker in .glitchcore-chapter7-temporary-tools-complete .glitchcore-ch8-man-pages-complete .glitchcore-ch8-iana-etc-complete .glitchcore-ch8-glibc-complete; do
             test -f "$LFS/tools/$marker"
           done
-          grep -Fq "Status: Glibc 2.44 built, make check passed, installed and verified inside LFS chroot" "$LFS/CHAPTER-8-BUILD-INFO.txt"
+          grep -Fq "Status: Glibc 2.44 built, full make check completed (only LFS-documented io/tst-lchmod chroot exception permitted), installed and verified inside LFS chroot" "$LFS/CHAPTER-8-BUILD-INFO.txt"
           test -s "$LFS/sources/md5sums"
       - name: Test and preflight Zlib
         run: |

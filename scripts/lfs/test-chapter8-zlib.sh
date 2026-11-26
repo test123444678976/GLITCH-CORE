@@ -13,6 +13,8 @@ mkdir -p "$T/src/zlib-1.3.2"; printf 'all:\n\t@true\n' > "$T/src/zlib-1.3.2/Make
 tar -czf "$L/sources/zlib-1.3.2.tar.gz" -C "$T/src" zlib-1.3.2
 (cd "$L/sources" && md5sum zlib-1.3.2.tar.gz > md5sums)
 bash "$BUILDER" --check-only "$L" >/dev/null || fail "Valid preflight rejected."
+JOBS=3 bash "$BUILDER" --check-only "$L" >/dev/null || fail "Explicit JOBS override rejected."
+if JOBS=0 bash "$BUILDER" --check-only "$L" >/dev/null 2>&1; then fail "Invalid JOBS value accepted."; fi
 [[ ! -e "$L/tools/.glitchcore-ch8-zlib-complete" ]] || fail "Check-only wrote marker."
 cp -a "$L" "$T/no-glibc"; rm "$T/no-glibc/tools/.glitchcore-ch8-glibc-complete"
 if bash "$BUILDER" --check-only "$T/no-glibc" >/dev/null 2>&1; then fail "Missing Glibc checkpoint accepted."; fi

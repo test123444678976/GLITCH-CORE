@@ -11,3 +11,5 @@ libc and loader tools are present, and the completion marker is written.
 
 Diagnostic rerun: preserve the complete make-check log as an artifact if the
 test suite fails, so all failing test details can be investigated.
+
+Failure diagnostics now also archive the individual `.out` and `.test-result` files for every test reported as `FAIL`, alongside the complete `make check` log. This allows the next investigation to identify the actual assertion or environment error for each failing test.

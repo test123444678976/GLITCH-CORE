@@ -24,8 +24,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
-      LFS: \${{ github.workspace }}/work-lfs/lfs
-      JOBS: \${{ inputs.jobs || '2' }}
+      LFS: ${{ github.workspace }}/work-lfs/lfs
+      JOBS: ${{ inputs.jobs || '2' }}
     steps:
       - name: Checkout feature branch
         uses: actions/checkout@v4
@@ -36,9 +36,9 @@ jobs:
         with:
           name: glitch-core-lfs-chapter8-glibc-x86_64
           path: work-lfs
-          github-token: \${{ github.token }}
-          repository: \${{ github.repository }}
-          run-id: \${{ inputs.source_run_id || '45616626689' }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.source_run_id || '45616626689' }}
       - name: Restore and verify Chapter 8.5
         run: |
           set -Eeuo pipefail

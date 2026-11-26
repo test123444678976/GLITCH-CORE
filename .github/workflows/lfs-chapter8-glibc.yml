@@ -68,7 +68,7 @@ jobs:
           test -s "$LFS/usr/lib/libc.so.6"
           test -x "$LFS/usr/bin/ldconfig"
           test -s "$LFS/sources/glibc-2.44-make-check.log"
-          grep -Fq "Status: Glibc 2.44 built, make check passed, installed and verified inside LFS chroot" "$LFS/CHAPTER-8-BUILD-INFO.txt"
+          grep -Fq "Status: Glibc 2.44 built, full make check completed (only LFS-documented io/tst-lchmod chroot exception permitted), installed and verified inside LFS chroot" "$LFS/CHAPTER-8-BUILD-INFO.txt"
       - name: Package Chapter 8.5 checkpoint
         run: |
           set -Eeuo pipefail

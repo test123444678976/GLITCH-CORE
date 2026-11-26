@@ -50,12 +50,17 @@ patch -Np1 -i ../glibc-2.44-upstream_fixes-1.patch
 mkdir -p build && cd build
 ../configure --prefix=/usr --disable-werror --disable-nscd libc_cv_slibdir=/usr/lib --enable-stack-protector=strong --enable-kernel=5.10
 make -j"$JOBS"
-# LFS treats this test suite as critical: no install/checkpoint on failure.
-if ! make check > /sources/glibc-2.44-make-check.log 2>&1; then
-  # Preserve each failed test's own output/result, not only make's summary.
-  failed_list=/sources/glibc-2.44-failed-tests.txt
-  failed_manifest=/tmp/glibc-2.44-failed-tests.manifest
-  awk '/^FAIL: / { print $2 }' /sources/glibc-2.44-make-check.log > "$failed_list"
+# Run the complete critical test suite. LFS 13.1 documents io/tst-lchmod
+# as a known failure in the chroot environment; accept only that exact,
+# diagnosed descriptor-path mismatch. Every other failure remains fatal.
+set +e
+make check > /sources/glibc-2.44-make-check.log 2>&1
+check_status=$?
+set -e
+failed_list=/sources/glibc-2.44-failed-tests.txt
+failed_manifest=/tmp/glibc-2.44-failed-tests.manifest
+awk '/^FAIL: / { print $2 }' /sources/glibc-2.44-make-check.log > "$failed_list"
+if (( check_status != 0 )); then
   : > "$failed_manifest"
   while IFS= read -r test_name; do
     [[ -n "$test_name" ]] || continue
@@ -68,10 +73,24 @@ if ! make check > /sources/glibc-2.44-make-check.log 2>&1; then
     tar -czf /sources/glibc-2.44-failed-tests.tar.gz -T "$failed_manifest" || true
   fi
   rm -f "$failed_manifest"
-  tail -n 160 /sources/glibc-2.44-make-check.log >&2 || true
-  echo "Glibc make check failed; installation stopped." >&2
-  exit 1
+  pass_count=$(awk '/^[[:space:]]*[0-9]+ PASS$/ { print $1 }' /sources/glibc-2.44-make-check.log | tail -n 1)
+  if [[ "$(wc -l < "$failed_list")" -eq 1 ]] &&
+     [[ "$(cat "$failed_list")" == "io/tst-lchmod" ]] &&
+     [[ "$pass_count" =~ ^[0-9]+$ ]] && (( pass_count >= 6000 )) &&
+     grep -Fq "Differences found in descriptor set" io/tst-lchmod.out; then
+    echo "NOTICE: accepting the single LFS-documented io/tst-lchmod chroot descriptor-path failure ($pass_count tests passed)." >&2
+  else
+    tail -n 160 /sources/glibc-2.44-make-check.log >&2 || true
+    echo "Glibc make check has an unexpected failure; installation stopped." >&2
+    exit 1
+  fi
+else
+  [[ ! -s "$failed_list" ]] || {
+    echo "Glibc make check returned success but reported failed tests; installation stopped." >&2
+    exit 1
+  }
 fi
+rm -f "$failed_list"
 touch /etc/ld.so.conf
 sed '/test-installation/s@$(PERL)@echo not running@' -i ../Makefile
 make install
@@ -114,7 +133,7 @@ trap - EXIT INT TERM
  echo "FHS patch SHA256: $(sha256sum "$LFS/sources/$FHS" | awk '{print $1}')"
  echo "Upstream fixes SHA256: $(sha256sum "$LFS/sources/$FIXES" | awk '{print $1}')"
  echo "Test log: /sources/glibc-2.44-make-check.log"
- echo "Status: Glibc 2.44 built, make check passed, installed and verified inside LFS chroot"
+ echo "Status: Glibc 2.44 built, full make check completed (only LFS-documented io/tst-lchmod chroot exception permitted), installed and verified inside LFS chroot"
 } >> "$LFS/CHAPTER-8-BUILD-INFO.txt"
 touch "$LFS/tools/$MARKER"
 echo "Chapter 8.5 Glibc 2.44: PASSED"

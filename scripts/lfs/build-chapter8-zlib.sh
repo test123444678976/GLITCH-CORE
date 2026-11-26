@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 CHECK_ONLY=0
-if [[ "\${1:-}" == --check-only ]]; then CHECK_ONLY=1; shift; fi
+if [[ "${1:-}" == --check-only ]]; then CHECK_ONLY=1; shift; fi
 [[ $# == 1 ]] || { echo "Usage: $0 [--check-only] /absolute/LFS" >&2; exit 2; }
-INPUT=$1 ROOT="$(cd "$(dirname "\${BASH_SOURCE[0]}")/../.." && pwd)"
-ARCHIVE=zlib-1.3.2.tar.gz MARKER=.glitchcore-ch8-zlib-complete JOBS="\${JOBS:-2}"
+INPUT=$1 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+ARCHIVE=zlib-1.3.2.tar.gz MARKER=.glitchcore-ch8-zlib-complete JOBS="${JOBS:-2}"
 fail(){ echo "ERROR: $*" >&2; exit 1; }
 [[ "$INPUT" == /* && -d "$INPUT" && ! -L "$INPUT" ]] || fail "Unsafe LFS root."
 LFS="$(realpath -e "$INPUT")"; [[ "$LFS" != / ]] || fail "Refusing host root."

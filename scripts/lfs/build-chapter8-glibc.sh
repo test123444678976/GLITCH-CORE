@@ -51,6 +51,22 @@ mkdir -p build && cd build
 make -j"$JOBS"
 # LFS treats this test suite as critical: no install/checkpoint on failure.
 if ! make check > /sources/glibc-2.44-make-check.log 2>&1; then
+  # Preserve each failed test's own output/result, not only make's summary.
+  failed_list=/sources/glibc-2.44-failed-tests.txt
+  failed_manifest=/tmp/glibc-2.44-failed-tests.manifest
+  awk '/^FAIL: / { print $2 }' /sources/glibc-2.44-make-check.log > "$failed_list"
+  : > "$failed_manifest"
+  while IFS= read -r test_name; do
+    [[ -n "$test_name" ]] || continue
+    for suffix in out test-result; do
+      test_file="$test_name.$suffix"
+      [[ ! -f "$test_file" ]] || printf '%s\n' "$test_file" >> "$failed_manifest"
+    done
+  done < "$failed_list"
+  if [[ -s "$failed_manifest" ]]; then
+    tar -czf /sources/glibc-2.44-failed-tests.tar.gz -T "$failed_manifest" || true
+  fi
+  rm -f "$failed_manifest"
   tail -n 160 /sources/glibc-2.44-make-check.log >&2 || true
   echo "Glibc make check failed; installation stopped." >&2
   exit 1

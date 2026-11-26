@@ -10,7 +10,7 @@ fail(){ echo "ERROR: $*" >&2; exit 1; }
 [[ "$INPUT" == /* && -d "$INPUT" && ! -L "$INPUT" ]] || fail "Unsafe LFS root."
 LFS="$(realpath -e "$INPUT")"; [[ "$LFS" != / ]] || fail "Refusing host root."
 [[ "$JOBS" =~ ^[1-9][0-9]*$ ]] || fail "JOBS must be positive."
-for p in sources tools etc usr/bin usr/share dev proc sys run; do
+for p in sources tools etc usr/bin usr/share dev dev/pts proc sys run; do
   [[ -d "$LFS/$p" && ! -L "$LFS/$p" ]] || fail "Missing/unsafe directory: $p"
 done
 for m in .glitchcore-chapter7-temporary-tools-complete .glitchcore-ch8-man-pages-complete .glitchcore-ch8-iana-etc-complete; do
@@ -28,12 +28,13 @@ if (( CHECK_ONLY )); then echo "Chapter 8.5 Glibc preflight: OK"; exit 0; fi
 [[ "$(uname -s)" == Linux && "$(uname -m)" == x86_64 && "$(id -u)" == 0 ]] || fail "Requires root on Linux x86_64."
 for c in mount umount mountpoint chroot realpath sha256sum; do command -v "$c" >/dev/null || fail "Missing host command: $c"; done
 [[ ! -e "$LFS/tools/$MARKER" ]] || { echo "Glibc already installed."; exit 0; }
-for p in dev proc sys run; do mountpoint -q "$LFS/$p" && fail "Already mounted: $LFS/$p"; done
-D=0 P=0 S=0 R=0
-cleanup(){ local e=0; if ((R)); then umount "$LFS/run" && R=0 || e=1; fi; if ((S)); then umount "$LFS/sys" && S=0 || e=1; fi; if ((P)); then umount "$LFS/proc" && P=0 || e=1; fi; if ((D)); then umount "$LFS/dev" && D=0 || e=1; fi; return "$e"; }
+for p in dev dev/pts proc sys run; do mountpoint -q "$LFS/$p" && fail "Already mounted: $LFS/$p"; done
+D=0 DPTS=0 P=0 S=0 R=0
+cleanup(){ local e=0; if ((R)); then umount "$LFS/run" && R=0 || e=1; fi; if ((S)); then umount "$LFS/sys" && S=0 || e=1; fi; if ((P)); then umount "$LFS/proc" && P=0 || e=1; fi; if ((DPTS)); then umount "$LFS/dev/pts" && DPTS=0 || e=1; fi; if ((D)); then umount "$LFS/dev" && D=0 || e=1; fi; return "$e"; }
 finish(){ local s=$?; trap - EXIT; set +e; cleanup || s=1; exit "$s"; }
 trap finish EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 mount --bind /dev "$LFS/dev"; D=1
+mount -t devpts devpts -o gid=5,mode=0620 "$LFS/dev/pts"; DPTS=1
 mount -t proc proc "$LFS/proc"; P=1
 mount -t sysfs sysfs "$LFS/sys"; S=1
 mount -t tmpfs tmpfs "$LFS/run"; R=1

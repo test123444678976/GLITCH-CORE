@@ -262,11 +262,11 @@ jobs:
       - name: Verify Chapter 5 checkpoint before continuing
         run: |
           set -Eeuo pipefail
-          test -s "$LFS/tools/.glitchcore-binutils-pass1-complete"
-          test -s "$LFS/tools/.glitchcore-gcc-pass1-complete"
-          test -s "$LFS/tools/.glitchcore-linux-headers-complete"
-          test -s "$LFS/tools/.glitchcore-glibc-complete"
-          test -s "$LFS/tools/.glitchcore-libstdcxx-complete"
+          test -f "$LFS/tools/.glitchcore-binutils-pass1-complete"
+          test -f "$LFS/tools/.glitchcore-gcc-pass1-complete"
+          test -f "$LFS/tools/.glitchcore-linux-headers-complete"
+          test -f "$LFS/tools/.glitchcore-glibc-complete"
+          test -f "$LFS/tools/.glitchcore-libstdcxx-complete"
           test -s "$LFS/usr/lib/libc.so.6"
           test -s "$LFS/usr/lib/libstdc++.so.6"
           test -s "$LFS/sources/md5sums"
@@ -280,7 +280,7 @@ jobs:
       - name: Verify Chapter 6 completion
         run: |
           set -Eeuo pipefail
-          test -s "$LFS/tools/.glitchcore-chapter6-complete"
+          test -f "$LFS/tools/.glitchcore-chapter6-complete"
           test -x "$LFS/usr/bin/bash"
           test -x "$LFS/usr/bin/make"
           test -x "$LFS/usr/bin/gcc"

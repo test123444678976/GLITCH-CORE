@@ -76,7 +76,7 @@ jobs:
           sudo bash scripts/lfs/package-chapter8-checkpoint.sh "$GITHUB_WORKSPACE/work-lfs" "$archive" "$(id -u)" "$(id -g)" ".glitchcore-ch8-glibc-complete"
           test -s "$archive"
           tar -tzf "$archive" > "$GITHUB_WORKSPACE/chapter8-checkpoint-files.txt"
-grep -Fxq "lfs/tools/.glitchcore-ch8-glibc-complete" "$GITHUB_WORKSPACE/chapter8-checkpoint-files.txt"
+          grep -Fxq "lfs/tools/.glitchcore-ch8-glibc-complete" "$GITHUB_WORKSPACE/chapter8-checkpoint-files.txt"
       - name: Upload Chapter 8.5 checkpoint
         uses: actions/upload-artifact@v4
         with:

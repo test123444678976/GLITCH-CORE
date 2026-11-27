@@ -230,6 +230,78 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  build-lfs-chapter6:
+    name: Build GLITCH//CORE LFS Chapter 6 temporary tools
+    if: github.event_name == 'workflow_dispatch'
+    needs: build-lfs-toolchain-pass1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      LFS: ${{ github.workspace }}/work-lfs/lfs
+      LFS_TGT: x86_64-lfs-linux-gnu
+      JOBS: "2"
+
+    steps:
+      - name: Checkout selected branch
+        uses: actions/checkout@v4
+
+      - name: Download verified Chapter 5 checkpoint
+        uses: actions/download-artifact@v4
+        with:
+          name: glitch-core-lfs-toolchain-chapter5
+          path: work-lfs
+
+      - name: Install LFS Chapter 6 host dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential bison gawk m4 texinfo perl python3 \
+            patch diffutils findutils grep sed file gzip xz-utils \
+            wget ca-certificates
+
+      - name: Verify Chapter 5 checkpoint before continuing
+        run: |
+          set -Eeuo pipefail
+          test -s "$LFS/tools/.glitchcore-binutils-pass1-complete"
+          test -s "$LFS/tools/.glitchcore-gcc-pass1-complete"
+          test -s "$LFS/tools/.glitchcore-linux-headers-complete"
+          test -s "$LFS/tools/.glitchcore-glibc-complete"
+          test -s "$LFS/tools/.glitchcore-libstdcxx-complete"
+          test -s "$LFS/usr/lib/libc.so.6"
+          test -s "$LFS/usr/lib/libstdc++.so.6"
+          test -s "$LFS/sources/md5sums"
+          echo "Chapter 5 checkpoint is present."
+
+      - name: Build LFS Chapter 6 temporary cross-tools
+        run: |
+          chmod +x scripts/lfs/build-toolchain-chapter6.sh
+          bash scripts/lfs/build-toolchain-chapter6.sh
+
+      - name: Verify Chapter 6 completion
+        run: |
+          set -Eeuo pipefail
+          test -s "$LFS/tools/.glitchcore-chapter6-complete"
+          test -x "$LFS/usr/bin/bash"
+          test -x "$LFS/usr/bin/make"
+          test -x "$LFS/usr/bin/gcc"
+          test -x "$LFS/usr/sbin/chroot"
+          "$LFS/usr/bin/gcc" -dumpmachine | grep -Fx "$LFS_TGT"
+          echo "LFS Chapter 6 temporary tools completed."
+
+      - name: Upload LFS Chapter 6 checkpoint
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: glitch-core-lfs-chapter6-temporary-tools
+          path: |
+            work-lfs/LFS-VERSION
+            work-lfs/lfs/sources/
+            work-lfs/lfs/tools/
+            work-lfs/lfs/usr/
+            work-lfs/lfs/lib64/
+          if-no-files-found: error
+          retention-days: 7
+
   desktop-build-host-preflight:
     name: Preflight host for Xorg, Mesa, GTK and MATE
     if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/feature/mate-desktop'

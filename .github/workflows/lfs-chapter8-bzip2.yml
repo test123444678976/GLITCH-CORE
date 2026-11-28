@@ -24,6 +24,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: feature/mate-desktop
+      - name: Validate source run ID
+        env:
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+        run: |
+          set -Eeuo pipefail
+          [[ "$SOURCE_RUN_ID" =~ ^[0-9]+$ ]] || { echo "source_run_id must be a numeric successful Zlib run ID." >&2; exit 2; }
       - name: Download Chapter 8.6 checkpoint
         uses: actions/download-artifact@v4
         with:

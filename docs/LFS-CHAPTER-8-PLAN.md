@@ -36,6 +36,23 @@ https://www.linuxfromscratch.org/lfs/view/stable-systemd/chapter08/chapter08.htm
 - dpkg and APT are GLITCH//CORE's intended native package-management layer; CI-host binaries must never be copied into the target as if they were target-native builds.
 - The official LFS book remains the build reference. No Debian/Ubuntu root filesystem or binary package base is introduced.
 
-## Next implementation task
+## Verified progress — 2026-11-28
 
-After the Chapter 7 artifact is confirmed, implement the Chapter 8 chroot builder in small, restartable package groups, beginning with the earliest dependencies. Add a dedicated workflow that consumes the Chapter 7 checkpoint and uploads a Chapter 8 tar checkpoint only after all package and rootfs gates pass.
+The first three Chapter 8 package stages are implemented as separate, restartable workflows:
+
+- Chapter 8.3: Man-pages 6.18
+- Chapter 8.4: IANA-etc 20260805
+- Chapter 8.5: Glibc 2.44
+
+The latest Glibc workflow run (#8) completed successfully on 2026-11-27. Its run ID is `46009716834`, and the run uploaded the artifact `glitch-core-lfs-chapter8-glibc-x86_64`. The artifact was checked on 2026-11-28 and was present and not expired. This is a verified Chapter 8 checkpoint, not a complete LFS system or bootable desktop ISO.
+
+## Next stage
+
+Chapter 8.6 is Zlib 1.3.2. The builder, preflight regression test, and manual workflow are present:
+
+- `scripts/lfs/build-chapter8-zlib.sh`
+- `scripts/lfs/test-chapter8-zlib.sh`
+- `.github/workflows/lfs-chapter8-zlib.yml`
+
+To continue, manually dispatch the Zlib workflow and supply the successful Glibc source run ID `46009716834`. The workflow must restore and verify the Chapter 8.5 artifact before it starts the Zlib build. Do not start Chapter 8.7 Bzip2 until the Zlib workflow uploads its verified checkpoint.
+

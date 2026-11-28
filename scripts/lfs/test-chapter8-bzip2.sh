@@ -2,7 +2,12 @@
 set -Eeuo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 BUILDER="$ROOT/scripts/lfs/build-chapter8-bzip2.sh"
+WORKFLOW="$ROOT/.github/workflows/lfs-chapter8-bzip2.yml"
 fail(){ echo "ERROR: $*" >&2; exit 1; }
+[[ -s "$WORKFLOW" ]] || fail "Bzip2 workflow is missing or empty."
+grep -Fq 'run-id: ${{ inputs.source_run_id }}' "$WORKFLOW" || fail "Bzip2 workflow does not use the supplied Zlib run ID."
+grep -Fq 'SOURCE_RUN_ID: ${{ inputs.source_run_id }}' "$WORKFLOW" || fail "Bzip2 workflow does not validate its source run ID."
+grep -Fq '[[ "$SOURCE_RUN_ID" =~ ^[0-9]+$ ]]' "$WORKFLOW" || fail "Bzip2 workflow accepts non-numeric source run IDs."
 bash -n "$BUILDER" || fail "Invalid builder syntax."
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
 L="$T/lfs"; mkdir -p "$L"/{sources,tools,etc,usr/bin,usr/lib,dev,proc,sys,run}

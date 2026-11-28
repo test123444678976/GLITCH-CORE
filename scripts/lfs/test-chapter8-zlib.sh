@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+fail(){ echo "ERROR: $*" >&2; exit 1; }
 WORKFLOW="$ROOT/.github/workflows/lfs-chapter8-zlib.yml"
+[[ -s "$WORKFLOW" ]] || fail "Zlib workflow is missing or empty."
 grep -Fq 'run-id: ${{ inputs.source_run_id }}' "$WORKFLOW" || fail "Zlib workflow does not use the supplied source run ID."
 if grep -Fq "45616626689" "$WORKFLOW"; then fail "Stale failed Glibc run ID remains in Zlib workflow."; fi
 BUILDER="$ROOT/scripts/lfs/build-chapter8-zlib.sh"
-fail(){ echo "ERROR: $*" >&2; exit 1; }
 bash -n "$BUILDER" || fail "Invalid builder syntax."
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
 L="$T/lfs"; mkdir -p "$L"/{sources,tools,etc,usr/bin,usr/lib,dev,proc,sys,run}
